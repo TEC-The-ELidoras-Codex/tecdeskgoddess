@@ -6,6 +6,7 @@ import sqlite3
 from PyPDF2 import PdfReader
 from bs4 import BeautifulSoup
 import urllib.request
+from flask import Flask, request, jsonify  # Add Flask imports
 
 # Simple memory system (can be replaced with a DB later)
 MEMORY_FILE = os.path.join(os.path.dirname(__file__), 'tec_memories.json')
@@ -138,3 +139,49 @@ def process_input(input_data: str, api_key: str, input_type: str = 'text', provi
         return output
     else:
         return "Input type not supported or missing parameters."
+
+
+app = Flask(__name__)
+
+@app.route('/api/agentic/process', methods=['POST'])
+def process_agentic_input():
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        return jsonify({"error": "GEMINI_API_KEY not set in environment variables"}), 500
+
+    input_type = request.form.get('input_type')
+    input_data = request.form.get('input_data')
+    url_data = request.form.get('url')
+    uploaded_file = request.files.get('file')
+    filepath = None
+
+    if input_type == 'text':
+        if not input_data:
+            return jsonify({"error": "No text input provided"}), 400
+        output = process_input(input_data, api_key, input_type='text')
+        return jsonify({"output": output})
+    elif input_type in ['pdf_file', 'txt_file']:
+        if not uploaded_file:
+            return jsonify({"error": "No file uploaded"}), 400
+        # Save uploaded file temporarily
+        temp_path = os.path.join(os.path.dirname(__file__), 'temp_upload_' + uploaded_file.filename)
+        uploaded_file.save(temp_path)
+        output = process_input('', api_key, input_type=input_type, filepath=temp_path)
+        os.remove(temp_path)
+        return jsonify({"output": output})
+    elif input_type == 'url':
+        if not url_data:
+            return jsonify({"error": "No URL provided"}), 400
+        output = process_input('', api_key, input_type='url', url=url_data)
+        return jsonify({"output": output})
+    else:
+        return jsonify({"error": "Invalid input_type"}), 400
+
+@app.route('/api/agentic/memories', methods=['GET'])
+def get_agentic_memories():
+    memories = load_memories_sqlite()
+    return jsonify({"memories": memories})
+
+if __name__ == '__main__':
+    init_db()
+    app.run(host='0.0.0.0', port=5000, debug=True)
