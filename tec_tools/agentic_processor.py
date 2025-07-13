@@ -6,7 +6,8 @@ import sqlite3
 from PyPDF2 import PdfReader
 from bs4 import BeautifulSoup
 import urllib.request
-from flask import Flask, request, jsonify  # Add Flask imports
+from flask import Flask, request, jsonify
+from openai import OpenAI  # Add OpenAI for GitHub AI integration
 
 # Simple memory system (can be replaced with a DB later)
 MEMORY_FILE = os.path.join(os.path.dirname(__file__), 'tec_memories.json')
@@ -103,12 +104,57 @@ def scrape_url(url: str) -> str:
 
 # Modular LLM API wrapper
 
+def call_github_ai(text: str, model: str = 'gpt-4o-mini') -> str:
+    """
+    Call GitHub AI Models API
+    """
+    try:
+        token = os.environ.get("GITHUB_TOKEN")
+        if not token:
+            return "Error: GITHUB_TOKEN not set in environment variables"
+            
+        client = OpenAI(
+            base_url="https://models.github.ai/inference",
+            api_key=token,
+        )
+        
+        response = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a helpful AI assistant for TEC Life & Finance. Provide thoughtful, detailed responses for journaling analysis, finance insights, and general assistance."
+                },
+                {
+                    "role": "user",
+                    "content": text
+                }
+            ],
+            temperature=0.7,
+            model=model
+        )
+        
+        return response.choices[0].message.content
+        
+    except Exception as e:
+        return f"GitHub AI Error: {str(e)}"
+
+
 def call_llm(text: str, api_key: str, provider: str = 'gemini', model: str = 'gemini-2.0-flash') -> str:
-    if provider == 'gemini':
-        return process_text(text, api_key, model)
+    """
+    Enhanced LLM caller with GitHub AI fallback
+    """
+    if provider == 'github':
+        return call_github_ai(text, model)
+    elif provider == 'gemini':
+        result = process_text(text, api_key, model)
+        # If Gemini fails, fallback to GitHub AI
+        if result and result.startswith("Error:"):
+            print("Gemini failed, falling back to GitHub AI...")
+            return call_github_ai(text)
+        return result
     elif provider == 'openai':
-        # Placeholder for OpenAI call
-        return 'OpenAI API not implemented yet.'
+        # Placeholder for direct OpenAI call
+        return 'Direct OpenAI API not implemented yet.'
     elif provider == 'local':
         # Placeholder for local LLM call
         return 'Local LLM not implemented yet.'
@@ -145,35 +191,56 @@ app = Flask(__name__)
 
 @app.route('/api/agentic/process', methods=['POST'])
 def process_agentic_input():
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        return jsonify({"error": "GEMINI_API_KEY not set in environment variables"}), 500
+    """
+    Enhanced processing with provider selection and fallback
+    """
+    # Check for API keys
+    gemini_key = os.environ.get("GEMINI_API_KEY")
+    github_token = os.environ.get("GITHUB_TOKEN")
+    
+    # Get provider preference
+    provider = request.form.get('provider', 'auto')  # auto, gemini, github
+    
+    # Auto-select provider based on available keys
+    if provider == 'auto':
+        if gemini_key:
+            provider = 'gemini'
+        elif github_token:
+            provider = 'github'
+        else:
+            return jsonify({"error": "No AI provider keys available"}), 500
+    
+    # Validate selected provider
+    if provider == 'gemini' and not gemini_key:
+        return jsonify({"error": "GEMINI_API_KEY not set"}), 500
+    elif provider == 'github' and not github_token:
+        return jsonify({"error": "GITHUB_TOKEN not set"}), 500
 
     input_type = request.form.get('input_type')
     input_data = request.form.get('input_data')
     url_data = request.form.get('url')
     uploaded_file = request.files.get('file')
-    filepath = None
+    model = request.form.get('model', 'gemini-2.0-flash' if provider == 'gemini' else 'gpt-4o-mini')
 
     if input_type == 'text':
         if not input_data:
             return jsonify({"error": "No text input provided"}), 400
-        output = process_input(input_data, api_key, input_type='text')
-        return jsonify({"output": output})
+        output = process_input(input_data, gemini_key or '', input_type='text', provider=provider, model=model)
+        return jsonify({"output": output, "provider_used": provider})
     elif input_type in ['pdf_file', 'txt_file']:
         if not uploaded_file:
             return jsonify({"error": "No file uploaded"}), 400
         # Save uploaded file temporarily
         temp_path = os.path.join(os.path.dirname(__file__), 'temp_upload_' + uploaded_file.filename)
         uploaded_file.save(temp_path)
-        output = process_input('', api_key, input_type=input_type, filepath=temp_path)
+        output = process_input('', gemini_key or '', input_type=input_type, provider=provider, model=model, filepath=temp_path)
         os.remove(temp_path)
-        return jsonify({"output": output})
+        return jsonify({"output": output, "provider_used": provider})
     elif input_type == 'url':
         if not url_data:
             return jsonify({"error": "No URL provided"}), 400
-        output = process_input('', api_key, input_type='url', url=url_data)
-        return jsonify({"output": output})
+        output = process_input('', gemini_key or '', input_type='url', provider=provider, model=model, url=url_data)
+        return jsonify({"output": output, "provider_used": provider})
     else:
         return jsonify({"error": "Invalid input_type"}), 400
 
@@ -181,6 +248,42 @@ def process_agentic_input():
 def get_agentic_memories():
     memories = load_memories_sqlite()
     return jsonify({"memories": memories})
+
+@app.route('/api/agentic/test-github', methods=['POST'])
+def test_github_ai():
+    """
+    Test endpoint for GitHub AI integration
+    """
+    github_token = os.environ.get("GITHUB_TOKEN")
+    if not github_token:
+        return jsonify({"error": "GITHUB_TOKEN not set"}), 500
+    
+    test_message = request.json.get('message', 'Hello! Are you working with the TEC Life & Finance project?')
+    
+    try:
+        response = call_github_ai(test_message)
+        return jsonify({
+            "success": True,
+            "message": test_message,
+            "response": response,
+            "provider": "github-ai"
+        })
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+@app.route('/api/agentic/providers', methods=['GET'])
+def get_available_providers():
+    """
+    Check which AI providers are available
+    """
+    providers = {
+        "gemini": bool(os.environ.get("GEMINI_API_KEY")),
+        "github": bool(os.environ.get("GITHUB_TOKEN")),
+    }
+    return jsonify({"providers": providers})
 
 if __name__ == '__main__':
     init_db()

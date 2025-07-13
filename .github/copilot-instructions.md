@@ -1,7 +1,10 @@
 # Copilot Instructions for TEC Life & Finance Codebase
 
 ## Overview
-This document provides guidance for AI coding agents working on the TEC Life & Finance project. The goal is to ensure productive contributions by outlining the project's architecture, workflows, conventions, and integration points.
+This document provides guidance for 3. **Enhance AI capabilities**
+   - Implement fallback logic between Gemini and GitHub AI in `tec_tools/agentic_processor.py`
+   - Add model switching based on availability and task requirements
+   - See `FLASKREADME.md` for GitHub AI integration detailscoding agents working on the TEC Life & Finance project. The goal is to ensure productive contributions by outlining the project's architecture, workflows, conventions, and integration points.
 
 ---
 
@@ -36,9 +39,10 @@ This document provides guidance for AI coding agents working on the TEC Life & F
 ## Developer Workflows
 
 ### Build and Run
-- **Frontend**: React app setup is not yet included but will follow standard React workflows.
 - **Backend**:
   - Install dependencies: `pip install -r requirements.txt`
+  - Additional: `pip install openai` (for GitHub AI integration)
+  - Set environment variables for AI services (GITHUB_TOKEN, etc.)
   - Run backend services: `python -m tec_tools.api`
 
 ### Testing
@@ -65,17 +69,24 @@ This document provides guidance for AI coding agents working on the TEC Life & F
 
 ## Integration Points
 
-1. **Gemini API**
-   - Used for AI chatbot and generative tools.
-   - API calls are handled in `tec_tools/agentic_processor.py`.
+1. **AI Services**
+   - **Primary**: Gemini API for chatbot and generative tools
+   - **Secondary**: GitHub AI Models (see `FLASKREADME.md`) as backup/alternative
+   - API calls are handled in `tec_tools/agentic_processor.py`
+   - Implement fallback logic between providers
 
 2. **Firebase**
-   - Firestore for database, Auth for user authentication.
-   - Configuration is expected in `firebaseConfig` (not yet implemented).
+   - Firestore for database, Auth for user authentication
+   - Configuration is expected in `firebaseConfig` (not yet implemented)
 
-3. **Future Integrations**
-   - Eleven Labs API for Text-to-Speech.
-   - Smartwatch data integration in `hardware/`.
+3. **GitHub AI Models**
+   - Alternative AI provider using OpenAI SDK compatibility
+   - Requires GitHub PAT with `models:read` permissions
+   - Environment variable: `GITHUB_TOKEN`
+
+4. **Future Integrations**
+   - Eleven Labs API for Text-to-Speech
+   - Smartwatch data integration in `hardware/`
 
 ---
 
