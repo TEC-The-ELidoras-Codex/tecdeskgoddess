@@ -1,36 +1,77 @@
 from flask import Flask, request, jsonify
-from agentic_processor import process_input, load_memories_sqlite
+from flask_cors import CORS
+from .agentic_processor import process_input, load_memories_sqlite
 import os
+import logging
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for web interface
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Set your API key here or use environment variable
 API_KEY = os.environ.get("GEMINI_API_KEY", "YOUR_DEFAULT_API_KEY")
 
 @app.route("/api/agentic/process", methods=["POST"])
 def process():
-    input_type = request.form.get("input_type", "text")
-    input_data = request.form.get("input_data", "")
-    url = request.form.get("url")
-    file = request.files.get("file")
-    filepath = None
+    try:
+        # Handle both form data and JSON
+        if request.is_json:
+            data = request.get_json()
+            input_data = data.get("message", "")
+            user_id = data.get("user_id", "anonymous")
+            session_id = data.get("session_id", "default")
+            preferred_provider = data.get("preferred_provider", "auto")
+            input_type = "text"
+            url = None
+            file = None
+        else:
+            input_type = request.form.get("input_type", "text")
+            input_data = request.form.get("input_data", "")
+            url = request.form.get("url")
+            file = request.files.get("file")
+            user_id = request.form.get("user_id", "anonymous")
+            session_id = request.form.get("session_id", "default")
+            preferred_provider = request.form.get("preferred_provider", "auto")
 
-    # Handle file upload
-    if file:
-        filepath = f"/tmp/{file.filename}"
-        file.save(filepath)
+        filepath = None
 
-    output = process_input(
-        input_data=input_data,
-        api_key=API_KEY,
-        input_type=input_type,
-        filepath=filepath,
-        url=url
-    )
-    # Clean up temp file
-    if filepath and os.path.exists(filepath):
-        os.remove(filepath)
-    return jsonify({"output": output})
+        # Handle file upload
+        if file:
+            filepath = f"/tmp/{file.filename}"
+            file.save(filepath)
+
+        logger.info(f"Processing request from user {user_id}, session {session_id}, provider: {preferred_provider}")
+        
+        output = process_input(
+            input_data=input_data,
+            api_key=API_KEY,
+            input_type=input_type,
+            filepath=filepath,
+            url=url,
+            provider=preferred_provider
+        )
+        
+        # Clean up temp file
+        if filepath and os.path.exists(filepath):
+            os.remove(filepath)
+            
+        return jsonify({
+            "output": output,
+            "status": "success",
+            "user_id": user_id,
+            "session_id": session_id,
+            "provider": preferred_provider
+        })
+        
+    except Exception as e:
+        logger.error(f"Error processing request: {str(e)}")
+        return jsonify({
+            "error": str(e),
+            "status": "error"
+        }), 500
 
 @app.route("/api/agentic/memories", methods=["GET"])
 def memories():
