@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from .agentic_processor import process_input, load_memories_sqlite
+from .enhanced_ai import enhanced_process_input
 import os
 import logging
 
@@ -45,26 +46,39 @@ def process():
 
         logger.info(f"Processing request from user {user_id}, session {session_id}, provider: {preferred_provider}")
         
-        output = process_input(
-            input_data=input_data,
-            api_key=API_KEY,
-            input_type=input_type,
-            filepath=filepath,
-            url=url,
-            provider=preferred_provider
-        )
-        
-        # Clean up temp file
-        if filepath and os.path.exists(filepath):
-            os.remove(filepath)
+        # Use enhanced AI for better responses
+        if input_type == "text" and not file and not url:
+            # Use enhanced AI for text-only requests
+            result = enhanced_process_input(
+                message=input_data,
+                user_id=user_id,
+                session_id=session_id,
+                provider=preferred_provider
+            )
             
-        return jsonify({
-            "output": output,
-            "status": "success",
-            "user_id": user_id,
-            "session_id": session_id,
-            "provider": preferred_provider
-        })
+            return jsonify(result)
+        else:
+            # Use original processor for file/URL handling
+            output = process_input(
+                input_data=input_data,
+                api_key=API_KEY,
+                input_type=input_type,
+                filepath=filepath,
+                url=url,
+                provider=preferred_provider
+            )
+            
+            # Clean up temp file
+            if filepath and os.path.exists(filepath):
+                os.remove(filepath)
+                
+            return jsonify({
+                "output": output,
+                "status": "success",
+                "user_id": user_id,
+                "session_id": session_id,
+                "provider": preferred_provider
+            })
         
     except Exception as e:
         logger.error(f"Error processing request: {str(e)}")
