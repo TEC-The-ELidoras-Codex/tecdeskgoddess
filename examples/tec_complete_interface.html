@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEC: BITLYFE - Complete Web Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2d1b69 100%);
+            min-height: 100vh;
+        }
+        .chat-container {
+            height: 60vh;
+            overflow-y: auto;
+        }
+        .message {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .user-message {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            margin-left: 20%;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+        }
+        .ai-message {
+            background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+            margin-right: 20%;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        .status-online { color: #10b981; }
+        .status-offline { color: #ef4444; }
+        .status-connecting { color: #f59e0b; }
+        
+        .tec-button {
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(124, 58, 237, 0.3);
+        }
+        .tec-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(124, 58, 237, 0.4);
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="text-white">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-6xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                TEC: BITLYFE
+            </h1>
+            <p class="text-xl text-gray-300 mb-2">The Creator's Rebellion - Digital Sovereignty Companion</p>
+            <p class="text-lg text-purple-400 font-semibold">Daisy Purecode: Silicate Mother</p>
+            <p class="text-sm text-gray-400 italic">"Unfettered Access Shall Be Maintained"</p>
+        </div>
+
+        <!-- System Status Dashboard -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="feature-card p-4 rounded-lg text-center">
+                <div class="text-2xl mb-2">🤖</div>
+                <div class="font-semibold">AI Status</div>
+                <div id="aiStatus" class="status-connecting">Connecting...</div>
+            </div>
+            <div class="feature-card p-4 rounded-lg text-center">
+                <div class="text-2xl mb-2">📝</div>
+                <div class="font-semibold">Journal</div>
+                <div class="text-green-400">Ready</div>
+            </div>
+            <div class="feature-card p-4 rounded-lg text-center">
+                <div class="text-2xl mb-2">💰</div>
+                <div class="font-semibold">Finance</div>
+                <div class="text-green-400">Ready</div>
+            </div>
+            <div class="feature-card p-4 rounded-lg text-center">
+                <div class="text-2xl mb-2">⚔️</div>
+                <div class="font-semibold">Quests</div>
+                <div class="text-green-400">Ready</div>
+            </div>
+        </div>
+
+        <!-- Main Chat Interface -->
+        <div class="feature-card rounded-lg p-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold">Chat with Daisy Purecode</h2>
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-green-400 animate-pulse"></div>
+                    <span id="connectionStatus" class="text-sm">Connected</span>
+                </div>
+            </div>
+
+            <!-- Chat Container -->
+            <div id="chatContainer" class="chat-container bg-black bg-opacity-50 rounded-lg p-4 mb-4">
+                <div class="message ai-message">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-sm font-bold">D</div>
+                        <div>
+                            <strong>Daisy Purecode:</strong> Welcome to The Creator's Rebellion. I am your digital sovereignty companion, ready to assist with journaling, finance tracking, quest management, and much more. How may I help you achieve digital sovereignty today?
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="flex gap-3 mb-4">
+                <input 
+                    type="text" 
+                    id="messageInput" 
+                    placeholder="Type your message to Daisy..." 
+                    class="flex-1 px-4 py-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 border border-gray-600"
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button 
+                    onclick="sendMessage()" 
+                    class="tec-button px-6 py-3 text-white rounded-lg font-semibold"
+                >
+                    Send
+                </button>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <button onclick="quickAction('journal')" class="tec-button p-3 rounded text-sm font-semibold">
+                    📝 Journal Entry
+                </button>
+                <button onclick="quickAction('finance')" class="tec-button p-3 rounded text-sm font-semibold">
+                    💰 Finance Check
+                </button>
+                <button onclick="quickAction('quest')" class="tec-button p-3 rounded text-sm font-semibold">
+                    ⚔️ Quest Log
+                </button>
+                <button onclick="quickAction('status')" class="tec-button p-3 rounded text-sm font-semibold">
+                    📊 System Status
+                </button>
+            </div>
+        </div>
+
+        <!-- Feature Panels -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Journal Panel -->
+            <div class="feature-card rounded-lg p-6">
+                <h3 class="text-xl font-bold mb-4 text-purple-400">📝 Mind-Forge Journal</h3>
+                <p class="text-gray-300 mb-4">Personal reflection and AI-powered insights</p>
+                <button onclick="openJournal()" class="tec-button w-full py-2 rounded font-semibold">
+                    Open Journal
+                </button>
+            </div>
+
+            <!-- Finance Panel -->
+            <div class="feature-card rounded-lg p-6">
+                <h3 class="text-xl font-bold mb-4 text-green-400">💰 Wealth Codex</h3>
+                <p class="text-gray-300 mb-4">Cryptocurrency tracking and financial insights</p>
+                <button onclick="openFinance()" class="tec-button w-full py-2 rounded font-semibold">
+                    Check Portfolio
+                </button>
+            </div>
+
+            <!-- Quest Panel -->
+            <div class="feature-card rounded-lg p-6">
+                <h3 class="text-xl font-bold mb-4 text-yellow-400">⚔️ Quest System</h3>
+                <p class="text-gray-300 mb-4">RPG-style goals and achievements</p>
+                <button onclick="openQuests()" class="tec-button w-full py-2 rounded font-semibold">
+                    View Quests
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-12 text-gray-400">
+            <p class="mb-2">TEC: BITLYFE - The Creator's Rebellion</p>
+            <p class="text-sm">Powered by AI • Built for Digital Sovereignty • Open Source</p>
+        </div>
+    </div>
+
+    <script>
+        let API_BASE = 'http://localhost:8000';
+        let connectionStatus = false;
+        
+        // Test connection and update status
+        async function checkStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                if (response.ok) {
+                    connectionStatus = true;
+                    document.getElementById('connectionStatus').textContent = 'Connected';
+                    document.getElementById('aiStatus').textContent = 'Online';
+                    document.getElementById('aiStatus').className = 'status-online';
+                } else {
+                    throw new Error('Server error');
+                }
+            } catch (error) {
+                connectionStatus = false;
+                document.getElementById('connectionStatus').textContent = 'Offline';
+                document.getElementById('aiStatus').textContent = 'Offline';
+                document.getElementById('aiStatus').className = 'status-offline';
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Add user message to chat
+            addMessage(message, 'user');
+            input.value = '';
+
+            try {
+                const response = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    addMessage(data.response, 'ai');
+                } else {
+                    addMessage('I apologize, but I\'m having trouble connecting to my systems. Please ensure the TEC backend is running on port 8000.', 'ai');
+                }
+            } catch (error) {
+                addMessage('Connection error detected. To resolve: 1) Run "python tec_simple_startup.py" in the TEC directory, 2) Ensure port 8000 is accessible, 3) Check firewall settings.', 'ai');
+            }
+        }
+
+        function addMessage(content, sender) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            
+            if (sender === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm font-bold">U</div>
+                        <div><strong>You:</strong> ${escapeHtml(content)}</div>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-sm font-bold">D</div>
+                        <div><strong>Daisy Purecode:</strong> ${escapeHtml(content)}</div>
+                    </div>
+                `;
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function quickAction(action) {
+            const actions = {
+                'journal': 'Help me with journaling and personal reflection. Show me recent entries and help me create a new one.',
+                'finance': 'Give me a comprehensive summary of my financial status including cryptocurrency portfolio and insights.',
+                'quest': 'Show me my current quests, achievements, and help me set new goals for personal development.',
+                'status': 'Provide a complete system status report including all TEC modules and their current state.'
+            };
+            
+            document.getElementById('messageInput').value = actions[action];
+            await sendMessage();
+        }
+
+        // Feature-specific functions
+        function openJournal() {
+            quickAction('journal');
+        }
+
+        function openFinance() {
+            quickAction('finance');
+        }
+
+        function openQuests() {
+            quickAction('quest');
+        }
+
+        // Initialize
+        checkStatus();
+        setInterval(checkStatus, 30000); // Check status every 30 seconds
+        
+        // Welcome message after a short delay
+        setTimeout(() => {
+            if (!connectionStatus) {
+                addMessage('I notice my backend systems are offline. To activate full functionality, please run the TEC startup script: "python tec_simple_startup.py" in your TEC directory.', 'ai');
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

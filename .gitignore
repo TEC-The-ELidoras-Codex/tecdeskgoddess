@@ -1,9 +1,6 @@
 # TEC: BITLYFE IS THE NEW SHIT - Git Ignore Rules
 # The Creator's Rebellion - Keep the repository clean
 
-# Environment variables (CRITICAL - contains API keys!)
-.env
-
 # Python Virtual Environments
 venv/
 env/
