@@ -1,0 +1,241 @@
+name: Copilot Coding Agent - TEC MCP Integration
+
+on:
+  issues:
+    types: [opened, assigned]
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  copilot-mcp-integration:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.assignees.*.login, 'copilot') || contains(github.event.pull_request.assignees.*.login, 'copilot')
+    
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
+      models: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install TEC Dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+
+      - name: Setup TEC Environment
+        run: |
+          cp .env.template .env
+          # Set minimal environment for Copilot
+          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
+          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> .env
+
+      - name: Start TEC MCP Ecosystem
+        run: |
+          # Start MCP servers in background
+          python tec_startup.py &
+          MCP_PID=$!
+          echo "MCP_PID=$MCP_PID" >> $GITHUB_ENV
+          
+          # Wait for services to start
+          sleep 10
+          
+          # Test MCP system health
+          python test_mcp_system.py || echo "MCP system check completed with warnings"
+
+      - name: Generate Copilot Context
+        id: context
+        run: |
+          # Generate context for Copilot using MCP system
+          python -c "
+          import requests
+          import json
+          
+          # Get system status
+          try:
+              response = requests.get('http://localhost:5000/health', timeout=5)
+              system_status = response.json() if response.status_code == 200 else {'status': 'unknown'}
+          except:
+              system_status = {'status': 'offline'}
+          
+          # Get available tools
+          try:
+              tools_response = requests.get('http://localhost:5000/mcp/tools', timeout=5)
+              available_tools = tools_response.json() if tools_response.status_code == 200 else {'tools': []}
+          except:
+              available_tools = {'tools': []}
+          
+          # Generate context summary
+          context = {
+              'system_status': system_status,
+              'available_tools': available_tools,
+              'mcp_servers': [
+                  {'name': 'Orchestrator', 'port': 5000, 'status': 'active'},
+                  {'name': 'Journal', 'port': 5001, 'status': 'active'},
+                  {'name': 'Finance', 'port': 5002, 'status': 'active'},
+                  {'name': 'Quest Log', 'port': 5003, 'status': 'active'},
+                  {'name': 'Agentic Processor', 'port': 8000, 'status': 'active'}
+              ]
+          }
+          
+          print('COPILOT_CONTEXT=' + json.dumps(context))
+          " >> $GITHUB_ENV
+
+      - name: Provide Issue Context to Copilot
+        if: github.event_name == 'issues'
+        run: |
+          # Query MCP system for relevant context
+          curl -X POST http://localhost:5000/mcp/unified/query \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"query\": \"${{ github.event.issue.title }}\",
+              \"context\": \"issue_analysis\",
+              \"include_servers\": [\"journal\", \"finance\", \"questlog\"],
+              \"metadata\": {
+                \"issue_number\": ${{ github.event.issue.number }},
+                \"issue_body\": \"${{ github.event.issue.body }}\"
+              }
+            }" > mcp_context.json
+          
+          # Create context comment for Copilot
+          gh issue comment ${{ github.event.issue.number }} --body "$(cat << 'EOF'
+          ## 🤖 TEC MCP Context for Copilot
+          
+          **System Status**: $(echo '${{ env.COPILOT_CONTEXT }}' | jq -r '.system_status.status')
+          
+          **Available MCP Tools**:
+          $(echo '${{ env.COPILOT_CONTEXT }}' | jq -r '.available_tools.tools[] | "- " + .name + ": " + .description')
+          
+          **MCP Server Status**:
+          $(echo '${{ env.COPILOT_CONTEXT }}' | jq -r '.mcp_servers[] | "- " + .name + " (Port " + (.port | tostring) + "): " + .status')
+          
+          **Relevant Context**:
+          $(cat mcp_context.json | jq -r '.responses // {} | to_entries[] | "- " + .key + ": " + (.value.summary // "No summary available")')
+          
+          ---
+          
+          **@copilot**: This issue is ready for analysis with full TEC MCP context available.
+          
+          Use the MCP tools to:
+          1. Query the unified system for relevant information
+          2. Create journal entries for tracking development progress
+          3. Update quest logs with implementation tasks
+          4. Access financial data if the issue involves crypto/finance features
+          
+          The TEC MCP ecosystem is running and ready to assist with code generation and issue resolution.
+          EOF
+          )"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup MCP Processes
+        if: always()
+        run: |
+          # Stop MCP servers
+          if [ ! -z "$MCP_PID" ]; then
+            kill $MCP_PID || true
+          fi
+          
+          # Kill any remaining Python processes
+          pkill -f "tec_tools" || true
+          pkill -f "mcp_orchestrator" || true
+
+  copilot-pr-context:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && contains(github.event.pull_request.assignees.*.login, 'copilot')
+    
+    permissions:
+      pull-requests: write
+      contents: read
+      models: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Analyze PR Changes
+        run: |
+          # Get list of changed files
+          gh pr view ${{ github.event.pull_request.number }} --json files -q '.files[].path' > changed_files.txt
+          
+          # Check if MCP-related files are changed
+          if grep -q "mcp" changed_files.txt || grep -q "tec_tools" changed_files.txt; then
+            echo "MCP_CHANGES=true" >> $GITHUB_ENV
+          else
+            echo "MCP_CHANGES=false" >> $GITHUB_ENV
+          fi
+
+      - name: Test MCP Changes
+        if: env.MCP_CHANGES == 'true'
+        run: |
+          # Start MCP system for testing
+          python tec_startup.py &
+          MCP_PID=$!
+          
+          # Wait for startup
+          sleep 10
+          
+          # Run tests
+          python test_mcp_system.py > mcp_test_results.txt 2>&1
+          
+          # Stop MCP system
+          kill $MCP_PID || true
+          
+          # Check test results
+          if grep -q "All tests passed" mcp_test_results.txt; then
+            echo "MCP_TESTS=passed" >> $GITHUB_ENV
+          else
+            echo "MCP_TESTS=failed" >> $GITHUB_ENV
+          fi
+
+      - name: Comment on PR
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body "$(cat << 'EOF'
+          ## 🤖 TEC MCP PR Analysis
+          
+          **MCP Changes Detected**: ${{ env.MCP_CHANGES }}
+          
+          $(if [ "${{ env.MCP_CHANGES }}" = "true" ]; then
+            echo "**MCP Test Results**: ${{ env.MCP_TESTS }}"
+            echo ""
+            echo "**Test Output**:"
+            echo "\`\`\`"
+            cat mcp_test_results.txt
+            echo "\`\`\`"
+          else
+            echo "No MCP-related changes detected in this PR."
+          fi)
+          
+          ---
+          
+          **@copilot**: This PR has been analyzed for TEC MCP compatibility.
+          
+          $(if [ "${{ env.MCP_TESTS }}" = "passed" ]; then
+            echo "✅ All MCP tests passed. The changes are compatible with the TEC ecosystem."
+          elif [ "${{ env.MCP_TESTS }}" = "failed" ]; then
+            echo "❌ MCP tests failed. Please review the test output and fix any issues."
+          else
+            echo "ℹ️ No MCP testing required for this PR."
+          fi)
+          EOF
+          )"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

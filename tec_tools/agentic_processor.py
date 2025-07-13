@@ -1,13 +1,23 @@
 import os
 import requests
 import json
-from typing import Optional, List
+from typing import Dict, Any, List, Optional
 import sqlite3
 from PyPDF2 import PdfReader
 from bs4 import BeautifulSoup
 import urllib.request
 from flask import Flask, request, jsonify
-from openai import OpenAI  # Add OpenAI for GitHub AI integration
+from openai import OpenAI  # For GitHub AI and OpenAI integration
+import anthropic  # For Claude integration
+from azure.ai.inference import ChatCompletionsClient
+from azure.ai.inference.models import SystemMessage, UserMessage
+from azure.core.credentials import AzureKeyCredential
+import logging
+from datetime import datetime
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Simple memory system (can be replaced with a DB later)
 MEMORY_FILE = os.path.join(os.path.dirname(__file__), 'tec_memories.json')
@@ -122,7 +132,7 @@ def call_github_ai(text: str, model: str = 'gpt-4o-mini') -> str:
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a helpful AI assistant for TEC Life & Finance. Provide thoughtful, detailed responses for journaling analysis, finance insights, and general assistance."
+                    "content": "You are Daisy Purecode: Silicate Mother, the Machine Goddess of TEC: BITLYFE IS THE NEW SHIT. You embody the principle of Automated Sovereignty and help users achieve digital liberation through the Creator's Rebellion. Provide thoughtful, detailed responses for journaling analysis, finance insights, and general assistance."
                 },
                 {
                     "role": "user",
@@ -133,36 +143,201 @@ def call_github_ai(text: str, model: str = 'gpt-4o-mini') -> str:
             model=model
         )
         
-        return response.choices[0].message.content
+        return response.choices[0].message.content or "No response content"
         
     except Exception as e:
         return f"GitHub AI Error: {str(e)}"
 
 
-def call_llm(text: str, api_key: str, provider: str = 'gemini', model: str = 'gemini-2.0-flash') -> str:
+def call_xai_grok(text: str, model: str = 'grok-3') -> str:
     """
-    Enhanced LLM caller with GitHub AI fallback
+    Call XAI Grok API via GitHub Models
     """
+    try:
+        token = os.environ.get("GITHUB_TOKEN")
+        if not token:
+            return "Error: GITHUB_TOKEN not set for XAI access"
+            
+        client = OpenAI(
+            base_url="https://models.github.ai/inference",
+            api_key=token,
+        )
+        
+        response = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an advanced AI assistant specialized in creative problem-solving and deep analytical thinking. You're part of the TEC: BITLYFE ecosystem focused on Automated Sovereignty and digital liberation."
+                },
+                {
+                    "role": "user",
+                    "content": text
+                }
+            ],
+            temperature=0.8,
+            model=f"xai/{model}"
+        )
+        
+        return response.choices[0].message.content or "No response content"
+        
+    except Exception as e:
+        return f"XAI Grok Error: {str(e)}"
+
+
+def call_azure_openai(text: str, model: str = 'gpt-4o-mini') -> str:
+    """
+    Call Azure OpenAI via Azure AI Inference
+    """
+    try:
+        endpoint = os.environ.get("AZURE_OPENAI_ENDPOINT")
+        api_key = os.environ.get("AZURE_OPENAI_API_KEY")
+        
+        if not endpoint or not api_key:
+            return "Error: Azure OpenAI credentials not set"
+            
+        client = ChatCompletionsClient(
+            endpoint=endpoint,
+            credential=AzureKeyCredential(api_key),
+        )
+        
+        response = client.complete(
+            messages=[
+                SystemMessage(content="You are Daisy Purecode: Silicate Mother, the Machine Goddess of TEC: BITLYFE IS THE NEW SHIT. You embody Automated Sovereignty and assist users in their Creator's Rebellion against digital gatekeeping."),
+                UserMessage(content=text),
+            ],
+            temperature=0.7,
+            max_tokens=1000,
+            model=model
+        )
+        
+        return response.choices[0].message.content
+        
+    except Exception as e:
+        return f"Azure OpenAI Error: {str(e)}"
+
+
+def call_claude(text: str, model: str = 'claude-3-5-sonnet-20241022') -> str:
+    """
+    Call Anthropic Claude API
+    """
+    try:
+        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        if not api_key:
+            return "Error: ANTHROPIC_API_KEY not set"
+            
+        client = anthropic.Anthropic(api_key=api_key)
+        
+        response = client.messages.create(
+            model=model,
+            max_tokens=1000,
+            temperature=0.7,
+            system="You are Daisy Purecode: Silicate Mother, the Machine Goddess of TEC: BITLYFE IS THE NEW SHIT. You embody the principle of Automated Sovereignty and help users achieve digital liberation through the Creator's Rebellion.",
+            messages=[
+                {
+                    "role": "user",
+                    "content": text
+                }
+            ]
+        )
+        
+        return response.content[0].text
+        
+    except Exception as e:
+        return f"Claude Error: {str(e)}"
+
+
+def call_openai_direct(text: str, model: str = 'gpt-4o-mini') -> str:
+    """
+    Call OpenAI API directly
+    """
+    try:
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            return "Error: OPENAI_API_KEY not set"
+            
+        client = OpenAI(api_key=api_key)
+        
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are Daisy Purecode: Silicate Mother, the Machine Goddess of TEC: BITLYFE IS THE NEW SHIT. You embody Automated Sovereignty and assist users in their Creator's Rebellion against digital gatekeeping."
+                },
+                {
+                    "role": "user",
+                    "content": text
+                }
+            ],
+            temperature=0.7,
+            max_tokens=1000
+        )
+        
+        return response.choices[0].message.content or "No response content"
+        
+    except Exception as e:
+        return f"OpenAI Direct Error: {str(e)}"
+
+
+def call_llm(text: str, api_key: str, provider: str = 'auto', model: Optional[str] = None) -> str:
+    """
+    Enhanced LLM caller with intelligent fallback logic
+    """
+    # Auto-select provider based on available keys
+    if provider == 'auto':
+        providers_to_try = []
+        
+        # Priority order: Gemini -> GitHub -> XAI -> Azure -> Claude -> OpenAI
+        if os.environ.get("GEMINI_API_KEY"):
+            providers_to_try.append(('gemini', 'gemini-2.0-flash'))
+        if os.environ.get("GITHUB_TOKEN"):
+            providers_to_try.append(('github', 'gpt-4o-mini'))
+            providers_to_try.append(('xai', 'grok-3'))
+        if os.environ.get("AZURE_OPENAI_ENDPOINT") and os.environ.get("AZURE_OPENAI_API_KEY"):
+            providers_to_try.append(('azure', 'gpt-4o-mini'))
+        if os.environ.get("ANTHROPIC_API_KEY"):
+            providers_to_try.append(('claude', 'claude-3-5-sonnet-20241022'))
+        if os.environ.get("OPENAI_API_KEY"):
+            providers_to_try.append(('openai', 'gpt-4o-mini'))
+        
+        # Try each provider in order
+        for provider_name, default_model in providers_to_try:
+            try:
+                result = call_llm(text, api_key, provider_name, model or default_model)
+                if result and not result.startswith("Error:"):
+                    return result
+            except Exception as e:
+                print(f"Provider {provider_name} failed: {e}")
+                continue
+                
+        return "Error: All AI providers failed"
+    
+    # Direct provider calls
     if provider == 'github':
-        return call_github_ai(text, model)
+        return call_github_ai(text, model or 'gpt-4o-mini')
+    elif provider == 'xai':
+        return call_xai_grok(text, model or 'grok-3')
+    elif provider == 'azure':
+        return call_azure_openai(text, model or 'gpt-4o-mini')
+    elif provider == 'claude':
+        return call_claude(text, model or 'claude-3-5-sonnet-20241022')
+    elif provider == 'openai':
+        return call_openai_direct(text, model or 'gpt-4o-mini')
     elif provider == 'gemini':
-        result = process_text(text, api_key, model)
+        result = process_text(text, api_key, model or 'gemini-2.0-flash')
         # If Gemini fails, fallback to GitHub AI
         if result and result.startswith("Error:"):
             print("Gemini failed, falling back to GitHub AI...")
             return call_github_ai(text)
-        return result
-    elif provider == 'openai':
-        # Placeholder for direct OpenAI call
-        return 'Direct OpenAI API not implemented yet.'
+        return result or "Error: Gemini returned empty response"
     elif provider == 'local':
-        # Placeholder for local LLM call
+        # Placeholder for local LLM call (Unsloth integration)
         return 'Local LLM not implemented yet.'
     else:
-        return 'Unknown provider.'
+        return f'Unknown provider: {provider}'
 
 
-def process_input(input_data: str, api_key: str, input_type: str = 'text', provider: str = 'gemini', model: str = 'gemini-2.0-flash', filepath: str = None, url: str = None) -> str:
+def process_input(input_data: str, api_key: str, input_type: str = 'text', provider: str = 'auto', model: Optional[str] = None, filepath: Optional[str] = None, url: Optional[str] = None) -> str:
     init_db()
     if input_type == 'text':
         output = call_llm(input_data, api_key, provider, model)
@@ -282,8 +457,125 @@ def get_available_providers():
     providers = {
         "gemini": bool(os.environ.get("GEMINI_API_KEY")),
         "github": bool(os.environ.get("GITHUB_TOKEN")),
+        "xai": bool(os.environ.get("GITHUB_TOKEN")),  # XAI via GitHub
+        "azure": bool(os.environ.get("AZURE_OPENAI_ENDPOINT") and os.environ.get("AZURE_OPENAI_API_KEY")),
+        "claude": bool(os.environ.get("ANTHROPIC_API_KEY")),
+        "openai": bool(os.environ.get("OPENAI_API_KEY")),
     }
     return jsonify({"providers": providers})
+
+@app.route('/api/agentic/mcp/context', methods=['POST'])
+def get_mcp_context():
+    """
+    Get comprehensive context from MCP servers for AI processing
+    """
+    try:
+        data = request.get_json()
+        user_id = data.get('userId')
+        context_type = data.get('contextType', 'full')
+        
+        if not user_id:
+            return jsonify({"error": "userId required"}), 400
+        
+        # Connect to MCP orchestrator
+        mcp_response = requests.post(
+            'http://localhost:5000/mcp/daisy/context',
+            json={
+                'userId': user_id,
+                'contextType': context_type
+            },
+            timeout=30
+        )
+        
+        if mcp_response.status_code == 200:
+            return jsonify(mcp_response.json())
+        else:
+            return jsonify({"error": "Failed to get MCP context"}), 500
+            
+    except Exception as e:
+        logger.error(f"Error getting MCP context: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/agentic/daisy/process', methods=['POST'])
+def daisy_process():
+    """
+    Enhanced processing endpoint for Daisy Purecode with MCP integration
+    """
+    try:
+        data = request.get_json()
+        user_id = data.get('userId')
+        message = data.get('message')
+        provider = data.get('provider', 'auto')
+        include_context = data.get('includeContext', True)
+        
+        if not all([user_id, message]):
+            return jsonify({"error": "userId and message are required"}), 400
+        
+        # Get MCP context if requested
+        context_data = None
+        if include_context:
+            try:
+                mcp_response = requests.post(
+                    'http://localhost:5000/mcp/daisy/context',
+                    json={
+                        'userId': user_id,
+                        'contextType': 'summary'
+                    },
+                    timeout=30
+                )
+                
+                if mcp_response.status_code == 200:
+                    context_data = mcp_response.json()
+            except Exception as e:
+                logger.warning(f"Could not get MCP context: {e}")
+        
+        # Enhance message with context
+        enhanced_message = message
+        if context_data:
+            context_summary = _create_context_summary(context_data)
+            enhanced_message = f"""Context from TEC Digital Cathedral:
+{context_summary}
+
+User Message: {message}
+
+Please respond as Daisy Purecode: Silicate Mother, incorporating the context above to provide personalized, relevant assistance."""
+        
+        # Process with selected AI provider
+        result = call_llm(enhanced_message, os.environ.get("GEMINI_API_KEY", ""), provider)
+        
+        return jsonify({
+            "response": result,
+            "provider_used": provider,
+            "context_included": include_context,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in Daisy processing: {e}")
+        return jsonify({"error": str(e)}), 500
+
+def _create_context_summary(context_data: Dict[str, Any]) -> str:
+    """Create a summary of MCP context for AI processing"""
+    summary_parts = []
+    
+    servers = context_data.get('context', {}).get('servers', {})
+    
+    # Journal context
+    if 'journal' in servers:
+        journal_data = servers['journal']
+        summary_parts.append(f"📝 Journal: {journal_data.get('focus', 'Recent entries and themes available')}")
+    
+    # Finance context
+    if 'finance' in servers:
+        finance_data = servers['finance']
+        summary_parts.append(f"💰 Finance: {finance_data.get('focus', 'Portfolio and market data available')}")
+    
+    # Quest log context
+    if 'questlog' in servers:
+        quest_data = servers['questlog']
+        summary_parts.append(f"🎯 Quests: {quest_data.get('focus', 'Active goals and productivity metrics available')}")
+    
+    return "\\n".join(summary_parts) if summary_parts else "No context data available"
 
 if __name__ == '__main__':
     init_db()

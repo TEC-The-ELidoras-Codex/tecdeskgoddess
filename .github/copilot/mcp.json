@@ -1,0 +1,32 @@
+{
+  "mcpServers": {
+    "tec-orchestrator": {
+      "command": "python",
+      "args": ["-m", "tec_tools.mcp_orchestrator"],
+      "env": {
+        "PYTHONPATH": "."
+      }
+    },
+    "tec-journal": {
+      "command": "python", 
+      "args": ["-m", "tec_tools.mcp_journal"],
+      "env": {
+        "PYTHONPATH": "."
+      }
+    },
+    "tec-finance": {
+      "command": "python",
+      "args": ["-m", "tec_tools.mcp_finance"], 
+      "env": {
+        "PYTHONPATH": "."
+      }
+    },
+    "tec-questlog": {
+      "command": "python",
+      "args": ["-m", "tec_tools.mcp_questlog"],
+      "env": {
+        "PYTHONPATH": "."
+      }
+    }
+  }
+}
