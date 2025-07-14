@@ -1,6 +1,26 @@
 # TEC: BITLYFE Command Reference
 
-This guide provides the exact commands needed to start, manage, and stop the TEC system.
+This guide provides the exact commands needed to configure, start, manage, and stop the TEC system.
+
+## 🔑 API Configuration (FIRST TIME SETUP)
+
+### 1. Configure Your API Keys (Required)
+```powershell
+python scripts/configure_apis.py
+```
+**What it does:** Interactive wizard to set up your API keys securely.
+
+### 2. Test API Configuration
+```powershell
+python scripts/test_api_keys.py
+```
+**What it does:** Validates all configured API keys are working properly.
+
+### 3. View Configuration Guide
+```powershell
+# Open the comprehensive API guide
+code docs/API_CONFIGURATION_GUIDE.md
+```
 
 ## 🚀 Quick Start Commands
 
