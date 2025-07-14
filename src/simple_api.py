@@ -75,17 +75,30 @@ def generate_response(message):
 @app.route('/')
 def serve_chat():
     """Serve the chat interface"""
-    return send_from_directory('..', 'tec_chat.html')
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    logger.info(f"Serving tec_chat.html from: {parent_dir}")
+    return send_from_directory(parent_dir, 'tec_chat.html')
 
 @app.route('/tec_complete_interface.html')
 def serve_complete_interface():
     """Serve the complete interface"""
-    return send_from_directory('..', 'tec_complete_interface.html')
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    logger.info(f"Serving tec_complete_interface.html from: {parent_dir}")
+    return send_from_directory(parent_dir, 'tec_complete_interface.html')
+
+@app.route('/tec_chat.html')
+def serve_chat_direct():
+    """Serve the chat interface directly"""
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    logger.info(f"Serving tec_chat.html from: {parent_dir}")
+    return send_from_directory(parent_dir, 'tec_chat.html')
 
 @app.route('/<path:filename>')
 def serve_static(filename):
     """Serve static files from parent directory"""
-    return send_from_directory('..', filename)
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    logger.info(f"Serving {filename} from: {parent_dir}")
+    return send_from_directory(parent_dir, filename)
 
 if __name__ == '__main__':
     logger.info("Starting TEC Simple API Server...")
