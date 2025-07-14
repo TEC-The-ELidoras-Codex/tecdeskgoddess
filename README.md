@@ -46,16 +46,16 @@ copy config\.env.template .env
 ### 2. Configuration - NEW AZURE CREDENTIALS
 Update your `.env` file with the latest Azure credentials:
 ```dotenv
-# Azure AI Services (UPDATED CONFIGURATION)
-AZURE_API_KEY_1=xzUJjswM8kVu4Kn8GGxpB6QvH6d2iWB7QTr3g4L5nJUxymiAdn6gJQQJ99BGACYeBjFXJ3w3AAAAACOGZ1Lw
-AZURE_API_KEY_2=7qPemeVKavK3MDUOOSwKajtbD4RJ0aBr770mjHn9RkFEpDaq9ZFkJQQJ99BGACYeBjFXJ3w3AAAAACOG4EZ6
+# Azure AI Services Configuration (Update with your credentials)
+AZURE_API_KEY_1=your_primary_azure_key_here
+AZURE_API_KEY_2=your_secondary_azure_key_here
 
-# Azure Service Endpoints
-AZURE_COGNITIVE_SERVICES_ENDPOINT=https://tec-bitlyfe-tsc-resource.cognitiveservices.azure.com/
+# Azure Service Endpoints (Update with your endpoints)
+AZURE_COGNITIVE_SERVICES_ENDPOINT=your_cognitive_services_endpoint
 AZURE_TRANSLATOR_ENDPOINT=https://api.cognitive.microsofttranslator.com/
-AZURE_SPEECH_ENDPOINT=https://eastus.tts.speech.microsoft.com
-AZURE_OPENAI_ENDPOINT=https://tec-bitlyfe-tsc-resource.openai.azure.com/
-AZURE_AI_SEARCH_ENDPOINT=https://tec-bitlyfe-tsc-resource.services.ai.azure.com/
+AZURE_SPEECH_ENDPOINT=your_speech_endpoint
+AZURE_OPENAI_ENDPOINT=your_openai_endpoint
+AZURE_AI_SEARCH_ENDPOINT=your_search_endpoint
 ```
 
 ### 3. Start the System
