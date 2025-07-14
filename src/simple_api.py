@@ -75,7 +75,17 @@ def generate_response(message):
 @app.route('/')
 def serve_chat():
     """Serve the chat interface"""
-    return send_from_directory('.', 'tec_chat.html')
+    return send_from_directory('..', 'tec_chat.html')
+
+@app.route('/tec_complete_interface.html')
+def serve_complete_interface():
+    """Serve the complete interface"""
+    return send_from_directory('..', 'tec_complete_interface.html')
+
+@app.route('/<path:filename>')
+def serve_static(filename):
+    """Serve static files from parent directory"""
+    return send_from_directory('..', filename)
 
 if __name__ == '__main__':
     logger.info("Starting TEC Simple API Server...")
