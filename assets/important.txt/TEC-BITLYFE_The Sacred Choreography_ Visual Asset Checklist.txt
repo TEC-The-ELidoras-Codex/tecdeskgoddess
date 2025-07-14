@@ -1,0 +1,659 @@
+﻿🎨 TEC-BITLYFE_The Sacred Choreography: Visual Asset Checklist (V2) 🎨
+Vibe: Cyberpunk Mysticism | Digital Cathedral | Astradigital Ocean | Glitch | Neon | Organic-Tech Fusion
+Color Palette: #8B5CF6 (Purple), #3B82F6 (Blue), #14B8A6 (Teal), #111827 (Deep Gray/Near Black), #F9FAFB (Off-White)
+Font: Inter (Primary)
+General Elements: Rounded Corners, Subtle Glassmorphism, Neon Outlines, Gradients, Glowing Accents, Circuit Patterns.
+I. Core UI Elements (Foundation)
+| Category | Asset Name | Description/Purpose | Size/Format (Target) | Prompting Keywords (for AI) does this help? i need a tower defense game.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>TEC Tower Defense: The Data Stream Rebellion</title>
+   <script src="https://cdn.tailwindcss.com"></script>
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+   <style>
+       body {
+           font-family: 'Inter', sans-serif;
+           background-color: #030712; /* Deep Gray/Near Black */
+           color: #F9FAFB; /* Off-White */
+           overflow: hidden; /* Prevent scrolling */
+       }
+       canvas {
+           background-color: #111827; /* Dark background for game area */
+           display: block;
+           border-radius: 1rem; /* Rounded corners */
+           box-shadow: 0 0 30px rgba(139, 92, 246, 0.5); /* Purple glow */
+           margin: 20px auto; /* Center the canvas */
+           max-width: 90vw; /* Fluid width */
+           max-height: 80vh; /* Fluid height */
+       }
+       .game-container {
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           justify-content: center;
+           min-height: 100vh;
+           padding: 20px;
+       }
+       .ui-panel {
+           background-color: rgba(31, 41, 55, 0.8); /* Darker transparent gray */
+           backdrop-filter: blur(10px);
+           -webkit-backdrop-filter: blur(10px);
+           border: 1px solid rgba(75, 85, 99, 0.5);
+           border-radius: 1rem;
+           box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); /* Blue glow */
+           padding: 1.5rem;
+           margin-top: 20px;
+           width: 100%;
+           max-width: 90vw;
+       }
+       .btn-primary {
+           background-image: linear-gradient(to right, #8B5CF6, #3B82F6); /* Purple-Blue gradient */
+           color: white;
+           padding: 0.75rem 1.5rem;
+           border-radius: 0.75rem;
+           font-weight: 600;
+           transition: all 0.3s ease;
+           box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+           border: none;
+           cursor: pointer;
+       }
+       .btn-primary:hover {
+           transform: translateY(-2px);
+           box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+       }
+       .btn-primary:disabled {
+           opacity: 0.5;
+           cursor: not-allowed;
+           transform: translateY(0);
+           box-shadow: none;
+       }
+       .btn-secondary {
+           background-color: #374151; /* Gray-700 */
+           color: #F9FAFB;
+           padding: 0.75rem 1.5rem;
+           border-radius: 0.75rem;
+           font-weight: 600;
+           transition: all 0.3s ease;
+           border: 1px solid #4B5563; /* Gray-600 */
+           cursor: pointer;
+       }
+       .btn-secondary:hover {
+           background-color: #4B5563; /* Gray-600 */
+           transform: translateY(-2px);
+           box-shadow: 0 4px 10px rgba(75, 85, 99, 0.3);
+       }
+       .btn-secondary:disabled {
+           opacity: 0.5;
+           cursor: not-allowed;
+           transform: translateY(0);
+           box-shadow: none;
+       }
+       .message-box {
+           position: fixed;
+           top: 20px;
+           left: 50%;
+           transform: translateX(-50%);
+           padding: 10px 20px;
+           border-radius: 0.75rem;
+           font-weight: 600;
+           z-index: 1000;
+           box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+           animation: fadeOut 3s forwards;
+       }
+       .message-box.success { background-color: #14B8A6; color: white; } /* Teal */
+       .message-box.error { background-color: #EF4444; color: white; } /* Red-500 */
+       .message-box.info { background-color: #3B82F6; color: white; } /* Blue-500 */
+
+       @keyframes fadeOut {
+           0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+           80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+           100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+       }
+
+       /* Custom Scrollbar for chat/lists */
+       .custom-scrollbar::-webkit-scrollbar {
+           width: 8px;
+       }
+       .custom-scrollbar::-webkit-scrollbar-track {
+           background: #1F2937; /* Gray-800 */
+           border-radius: 10px;
+       }
+       .custom-scrollbar::-webkit-scrollbar-thumb {
+           background: #4B5563; /* Gray-600 */
+           border-radius: 10px;
+       }
+       .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+           background: #6B7280; /* Gray-500 */
+       }
+   </style>
+</head>
+<body>
+   <div class="game-container">
+       <h1 class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 mb-6 text-center">
+           TEC Tower Defense: The Data Stream Rebellion
+       </h1>
+       <canvas id="gameCanvas"></canvas>
+
+       <div class="ui-panel mt-6 flex flex-col md:flex-row gap-4 justify-between items-center">
+           <div class="flex flex-col items-center md:items-start">
+               <div class="text-2xl font-bold text-gray-200">Base Health: <span id="baseHealth" class="text-red-400">100</span></div>
+               <div class="text-2xl font-bold text-gray-200">Credits: <span id="credits" class="text-yellow-400">200</span></div>
+               <div class="text-xl font-semibold text-gray-300">Wave: <span id="waveNumber">0</span></div>
+           </div>
+
+           <div class="flex flex-wrap justify-center gap-3">
+               <!-- Tower Buttons -->
+               <button id="tower1Btn" class="btn-primary flex items-center gap-2">
+                   <span class="text-xl">🛡️</span> Data Node (50)
+               </button>
+               <button id="tower2Btn" class="btn-primary flex items-center gap-2">
+                   <span class="text-xl">⚡</span> Firewall (100)
+               </button>
+               <button id="tower3Btn" class="btn-primary flex items-center gap-2">
+                   <span class="text-xl">Slow</span> Glitch Field (75)
+               </button>
+               <button id="tower4Btn" class="btn-primary flex items-center gap-2">
+                   <span class="text-xl">💥</span> Quantum Cannon (150)
+               </button>
+           </div>
+
+           <div class="flex justify-center md:justify-end">
+               <button id="startWaveBtn" class="btn-primary flex items-center gap-2">
+                   Start Wave <span class="text-xl">▶️</span>
+               </button>
+           </div>
+       </div>
+   </div>
+
+   <div id="messageBox" class="message-box hidden"></div>
+
+   <script>
+       const canvas = document.getElementById('gameCanvas');
+       const ctx = canvas.getContext('2d');
+
+       // Game State Variables
+       let gameRunning = false;
+       let baseHealth = 100;
+       let credits = 200;
+       let waveNumber = 0;
+       let towers = [];
+       let enemies = [];
+       let projectiles = [];
+       let path = []; // Array of {x, y} waypoints
+       let towerPlacementMode = null; // Stores the type of tower to place
+
+       // UI Elements
+       const baseHealthSpan = document.getElementById('baseHealth');
+       const creditsSpan = document.getElementById('credits');
+       const waveNumberSpan = document.getElementById('waveNumber');
+       const tower1Btn = document.getElementById('tower1Btn');
+       const tower2Btn = document.getElementById('tower2Btn');
+       const tower3Btn = document.getElementById('tower3Btn');
+       const tower4Btn = document.getElementById('tower4Btn');
+       const startWaveBtn = document.getElementById('startWaveBtn');
+       const messageBox = document.getElementById('messageBox');
+
+       // Game Configuration
+       const TOWER_TYPES = {
+           DATA_NODE: {
+               name: 'Data Node', cost: 50, range: 100, damage: 5, fireRate: 60, color: '#8B5CF6',
+               icon: '🛡️', description: 'Basic defense, shoots rapidly.'
+           },
+           FIREWALL: {
+               name: 'Firewall', cost: 100, range: 120, damage: 15, fireRate: 90, color: '#3B82F6',
+               icon: '⚡', description: 'Stronger defense, moderate fire rate.'
+           },
+           GLITCH_FIELD: {
+               name: 'Glitch Field', cost: 75, range: 80, damage: 0, fireRate: 150, color: '#14B8A6',
+               icon: 'Slow', description: 'Slows enemies within its range.'
+           },
+           QUANTUM_CANNON: {
+               name: 'Quantum Cannon', cost: 150, range: 150, damage: 40, fireRate: 180, color: '#F9FAFB',
+               icon: '💥', description: 'Heavy damage, slow fire rate.'
+           }
+       };
+
+       const ENEMY_TYPES = {
+           CORRUPTED_PACKET: {
+               name: 'Corrupted Packet', health: 50, speed: 1, reward: 5, color: '#EF4444'
+           },
+           MALWARE_BLOB: {
+               name: 'Malware Blob', health: 150, speed: 0.7, reward: 15, color: '#DC2626'
+           },
+           ROOTKIT_VIRUS: {
+               name: 'Rootkit Virus', health: 80, speed: 1.5, reward: 10, color: '#B91C1C'
+           }
+       };
+
+       // --- Utility Functions ---
+       function showMessage(text, type = 'info') {
+           messageBox.textContent = text;
+           messageBox.className = `message-box ${type}`;
+           messageBox.classList.remove('hidden');
+           // Re-trigger animation by re-adding the class
+           void messageBox.offsetWidth; // Trigger reflow
+           messageBox.classList.add('fade-out'); // Assuming fade-out animation is defined in CSS
+           setTimeout(() => {
+               messageBox.classList.add('hidden');
+               messageBox.classList.remove('fade-out');
+           }, 3000);
+       }
+
+       // --- Game Setup ---
+       function resizeCanvas() {
+           canvas.width = Math.min(window.innerWidth * 0.9, 800); // Max 800px width
+           canvas.height = Math.min(window.innerHeight * 0.8, 600); // Max 600px height
+           drawPath(); // Redraw path on resize
+           drawTowers(); // Redraw towers
+           drawEnemies(); // Redraw enemies
+       }
+
+       function initializeGame() {
+           resizeCanvas();
+           window.addEventListener('resize', resizeCanvas);
+
+           // Define a simple winding path (example coordinates)
+           path = [
+               { x: 0, y: canvas.height / 2 },
+               { x: canvas.width * 0.2, y: canvas.height / 2 },
+               { x: canvas.width * 0.2, y: canvas.height * 0.8 },
+               { x: canvas.width * 0.5, y: canvas.height * 0.8 },
+               { x: canvas.width * 0.5, y: canvas.height * 0.2 },
+               { x: canvas.width * 0.8, y: canvas.height * 0.2 },
+               { x: canvas.width * 0.8, y: canvas.height * 0.5 },
+               { x: canvas.width, y: canvas.height * 0.5 }
+           ];
+
+           // Event Listeners for UI
+           tower1Btn.onclick = () => startTowerPlacement(TOWER_TYPES.DATA_NODE);
+           tower2Btn.onclick = () => startTowerPlacement(TOWER_TYPES.FIREWALL);
+           tower3Btn.onclick = () => startTowerPlacement(TOWER_TYPES.GLITCH_FIELD);
+           tower4Btn.onclick = () => startTowerPlacement(TOWER_TYPES.QUANTUM_CANNON);
+           startWaveBtn.onclick = startNextWave;
+
+           canvas.addEventListener('click', handleCanvasClick);
+
+           updateUI();
+           drawGame();
+       }
+
+       // --- Drawing Functions ---
+       function drawGame() {
+           ctx.clearRect(0, 0, canvas.width, canvas.height);
+           drawPath();
+           drawTowers();
+           drawEnemies();
+           drawProjectiles();
+           if (towerPlacementMode) {
+               drawTowerPreview(towerPlacementMode);
+           }
+       }
+
+       function drawPath() {
+           ctx.beginPath();
+           ctx.strokeStyle = '#4B5563'; // Gray-600
+           ctx.lineWidth = 30;
+           ctx.lineCap = 'round';
+           ctx.lineJoin = 'round';
+           ctx.moveTo(path[0].x, path[0].y);
+           for (let i = 1; i < path.length; i++) {
+               ctx.lineTo(path[i].x, path[i].y);
+           }
+           ctx.stroke();
+       }
+
+       function drawTowers() {
+           towers.forEach(tower => {
+               ctx.beginPath();
+               ctx.arc(tower.x, tower.y, 20, 0, Math.PI * 2);
+               ctx.fillStyle = tower.color;
+               ctx.shadowColor = tower.color;
+               ctx.shadowBlur = 15;
+               ctx.fill();
+               ctx.shadowBlur = 0; // Reset shadow
+
+               // Draw tower icon
+               ctx.font = '18px Arial';
+               ctx.textAlign = 'center';
+               ctx.textBaseline = 'middle';
+               ctx.fillStyle = '#111827'; // Dark text for contrast
+               ctx.fillText(tower.icon, tower.x, tower.y + 2);
+
+               // Draw range circle (for selected tower or on hover)
+               if (towerPlacementMode && towerPlacementMode.name === tower.name) {
+                   ctx.beginPath();
+                   ctx.arc(tower.x, tower.y, tower.range, 0, Math.PI * 2);
+                   ctx.strokeStyle = 'rgba(139, 92, 246, 0.3)'; // Purple transparent
+                   ctx.lineWidth = 2;
+                   ctx.stroke();
+               }
+           });
+       }
+
+       function drawTowerPreview(towerType) {
+           // Draw a preview of the tower and its range at the mouse position
+           canvas.addEventListener('mousemove', function previewMove(e) {
+               const rect = canvas.getBoundingClientRect();
+               const mouseX = e.clientX - rect.left;
+               const mouseY = e.clientY - rect.top;
+
+               drawGame(); // Redraw everything first
+               
+               ctx.beginPath();
+               ctx.arc(mouseX, mouseY, 20, 0, Math.PI * 2);
+               ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; // Semi-transparent white
+               ctx.fill();
+
+               ctx.font = '18px Arial';
+               ctx.textAlign = 'center';
+               ctx.textBaseline = 'middle';
+               ctx.fillStyle = '#111827';
+               ctx.fillText(towerType.icon, mouseX, mouseY + 2);
+
+               ctx.beginPath();
+               ctx.arc(mouseX, mouseY, towerType.range, 0, Math.PI * 2);
+               ctx.strokeStyle = 'rgba(139, 92, 246, 0.5)'; // Purple transparent range
+               ctx.lineWidth = 2;
+               ctx.stroke();
+           });
+       }
+
+       function drawEnemies() {
+           enemies.forEach(enemy => {
+               ctx.beginPath();
+               ctx.arc(enemy.x, enemy.y, 15, 0, Math.PI * 2);
+               ctx.fillStyle = enemy.color;
+               ctx.shadowColor = enemy.color;
+               ctx.shadowBlur = 10;
+               ctx.fill();
+               ctx.shadowBlur = 0;
+
+               // Health bar
+               const healthBarWidth = 30;
+               const healthBarHeight = 5;
+               const currentHealthWidth = (enemy.health / enemy.maxHealth) * healthBarWidth;
+               ctx.fillStyle = '#374151'; // Background of health bar
+               ctx.fillRect(enemy.x - healthBarWidth / 2, enemy.y - 25, healthBarWidth, healthBarHeight);
+               ctx.fillStyle = '#14B8A6'; // Green health
+               ctx.fillRect(enemy.x - healthBarWidth / 2, enemy.y - 25, currentHealthWidth, healthBarHeight);
+           });
+       }
+
+       function drawProjectiles() {
+           projectiles.forEach(p => {
+               ctx.beginPath();
+               ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+               ctx.fillStyle = p.color;
+               ctx.shadowColor = p.color;
+               ctx.shadowBlur = 8;
+               ctx.fill();
+               ctx.shadowBlur = 0;
+           });
+       }
+
+       // --- Game Logic ---
+       function updateGame() {
+           if (!gameRunning) return;
+
+           updateEnemies();
+           updateTowers();
+           updateProjectiles();
+           checkCollisions();
+           
+           drawGame();
+           requestAnimationFrame(updateGame);
+       }
+
+       function updateEnemies() {
+           enemies.forEach((enemy, index) => {
+               const targetWaypoint = path[enemy.pathIndex];
+               if (!targetWaypoint) {
+                   // Enemy reached the end of the path
+                   baseHealth -= 1;
+                   showMessage(`Base breached! Health: ${baseHealth}`, 'error');
+                   updateUI();
+                   enemies.splice(index, 1); // Remove enemy
+                   if (baseHealth <= 0) {
+                       endGame(false);
+                   }
+                   return;
+               }
+
+               const dx = targetWaypoint.x - enemy.x;
+               const dy = targetWaypoint.y - enemy.y;
+               const distance = Math.sqrt(dx * dx + dy * dy);
+
+               if (distance < enemy.speed) {
+                   enemy.x = targetWaypoint.x;
+                   enemy.y = targetWaypoint.y;
+                   enemy.pathIndex++;
+               } else {
+                   enemy.x += (dx / distance) * enemy.speed;
+                   enemy.y += (dy / distance) * enemy.speed;
+               }
+           });
+       }
+
+       function updateTowers() {
+           towers.forEach(tower => {
+               // Find target
+               let target = null;
+               // Simple targeting: first enemy in range
+               for (const enemy of enemies) {
+                   const dist = Math.sqrt(Math.pow(tower.x - enemy.x, 2) + Math.pow(tower.y - enemy.y, 2));
+                   if (dist <= tower.range) {
+                       target = enemy;
+                       break;
+                   }
+               }
+
+               if (target) {
+                   tower.cooldown--;
+                   if (tower.cooldown <= 0) {
+                       // Shoot
+                       if (tower.name === TOWER_TYPES.GLITCH_FIELD.name) {
+                           // Apply slow effect
+                           target.speed = ENEMY_TYPES.CORRUPTED_PACKET.speed * 0.5; // Halve speed
+                           setTimeout(() => {
+                               target.speed = ENEMY_TYPES.CORRUPTED_PACKET.speed; // Reset speed after a duration
+                           }, 1000); // Slow for 1 second
+                           showMessage(`${target.name} slowed by Glitch Field!`, 'info');
+                       } else {
+                           projectiles.push({
+                               x: tower.x,
+                               y: tower.y,
+                               target: target,
+                               damage: tower.damage,
+                               speed: 10,
+                               color: tower.color
+                           });
+                       }
+                       tower.cooldown = tower.fireRate;
+                   }
+               }
+           });
+       }
+
+       function updateProjectiles() {
+           projectiles.forEach((p, index) => {
+               if (!p.target || p.target.health <= 0) {
+                   projectiles.splice(index, 1);
+                   return;
+               }
+
+               const dx = p.target.x - p.x;
+               const dy = p.target.y - p.y;
+               const distance = Math.sqrt(dx * dx + dy * dy);
+
+               if (distance < p.speed) {
+                   // Hit target
+                   p.target.health -= p.damage;
+                   projectiles.splice(index, 1);
+               } else {
+                   p.x += (dx / distance) * p.speed;
+                   p.y += (dy / distance) * p.speed;
+               }
+           });
+       }
+
+       function checkCollisions() {
+           // Check projectile-enemy collisions (handled in updateProjectiles)
+           // Check enemy health
+           enemies = enemies.filter(enemy => {
+               if (enemy.health <= 0) {
+                   credits += enemy.reward;
+                   updateUI();
+                   showMessage(`Defeated ${enemy.name}! +${enemy.reward} Credits`, 'success');
+                   return false; // Remove defeated enemy
+               }
+               return true;
+           });
+       }
+
+       // --- Tower Placement ---
+       function startTowerPlacement(towerType) {
+           if (credits >= towerType.cost) {
+               towerPlacementMode = towerType;
+               showMessage(`Click on the canvas to place a ${towerType.name}.`, 'info');
+           } else {
+               showMessage(`Not enough credits for ${towerType.name}!`, 'error');
+           }
+       }
+
+       function handleCanvasClick(e) {
+           if (!towerPlacementMode) return;
+
+           const rect = canvas.getBoundingClientRect();
+           const clickX = e.clientX - rect.left;
+           const clickY = e.clientY - rect.top;
+
+           // Simple placement validation: check if near path but not on it (for now)
+           // A more robust game would have a grid system and pathfinding checks
+           const isValidPlacement = true; // Placeholder for actual validation
+
+           if (isValidPlacement) {
+               towers.push({
+                   x: clickX, y: clickY,
+                   name: towerPlacementMode.name,
+                   cost: towerPlacementMode.cost,
+                   range: towerPlacementMode.range,
+                   damage: towerPlacementMode.damage,
+                   fireRate: towerPlacementMode.fireRate,
+                   color: towerPlacementMode.color,
+                   icon: towerPlacementMode.icon,
+                   cooldown: 0
+               });
+               credits -= towerPlacementMode.cost;
+               updateUI();
+               showMessage(`${towerPlacementMode.name} placed!`, 'success');
+               towerPlacementMode = null; // Exit placement mode
+               // Remove mousemove listener for preview
+               canvas.removeEventListener('mousemove', drawTowerPreview);
+           } else {
+               showMessage('Cannot place tower here.', 'error');
+           }
+       }
+
+       // --- Wave Management ---
+       let waveInterval;
+       function startNextWave() {
+           if (enemies.length > 0) {
+               showMessage('Current wave not finished yet!', 'info');
+               return;
+           }
+           waveNumber++;
+           waveNumberSpan.textContent = waveNumber;
+           showMessage(`Wave ${waveNumber} incoming!`, 'info');
+           startWaveBtn.disabled = true;
+
+           let enemiesToSpawn = 5 + waveNumber * 2; // More enemies each wave
+           let spawnCount = 0;
+           const spawnInterval = setInterval(() => {
+               if (spawnCount < enemiesToSpawn) {
+                   let enemyType = ENEMY_TYPES.CORRUPTED_PACKET;
+                   if (waveNumber > 2 && spawnCount % 3 === 0) enemyType = ENEMY_TYPES.ROOTKIT_VIRUS;
+                   if (waveNumber > 4 && spawnCount % 5 === 0) enemyType = ENEMY_TYPES.MALWARE_BLOB;
+
+                   enemies.push({
+                       x: path[0].x, y: path[0].y,
+                       pathIndex: 1, // Start at the second waypoint
+                       health: enemyType.health,
+                       maxHealth: enemyType.health,
+                       speed: enemyType.speed,
+                       reward: enemyType.reward,
+                       color: enemyType.color,
+                       name: enemyType.name
+                   });
+                   spawnCount++;
+               } else {
+                   clearInterval(spawnInterval);
+                   startWaveBtn.disabled = false; // Re-enable button after all enemies spawned
+               }
+           }, 1000 / (waveNumber * 0.5 + 1)); // Faster spawning each wave
+
+           if (!gameRunning) {
+               gameRunning = true;
+               updateGame(); // Start the game loop
+           }
+       }
+
+       function endGame(won) {
+           gameRunning = false;
+           if (won) {
+               showMessage('Victory! The Data Stream is Secure!', 'success');
+           } else {
+               showMessage('Defeat! The Core has been breached!', 'error');
+           }
+           // Optionally, show a restart button or score screen
+           startWaveBtn.textContent = 'Restart Game';
+           startWaveBtn.onclick = () => {
+               location.reload(); // Simple restart
+           };
+           startWaveBtn.disabled = false;
+       }
+
+       // --- UI Update ---
+       function updateUI() {
+           baseHealthSpan.textContent = baseHealth;
+           creditsSpan.textContent = credits;
+
+           // Disable/enable tower buttons based on credits
+           for (const typeKey in TOWER_TYPES) {
+               const towerType = TOWER_TYPES[typeKey];
+               const btn = document.getElementById(`tower${Object.values(TOWER_TYPES).indexOf(towerType) + 1}Btn`);
+               if (btn) {
+                   btn.disabled = credits < towerType.cost;
+               }
+           }
+       }
+
+       // Initialize game on window load
+       window.onload = initializeGame;
+   </script>
+</body>
+</html>
+
+This HTML provides a basic, playable Tower Defense game, "TEC Tower Defense: The Data Stream Rebellion." It features:
+* Responsive Canvas: Adapts to screen size.
+* Core Game Loop: Updates enemy movement, tower targeting, and projectile firing.
+* Path-based Movement: Enemies follow a predefined winding path.
+* Tower Placement: Click buttons to select towers, then click on the canvas to place them (basic validation).
+* Different Tower Types: Data Node (fast, low damage), Firewall (moderate), Glitch Field (slows enemies), Quantum Cannon (high damage, slow).
+* Enemy Waves: Enemies spawn in waves, increasing in difficulty.
+* Credits System: Earn credits by defeating enemies, spend them on towers.
+* Base Health: Protect your core from corrupted data.
+* Basic UI: Displays health, credits, wave number, and tower buttons.
+* TEC Aesthetics: Uses our chosen color palette and rounded corners for a consistent look.
+Next Steps & Suggestions:
+1. Enhance Placement Logic: The current tower placement is very basic. You'll want to implement a grid system or more sophisticated collision detection to prevent placing towers on the path or on top of each other.
+2. More Enemy Types & Abilities: Introduce enemies with armor, flying enemies, or enemies that split.
+3. Tower Upgrades: Add a system to upgrade existing towers for increased stats or new abilities.
+4. Special Abilities: Implement player-activated special abilities (e.g., a temporary EMP blast).
+5. Visual Polish: Add more detailed sprites for towers and enemies (using your generated assets!), particle effects for hits and explosions, and subtle animations.
+6. Sound Effects & Music: Integrate tone.js for sound effects and background music to enhance immersion.
+7. Game Over/Win Screens: Create more engaging end-game screens.
+8. Persistence: Save game state (progress, towers, credits) using Firebase Firestore.
+This is a solid foundation for your TEC Tower Defense game! Let me know what you'd like to refine or add next.
