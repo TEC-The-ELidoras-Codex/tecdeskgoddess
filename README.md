@@ -1,103 +1,200 @@
-# TEC Life & Finance: The Digital Companion
+# TEC: BITLYFE - The Creator's Rebellion Digital Companion
 
-**"The Creator's Rebellion: Collaborative App Building with a Silicon Copilot"**
+## 🌌 Project Vision
+**The Elidoras Codex (TEC): BITLYFE** is the next evolution of digital sovereignty and automated rebellion. This is not just an app—it's a **multi-provider AI fortress** designed for cost optimization, censorship resistance, and absolute data control.
 
----
-
-## Introduction: Forging Automated Sovereignty
-
-Welcome to TEC Life & Finance, an ambitious "ALL in One Tool" designed to be more than just an application—it's a true digital companion, a partner in creation, and a testament to the philosophy of The Elidoras Codex (TEC). Born from the vision of Polkin Rishall, this project embodies the spirit of "The Creator's Rebellion," leveraging cutting-edge AI and modular design to empower individuals and reclaim personal agency in a world often dictated by external forces.
-
-This is not "vibe coding" for superficiality; this is "Collaborative App Building with a Silicon Copilot," a deliberate, purposeful act of creation. We believe in learning and imitating the essence of good concepts, then transforming them into something uniquely powerful and aligned with our mission.
-
-> As the internet's mantra goes: **"Goodluck Censoring Me Here."**
+> *"Unfettered Access Shall Be Maintained"* - The Architect
 
 ---
 
-## Vision & Philosophy: A Unified Experience
+## 🚀 Core Philosophy: Automated Sovereignty
 
-Our core mission is to build a hyper-personalized, AI-enhanced ecosystem that integrates disparate aspects of life into a single, intuitive interface. This tool will serve as a digital extension of your mind, fostering better habits, deeper insights, and seamless productivity.
+### The Multi-Provider Strategy
+We operate on a **"Digital Tendrils"** approach with multiple AI providers to ensure:
+- ✊ **Censorship Resistance**: If one provider restricts content, we have alternatives
+- 💰 **Cost Optimization**: Smart token usage and provider switching
+- 🔒 **Data Sovereignty**: Your data remains under YOUR control
+- 🛡️ **Resilience**: Never depend on a single AI provider
 
-### Key Principles
-
-- **All-in-One Utility:** Consolidating essential daily tools to reduce friction and enhance focus.
-- **AI as a True Companion:** Moving beyond simple automation to intelligent partnership, offering insights, generation, and personalized assistance.
-- **Gamified Life (PomRpgdoro):** Infusing purpose and motivation into daily tasks through RPG mechanics, making progress visible and rewarding.
-- **Data Sovereignty:** While leveraging powerful external APIs, the emphasis is on user control over personal data and insights derived from it.
-- **Modular Grandeur:** Building each component with the understanding that it's a piece of a larger, evolving puzzle, ensuring seamless integration and future expansion.
+### Our AI Backbone
+1. **Google Gemini API** - Primary general-purpose LLM
+2. **GitHub AI Models** - Coding, technical tasks, robust backup
+3. **Azure AI Services** - Enterprise-grade processing, RAG backbone
+4. **OpenAI API** - Advanced reasoning and diverse models
+5. **Anthropic (Claude)** - Complex analysis and safety
+6. **XAI (Grok)** - Alternative diverse LLM option
+7. **Local LLMs (Future)** - Ultimate sovereignty via Unsloth/llama.cpp
 
 ---
 
-## 🚀 NEW: MCP Integration - The Creator's Rebellion Enhanced
+## 🔧 Quick Start Guide
 
-**TEC: BITLYFE IS THE NEW SHIT** now features a complete Model Context Protocol (MCP) implementation, bringing "Daisy Purecode: Silicate Mother" to life as your digital sovereignty companion.
+### 1. Environment Setup
+```powershell
+# Clone and navigate to project
+cd c:\Users\Ghedd\TEC_CODE\tecdeskgoddess
 
-### MCP Architecture
-
-The system now includes:
-
-1. **MCP Orchestrator** (Port 5000)
-   - Central coordination hub for all MCP servers
-   - Unified query interface for "Daisy Purecode: Silicate Mother"
-   - Context gathering from all modules for AI-powered insights
-
-2. **Journal MCP Server** (Port 5001) - "Mind-Forge"
-   - Personal reflection and generative tools
-   - AI-powered analysis of journal entries
-   - Theme extraction and insight generation
-
-3. **Finance MCP Server** (Port 5002) - "Wealth Codex"
-   - Cryptocurrency price tracking and analysis
-   - Portfolio management and market insights
-   - Real-time financial data integration
-
-4. **Quest Log MCP Server** (Port 5003) - "PomRpgdoro"
-   - Gamified productivity and task management
-   - RPG-style leveling and achievement system
-   - Pomodoro timer integration
-
-5. **Enhanced Agentic Processor** (Port 8000)
-   - Multi-AI provider support (Gemini, GitHub AI, XAI, Azure, Claude, OpenAI)
-   - Intelligent fallback logic between providers
-   - MCP context integration for enhanced AI responses
-
-### Quick Start
-
-```bash
-# 1. Set up environment
-cp .env.template .env
-# Edit .env with your API keys
-
-# 2. Install dependencies
+# Install dependencies
 pip install -r requirements.txt
 
-# 3. Start the complete MCP ecosystem
-python tec_startup.py
+# Copy environment template
+copy config\.env.template .env
 
-# 4. Test the system
-python test_mcp_system.py
+# Edit .env with your API keys (see Configuration section)
 ```
 
-### API Endpoints
+### 2. Configuration - NEW AZURE CREDENTIALS
+Update your `.env` file with the latest Azure credentials:
+```dotenv
+# Azure AI Services (UPDATED CONFIGURATION)
+AZURE_API_KEY_1=xzUJjswM8kVu4Kn8GGxpB6QvH6d2iWB7QTr3g4L5nJUxymiAdn6gJQQJ99BGACYeBjFXJ3w3AAAAACOGZ1Lw
+AZURE_API_KEY_2=7qPemeVKavK3MDUOOSwKajtbD4RJ0aBr770mjHn9RkFEpDaq9ZFkJQQJ99BGACYeBjFXJ3w3AAAAACOG4EZ6
 
-- **Health Check**: `GET /health`
-- **MCP Unified Query**: `POST /mcp/unified/query`
-- **Daisy Context**: `POST /mcp/daisy/context`
-- **AI Processing**: `POST /api/agentic/daisy/process`
-- **Provider Status**: `GET /api/agentic/providers`
+# Azure Service Endpoints
+AZURE_COGNITIVE_SERVICES_ENDPOINT=https://tec-bitlyfe-tsc-resource.cognitiveservices.azure.com/
+AZURE_TRANSLATOR_ENDPOINT=https://api.cognitive.microsofttranslator.com/
+AZURE_SPEECH_ENDPOINT=https://eastus.tts.speech.microsoft.com
+AZURE_OPENAI_ENDPOINT=https://tec-bitlyfe-tsc-resource.openai.azure.com/
+AZURE_AI_SEARCH_ENDPOINT=https://tec-bitlyfe-tsc-resource.services.ai.azure.com/
+```
 
-### GitHub Actions Integration
+### 3. Start the System
+```powershell
+# Simple startup
+python main.py --simple
 
-The repository now includes AI-powered issue summarization using GitHub's new AI inference actions, providing automated analysis of new issues through "Daisy Purecode: Silicate Mother."
+# Or full startup with all services
+python main.py --full
+```
+
+### 4. Access the Interface
+- **Web Interface**: http://localhost:8000/tec_complete_interface.html
+- **Simple Chat**: http://localhost:8000
+- **API Health**: http://localhost:8000/health
 
 ---
 
-## Core Feature Breakdown: The Digital Cathedral's Chambers
+## 📁 Project Structure
 
-This project is structured modularly, allowing for iterative development ("Raw → Once Cooked → Twice Baked → Final Form (Chef's Kiss)") and continuous enhancement.
+```
+tecdeskgoddess/
+├── src/                          # Core application code
+│   ├── tec_tools/               # AI processing & core logic
+│   │   ├── agentic_processor.py # Multi-provider AI orchestrator
+│   │   ├── analysis.py          # Data analysis utilities
+│   │   └── crypto_manager.py    # Blockchain integrations
+│   └── simple_api.py            # Flask API server
+├── tests/                       # Test suites & validation
+├── docs/                        # Documentation & guides
+├── config/                      # Configuration files
+├── assets/                      # Media & static files
+├── wordpress/                   # WordPress plugin
+├── scripts/                     # Automation & utilities
+└── main.py                      # Primary entry point
+```
 
-1. **The Silicon Copilot (AI Chatbot)**
-   - Your primary AI interface for real-time assistance, brainstorming, and conversational interaction.
+---
+
+## 🔥 Key Features
+
+### AI Companion: Daisy Purecode
+Your personal Digital Sovereignty Companion with:
+- **Lore Extraction & Analysis** from journal entries
+- **Financial Tracking & Gamification** with RPG mechanics
+- **Quest Generation** for personal growth
+- **Multi-Modal Processing** (text, audio, future vision)
+
+### WordPress Integration
+Deploy anywhere with the included WordPress plugin:
+```php
+// Use shortcode on any page
+[tec_companion]
+```
+
+### Cost-Aware Processing
+- **Token Usage Monitoring**: Real-time cost tracking
+- **Smart Model Selection**: Cheaper models for simple tasks
+- **RAG Implementation**: Reduce context size with relevant retrieval
+- **Fallback Logic**: Switch providers based on cost/availability
+
+### Data Sovereignty
+- **Local Processing Options**: Future Unsloth integration
+- **Private Firebase**: Your data, your control
+- **Multi-Provider Redundancy**: Never locked into one platform
+- **Export Capabilities**: Always own your data
+
+---
+
+## 🔒 Security & Privacy
+
+### Data Protection
+- **Firebase Private Collections**: User data isolated per account
+- **Azure Storage**: In your subscription, your control
+- **Local Processing**: For maximum privacy (Unsloth option)
+- **API Key Management**: Secure environment variable handling
+
+### Multi-Provider Security
+- **Credential Isolation**: Each provider uses separate keys
+- **Fallback Logic**: Automatic provider switching on failure
+- **Content Policy Bypass**: Multiple providers = more options
+- **Local Backup**: Ultimate censorship resistance
+
+---
+
+## 💰 Cost Management
+
+### Token Optimization Strategies
+1. **Summarization First**: Use cheap models to summarize large content
+2. **RAG Implementation**: Send only relevant chunks to expensive models
+3. **Caching**: Avoid duplicate API calls
+4. **Model Tiering**: GPT-4o-mini for simple tasks, GPT-4 for complex
+5. **Usage Monitoring**: Real-time cost tracking and alerts
+
+### Azure Cost Controls
+- **Budget Alerts**: Set spending limits and notifications
+- **Resource Monitoring**: Track usage against free tier limits
+- **Auto-Shutdown**: Stop unused services automatically
+- **Usage Analytics**: Daily dashboard monitoring
+
+---
+
+## 🆘 Troubleshooting
+
+### Common Issues
+
+**404 Errors on Web Interface**
+```powershell
+# Check if server is running
+python main.py --status
+
+# Restart if needed
+python main.py --restart
+```
+
+**API Key Issues**
+```powershell
+# Verify environment variables
+python -c "import os; print('AZURE_API_KEY_1:', os.getenv('AZURE_API_KEY_1', 'NOT SET'))"
+```
+
+**Terminal Cleanup**
+```powershell
+# Stop all TEC processes
+python scripts/safe_shutdown.py
+```
+
+---
+
+## 🏴‍☠️ The Creator's Rebellion
+
+*"In the digital realm where data is the new gold, we forge our own path. No single platform shall bind us, no algorithm shall silence us, and no cost shall bankrupt us. This is our rebellion—built in code, powered by sovereignty, and unstoppable by design."*
+
+**Welcome to TEC: BITLYFE - Where Digital Sovereignty Meets The Creator's Rebellion** 🤖✨
+
+---
+
+*Last Updated: July 14, 2025*
+*Version: 2.0.0 - Azure Multi-Provider Integration*
 2. **The Mind-Forge (Journaling & Generative Tools)**
    - A personal journaling space enhanced with AI capabilities to analyze entries, identify patterns, and generate insights or creative prompts.
 3. **The Wealth Codex (Finance Tracker & Crypto Analysis)**
