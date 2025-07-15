@@ -3,98 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEC: BITLYFE - Complete Web Interface</title>
+    <title>TEC Life & Finance Digital Companion</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        body {
-            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2d1b69 100%);
-            min-height: 100vh;
-        }
-        .chat-container {
-            height: 60vh;
-            overflow-y: auto;
-        }
-        .message {
-            margin-bottom: 1rem;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            animation: fadeIn 0.3s ease-in;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .user-message {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            color: white;
-            margin-left: 20%;
-            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
-        }
-        .ai-message {
-            background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
-            margin-right: 20%;
-            color: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%); color: #e0e6ed; font-family: 'Inter', sans-serif; overflow: hidden; }
+        .glassmorphism { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border:1px solid rgba(255,255,255,0.1); border-radius:16px; }
+        
+        /* Header */
+        header { padding: 20px; text-align: center; }
+        h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(90deg, #7b2ff7, #f107a3); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        p { margin: 10px 0; }
+        
+        /* Main Container */
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; height: calc(100vh - 40px); }
+        
+        /* Status Dashboard */
+        .status-dashboard { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .status-card { padding: 20px; border-radius: 12px; }
         .status-online { color: #10b981; }
         .status-offline { color: #ef4444; }
         .status-connecting { color: #f59e0b; }
         
-        .tec-button {
-            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(124, 58, 237, 0.3);
-        }
-        .tec-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(124, 58, 237, 0.4);
-        }
+        /* Chat Interface */
+        .chat-interface { flex: 1; display: flex; flex-direction: column; }
+        .chat-container { flex: 1; overflow-y: auto; padding: 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.1); }
+        .message { margin-bottom: 10px; padding: 10px; border-radius: 8px; }
+        .user-message { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; }
+        .ai-message { background: linear-gradient(135deg, #374151 0%, #4b5563 100%); color: white; }
         
-        .feature-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+        /* Input Area */
+        .input-area { display: flex; gap: 10px; margin-top: 10px; }
+        .input-area input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
+        .input-area button { padding: 10px 20px; border-radius: 8px; background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; border: none; cursor: pointer; }
+        
+        /* Quick Actions */
+        .quick-actions { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 10px; }
+        .quick-actions button { padding: 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; }
+        
+        /* Feature Panels */
+        .feature-panels { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .feature-card { padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.1); }
+        
+        /* Footer */
+        footer { text-align: center; padding: 10px 0; }
+
+        /* Bottom Navigation */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: space-around; padding: 10px 0; }
+        .bottom-nav button { background: none; border: none; color: #e0e6ed; font-size: 1.5rem; cursor: pointer; }
+        .bottom-nav button:hover { color: #f107a3; }
+
+        .hidden { display: none; }
     </style>
 </head>
-<body class="text-white">
-    <div class="container mx-auto px-4 py-8">
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-6xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                TEC: BITLYFE
-            </h1>
-            <p class="text-xl text-gray-300 mb-2">The Creator's Rebellion - Digital Sovereignty Companion</p>
-            <p class="text-lg text-purple-400 font-semibold">Daisy Purecode: Silicate Mother</p>
-            <p class="text-sm text-gray-400 italic">"Unfettered Access Shall Be Maintained"</p>
-        </div>
+<body>
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-btn" data-target="statusDashboard" title="Status"><i class="fas fa-chart-line"></i></button>
+        <button class="nav-btn" data-target="chatInterface" title="Chat"><i class="fas fa-comment"></i></button>
+        <button class="nav-btn" data-target="calendarPanel" title="Calendar"><i class="fas fa-calendar-alt"></i></button>
+        <button class="nav-btn" data-target="financePanel" title="Finance"><i class="fas fa-wallet"></i></button>
+        <button class="nav-btn" data-target="questsPanel" title="Quests"><i class="fas fa-flag"></i></button>
+    </nav>
 
+    <!-- Header -->
+    <header>
+        <h1>TEC Life & Finance</h1>
+        <p>Your Digital Companion for Life Management</p>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
         <!-- System Status Dashboard -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div class="feature-card p-4 rounded-lg text-center">
-                <div class="text-2xl mb-2">🤖</div>
-                <div class="font-semibold">AI Status</div>
+        <div class="status-dashboard" id="statusDashboard">
+            <div class="status-card glassmorphism">
+                <h2 class="text-xl font-bold">AI Status</h2>
                 <div id="aiStatus" class="status-connecting">Connecting...</div>
             </div>
-            <div class="feature-card p-4 rounded-lg text-center">
-                <div class="text-2xl mb-2">📝</div>
-                <div class="font-semibold">Journal</div>
+            <div class="status-card glassmorphism">
+                <h2 class="text-xl font-bold">Journal</h2>
                 <div class="text-green-400">Ready</div>
             </div>
-            <div class="feature-card p-4 rounded-lg text-center">
-                <div class="text-2xl mb-2">💰</div>
-                <div class="font-semibold">Finance</div>
+            <div class="status-card glassmorphism">
+                <h2 class="text-xl font-bold">Finance</h2>
                 <div class="text-green-400">Ready</div>
             </div>
-            <div class="feature-card p-4 rounded-lg text-center">
-                <div class="text-2xl mb-2">⚔️</div>
-                <div class="font-semibold">Quests</div>
+            <div class="status-card glassmorphism">
+                <h2 class="text-xl font-bold">Quests</h2>
                 <div class="text-green-400">Ready</div>
             </div>
         </div>
 
         <!-- Main Chat Interface -->
-        <div class="feature-card rounded-lg p-6 mb-6">
+        <div class="chat-interface glassmorphism" id="chatInterface">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-2xl font-bold">Chat with Daisy Purecode</h2>
                 <div class="flex items-center gap-2">
@@ -104,7 +108,7 @@
             </div>
 
             <!-- Chat Container -->
-            <div id="chatContainer" class="chat-container bg-black bg-opacity-50 rounded-lg p-4 mb-4">
+            <div id="chatContainer" class="chat-container">
                 <div class="message ai-message">
                     <div class="flex items-start gap-3">
                         <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-sm font-bold">D</div>
@@ -116,7 +120,7 @@
             </div>
 
             <!-- Input Area -->
-            <div class="flex gap-3 mb-4">
+            <div class="input-area">
                 <input 
                     type="text" 
                     id="messageInput" 
@@ -133,7 +137,7 @@
             </div>
 
             <!-- Quick Actions -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="quick-actions">
                 <button onclick="quickAction('journal')" class="tec-button p-3 rounded text-sm font-semibold">
                     📝 Journal Entry
                 </button>
@@ -149,8 +153,21 @@
             </div>
         </div>
 
+        <!-- Calendar Panel (hidden by default) -->
+        <div class="glassmorphism p-4 hidden" id="calendarPanel">
+            <h2 class="text-xl font-bold mb-4">📅 Google Calendar</h2>
+            <div class="mb-4">
+                <button onclick="loadCalendar()" class="tec-button px-4 py-2 rounded font-semibold">
+                    Connect Calendar
+                </button>
+            </div>
+            <div id="gcal" class="bg-gray-800 p-4 rounded-lg">
+                <p class="text-gray-400">Click "Connect Calendar" to load your events</p>
+            </div>
+        </div>
+
         <!-- Feature Panels -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="feature-panels">
             <!-- Journal Panel -->
             <div class="feature-card rounded-lg p-6">
                 <h3 class="text-xl font-bold mb-4 text-purple-400">📝 Mind-Forge Journal</h3>
@@ -180,10 +197,10 @@
         </div>
 
         <!-- Footer -->
-        <div class="text-center mt-12 text-gray-400">
+        <footer>
             <p class="mb-2">TEC: BITLYFE - The Creator's Rebellion</p>
             <p class="text-sm">Powered by AI • Built for Digital Sovereignty • Open Source</p>
-        </div>
+        </footer>
     </div>
 
     <script>
@@ -320,6 +337,68 @@
                 addMessage('I notice my backend systems are offline. To activate full functionality, please run the TEC startup script: "python tec_simple_startup.py" in your TEC directory.', 'ai');
             }
         }, 2000);
+
+        // Tab navigation logic
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                ['statusDashboard','chatInterface','calendarPanel'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = (btn.dataset.target === id) ? '' : 'none';
+                });
+            });
+        });
+
+        // Google Calendar Integration
+        function loadCalendar() {
+            gapi.load('client:auth2', initGoogleCalendar);
+        }
+
+        function initGoogleCalendar() {
+            gapi.client.init({
+                apiKey: 'YOUR_API_KEY_HERE',
+                clientId: 'YOUR_CLIENT_ID_HERE.apps.googleusercontent.com',
+                discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
+                scope: "https://www.googleapis.com/auth/calendar.readonly"
+            }).then(() => {
+                return gapi.auth2.getAuthInstance().signIn();
+            }).then(() => {
+                listUpcomingEvents();
+            }).catch(error => {
+                document.getElementById('gcal').innerHTML = '<p class="text-red-400">Authentication failed. Please check your API credentials.</p>';
+            });
+        }
+
+        function listUpcomingEvents() {
+            gapi.client.calendar.events.list({
+                'calendarId': 'primary',
+                'timeMin': (new Date()).toISOString(),
+                'showDeleted': false,
+                'singleEvents': true,
+                'maxResults': 10,
+                'orderBy': 'startTime'
+            }).then(response => {
+                const events = response.result.items;
+                const container = document.getElementById('gcal');
+                
+                if (!events || events.length === 0) {
+                    container.innerHTML = '<p class="text-gray-400">No upcoming events found.</p>';
+                } else {
+                    container.innerHTML = '<div class="space-y-2">' + events.map(event => {
+                        const start = event.start.dateTime || event.start.date;
+                        const startDate = new Date(start);
+                        const dateStr = startDate.toLocaleDateString();
+                        const timeStr = event.start.dateTime ? startDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'All Day';
+                        
+                        return `<div class="bg-gray-700 p-3 rounded-lg">
+                            <div class="text-purple-400 font-semibold">${event.summary}</div>
+                            <div class="text-sm text-gray-300">${dateStr} - ${timeStr}</div>
+                        </div>`;
+                    }).join('') + '</div>';
+                }
+            }).catch(error => {
+                document.getElementById('gcal').innerHTML = '<p class="text-red-400">Error loading calendar events.</p>';
+            });
+        }
     </script>
 </body>
 </html>

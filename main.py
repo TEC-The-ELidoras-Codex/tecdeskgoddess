@@ -175,7 +175,7 @@ def open_web_interface():
     """Open the web interface in the default browser"""
     print_colored("🌐 Opening Web Interface...", BLUE)
     
-    interface_url = "http://localhost:8000/tec_complete_interface.html"
+    interface_url = "http://localhost:8000/"
     
     try:
         if os.name == 'nt':  # Windows

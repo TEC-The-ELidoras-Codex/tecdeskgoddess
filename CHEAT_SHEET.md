@@ -5,22 +5,22 @@
 
 ### Quick Start (Recommended)
 ```bash
-python scripts/safe_startup.py
+py main.py
 ```
 
-### Manual Start
+### Manual Start (Alternative)
 ```bash
-python main.py
+py main.py --simple
 ```
 
 ### Start with Debug Mode
 ```bash
-python main.py --debug
+py main.py --debug
 ```
 
 ### Start Simple Mode (No Features)
 ```bash
-python main.py --simple
+py scripts/tec_simple_startup.py
 ```
 
 ## 🔧 DEVELOPMENT COMMANDS
@@ -28,13 +28,13 @@ python main.py --simple
 ### Security & Safety
 ```bash
 # Check for exposed API keys
-python scripts/security_check.py
+py scripts/security_check.py
 
 # Safe shutdown
-python scripts/safe_shutdown.py
+py tec_safe_shutdown.py
 
 # Terminal cleanup
-python scripts/terminal_manager.py
+py scripts/terminal_manager.py
 ```
 
 ### Environment Setup
@@ -63,9 +63,11 @@ python scripts/import_data.py
 
 ### Local Interfaces
 - **Simple Chat**: http://localhost:8000
-- **Complete Interface**: http://localhost:8000/tec_complete_interface.html
+- **Complete Interface**: http://localhost:8000/tec_complete_interface.html ⭐
 - **Admin Panel**: http://localhost:8000/admin
 - **API Docs**: http://localhost:8000/docs
+
+**Note**: Use the Complete Interface for full features including bottom navigation, calendar, finance, and quests!
 
 ### API Endpoints
 ```bash
@@ -310,13 +312,14 @@ icacls .env /inheritance:r /grant:r "%USERNAME%":F
 
 | Action | Command |
 |--------|---------|
-| **Start TEC** | `python scripts/safe_startup.py` |
-| **Stop TEC** | `Ctrl+C` or `python scripts/safe_shutdown.py` |
-| **Check Security** | `python scripts/security_check.py` |
+| **Start TEC** | `py main.py` |
+| **Stop TEC** | `Ctrl+C` or `py tec_safe_shutdown.py` |
+| **Check Security** | `py scripts/security_check.py` |
 | **Commit Changes** | `git add . && git commit -m "message"` |
-| **Test APIs** | `python scripts/test_apis.py` |
+| **Test APIs** | `py scripts/test_api_keys.py` |
 | **View Logs** | `Get-Content logs/tec.log -Wait` |
-| **Reset System** | `python scripts/full_reset.py` |
+| **Reset System** | `py scripts/full_reset.py` |
+| **Complete Interface** | `http://localhost:8000/tec_complete_interface.html` |
 
 **Remember**: Always run security checks before committing! 🔒
 
