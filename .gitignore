@@ -49,9 +49,40 @@ Thumbs.db
 tec_startup.log
 logs/
 
+# ===========================================
+# CRITICAL SECURITY - API KEYS AND SECRETS
+# ===========================================
 # Environment Variables (but keep template)
 .env
+.env.*
+*.env
 !.env.template
+!.env.example
+
+# API Keys and Credentials
+*.key
+*.secret
+*.pem
+*.p12
+*.pfx
+config.json
+secrets.json
+api_keys.json
+credentials.json
+auth.json
+
+# Cloud Provider Credentials
+azure.json
+azure_credentials.json
+service_account.json
+gcp_credentials.json
+aws_credentials.json
+firebase_admin_key.json
+
+# OAuth and JWT Tokens
+*.token
+.tokens/
+oauth_cache/
 
 # Testing
 .coverage
