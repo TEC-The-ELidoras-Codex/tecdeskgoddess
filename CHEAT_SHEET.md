@@ -79,6 +79,24 @@ curl -X POST http://localhost:8000/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "Hello Daisy", "user_id": "user123"}'
 
+# BITL Token System
+curl http://localhost:8000/api/bitl/balance
+curl -X POST http://localhost:8000/api/bitl/earn \
+  -H "Content-Type: application/json" \
+  -d '{"amount": 100, "reason": "test"}'
+curl -X POST http://localhost:8000/api/bitl/spend \
+  -H "Content-Type: application/json" \
+  -d '{"amount": 50, "item": "test_purchase"}'
+
+# Quest System
+curl http://localhost:8000/api/quests/list
+curl -X POST http://localhost:8000/api/quests/start \
+  -H "Content-Type: application/json" \
+  -d '{"type": "daily"}'
+curl -X POST http://localhost:8000/api/quests/complete \
+  -H "Content-Type: application/json" \
+  -d '{"questId": "daily_chat"}'
+
 # Upload file
 curl -X POST http://localhost:8000/upload \
   -F "file=@yourfile.txt"

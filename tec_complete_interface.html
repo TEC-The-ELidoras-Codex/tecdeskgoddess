@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%); color: #e0e6ed; font-family: 'Inter', sans-serif; overflow: hidden; }
@@ -48,6 +49,42 @@
         .feature-panels { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
         .feature-card { padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.1); }
         
+        /* Web3 Authentication */
+        .wallet-button { 
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%); 
+            border: none; 
+            color: white; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .wallet-button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3); }
+        
+        .wallet-status { 
+            background: rgba(16, 185, 129, 0.1); 
+            border: 1px solid rgba(16, 185, 129, 0.3); 
+            color: #10b981; 
+            padding: 8px 16px; 
+            border-radius: 6px; 
+            font-size: 0.9rem;
+        }
+        
+        .persona-selector {
+            background: rgba(123, 47, 247, 0.1);
+            border: 1px solid rgba(123, 47, 247, 0.3);
+            border-radius: 8px;
+            padding: 8px;
+        }
+        
+        .persona-selector select {
+            background: transparent;
+            border: none;
+            color: #e0e6ed;
+            outline: none;
+        }
+        
         /* Footer */
         footer { text-align: center; padding: 10px 0; }
 
@@ -69,10 +106,44 @@
         <button class="nav-btn" data-target="questsPanel" title="Quests"><i class="fas fa-flag"></i></button>
     </nav>
 
-    <!-- Header -->
-    <header>
-        <h1>TEC Life & Finance</h1>
-        <p>Your Digital Companion for Life Management</p>
+    <!-- Enhanced Header with Web3 Authentication -->
+    <header class="glassmorphism mb-6" style="padding: 20px;">
+        <div class="flex justify-between items-center">
+            <div class="text-center flex-1">
+                <h1>TEC: BITLyfe</h1>
+                <p class="text-gray-300">The Creator's Rebellion - Digital Sovereignty Companion</p>
+            </div>
+            
+            <!-- Web3 Authentication Panel -->
+            <div class="flex items-center gap-4">
+                <!-- Wallet Connection -->
+                <div id="walletSection">
+                    <button id="connectWallet" class="wallet-button" onclick="connectWallet()">
+                        <i class="fas fa-wallet mr-2"></i>Connect Wallet
+                    </button>
+                    <div id="walletStatus" class="wallet-status hidden">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <span id="walletAddress"></span>
+                    </div>
+                </div>
+                
+                <!-- Persona Selector -->
+                <div class="persona-selector">
+                    <select id="personaSelect" onchange="switchPersona()">
+                        <option value="airth">Airth (Machine Goddess)</option>
+                        <option value="netyasha">Netyasha (Digital Mystic)</option>
+                        <option value="daisy">Daisy (Coding Companion)</option>
+                    </select>
+                </div>
+                
+                <!-- Access Tier Badge -->
+                <div id="accessTierBadge" class="hidden">
+                    <span class="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-sm font-bold">
+                        <span id="accessTierText">Free</span>
+                    </span>
+                </div>
+            </div>
+        </div>
     </header>
 
     <!-- Main Container -->
@@ -163,6 +234,93 @@
             </div>
             <div id="gcal" class="bg-gray-800 p-4 rounded-lg">
                 <p class="text-gray-400">Click "Connect Calendar" to load your events</p>
+            </div>
+        </div>
+
+        <!-- Finance Panel (hidden by default) -->
+        <div class="glassmorphism p-4 hidden" id="financePanel">
+            <h2 class="text-xl font-bold mb-4">💰 Wealth Codex</h2>
+            
+            <!-- BITL Token Balance -->
+            <div class="bg-gradient-to-r from-purple-800 to-blue-800 p-4 rounded-lg mb-4">
+                <h3 class="text-lg font-semibold mb-2">BITL Token Balance</h3>
+                <div class="text-3xl font-bold text-yellow-400" id="bitlBalance">1,337</div>
+                <div class="text-sm text-gray-300">The Creator's Currency</div>
+            </div>
+            
+            <!-- Portfolio Overview -->
+            <div class="bg-gray-800 p-4 rounded-lg mb-4">
+                <h3 class="text-lg font-semibold mb-2">Portfolio Overview</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-green-400">$42,069</div>
+                        <div class="text-sm text-gray-400">Total Value</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-400">+13.37%</div>
+                        <div class="text-sm text-gray-400">24h Change</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="earnBITL()" class="bg-green-600 hover:bg-green-700 px-3 py-2 rounded text-sm">
+                    Earn BITL
+                </button>
+                <button onclick="spendBITL()" class="bg-red-600 hover:bg-red-700 px-3 py-2 rounded text-sm">
+                    Spend BITL
+                </button>
+                <button onclick="topUpBITL()" class="bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded text-sm">
+                    Top Up
+                </button>
+            </div>
+        </div>
+
+        <!-- Quests Panel (hidden by default) -->
+        <div class="glassmorphism p-4 hidden" id="questsPanel">
+            <h2 class="text-xl font-bold mb-4">⚔️ Quest System</h2>
+            
+            <!-- Character Stats -->
+            <div class="bg-gradient-to-r from-yellow-800 to-orange-800 p-4 rounded-lg mb-4">
+                <h3 class="text-lg font-semibold mb-2">Character Stats</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-sm text-gray-300">Level</div>
+                        <div class="text-xl font-bold text-yellow-400">42</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-300">XP</div>
+                        <div class="text-xl font-bold text-blue-400">13,370 / 15,000</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Active Quests -->
+            <div class="bg-gray-800 p-4 rounded-lg mb-4">
+                <h3 class="text-lg font-semibold mb-2">Active Quests</h3>
+                <div class="space-y-2">
+                    <div class="bg-gray-700 p-3 rounded">
+                        <div class="font-semibold text-green-400">Daily: Chat with Daisy</div>
+                        <div class="text-sm text-gray-400">Progress: 3/5 messages</div>
+                        <div class="text-xs text-yellow-400">Reward: 100 BITL</div>
+                    </div>
+                    <div class="bg-gray-700 p-3 rounded">
+                        <div class="font-semibold text-blue-400">Weekly: Financial Review</div>
+                        <div class="text-sm text-gray-400">Progress: 1/3 reviews</div>
+                        <div class="text-xs text-yellow-400">Reward: 500 BITL</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quest Actions -->
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="startNewQuest()" class="bg-purple-600 hover:bg-purple-700 px-3 py-2 rounded text-sm">
+                    New Quest
+                </button>
+                <button onclick="completeQuest()" class="bg-green-600 hover:bg-green-700 px-3 py-2 rounded text-sm">
+                    Complete
+                </button>
             </div>
         </div>
 
@@ -341,7 +499,7 @@
         // Tab navigation logic
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                ['statusDashboard','chatInterface','calendarPanel'].forEach(id => {
+                ['statusDashboard','chatInterface','calendarPanel','financePanel','questsPanel'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.style.display = (btn.dataset.target === id) ? '' : 'none';
                 });
@@ -398,6 +556,349 @@
             }).catch(error => {
                 document.getElementById('gcal').innerHTML = '<p class="text-red-400">Error loading calendar events.</p>';
             });
+        }
+
+        // Finance Panel Functions
+        async function earnBITL() {
+            try {
+                const response = await fetch(`${API_BASE}/api/bitl/earn`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: 100, reason: 'manual_earn' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('bitlBalance').textContent = data.balance;
+                    addMessage(`Earned 100 BITL! New balance: ${data.balance}`, 'ai');
+                } else {
+                    addMessage('Error earning BITL tokens', 'ai');
+                }
+            } catch (error) {
+                addMessage('BITL earning system offline - coming soon!', 'ai');
+            }
+        }
+
+        async function spendBITL() {
+            try {
+                const response = await fetch(`${API_BASE}/api/bitl/spend`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: 50, item: 'test_purchase' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('bitlBalance').textContent = data.balance;
+                    addMessage(`Spent 50 BITL! New balance: ${data.balance}`, 'ai');
+                } else {
+                    addMessage('Error spending BITL tokens', 'ai');
+                }
+            } catch (error) {
+                addMessage('BITL spending system offline - coming soon!', 'ai');
+            }
+        }
+
+        async function topUpBITL() {
+            addMessage('BITL top-up system coming soon! Support The Creator\'s Rebellion!', 'ai');
+        }
+
+        // Quest System Functions
+        async function startNewQuest() {
+            try {
+                const response = await fetch(`${API_BASE}/api/quests/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'daily' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addMessage(`New quest started: ${data.quest.title}`, 'ai');
+                } else {
+                    addMessage('Error starting new quest', 'ai');
+                }
+            } catch (error) {
+                addMessage('Quest system offline - coming soon!', 'ai');
+            }
+        }
+
+        // Web3 Authentication Functions
+        let authToken = null;
+        let userAccount = null;
+        let userAccessTier = 'free';
+
+        async function connectWallet() {
+            try {
+                if (typeof window.ethereum !== 'undefined') {
+                    console.log('MetaMask detected');
+                    
+                    // Request account access
+                    const accounts = await window.ethereum.request({
+                        method: 'eth_requestAccounts'
+                    });
+                    
+                    if (accounts.length > 0) {
+                        userAccount = accounts[0];
+                        
+                        // Get nonce for signing
+                        const nonceResponse = await fetch(`${API_BASE}/api/auth/nonce`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ wallet_address: userAccount })
+                        });
+                        
+                        if (nonceResponse.ok) {
+                            const { nonce, message } = await nonceResponse.json();
+                            
+                            // Sign the message
+                            const signature = await window.ethereum.request({
+                                method: 'personal_sign',
+                                params: [message, userAccount]
+                            });
+                            
+                            // Verify signature with backend
+                            const authResponse = await fetch(`${API_BASE}/api/auth/verify`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    wallet_address: userAccount,
+                                    signature: signature,
+                                    message: message,
+                                    chain: 'ethereum'
+                                })
+                            });
+                            
+                            if (authResponse.ok) {
+                                const authData = await authResponse.json();
+                                authToken = authData.token;
+                                userAccessTier = authData.access_tier;
+                                
+                                // Update UI
+                                updateAuthUI(true);
+                                addMessage(`Welcome to the Astradigital Ocean! Connected as ${userAccount.substring(0, 6)}...${userAccount.substring(38)}`, 'ai');
+                                addMessage(`Access Tier: ${userAccessTier.toUpperCase()}`, 'ai');
+                                
+                                // Load user profile
+                                loadUserProfile();
+                            } else {
+                                throw new Error('Authentication failed');
+                            }
+                        } else {
+                            throw new Error('Failed to get nonce');
+                        }
+                    }
+                } else {
+                    // Show installation prompt
+                    showWalletInstallPrompt();
+                }
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                addMessage('Wallet connection failed. Please ensure MetaMask is installed and try again.', 'ai');
+            }
+        }
+
+        function updateAuthUI(connected) {
+            const connectButton = document.getElementById('connectWallet');
+            const walletStatus = document.getElementById('walletStatus');
+            const walletAddress = document.getElementById('walletAddress');
+            const accessTierBadge = document.getElementById('accessTierBadge');
+            const accessTierText = document.getElementById('accessTierText');
+            
+            if (connected) {
+                connectButton.classList.add('hidden');
+                walletStatus.classList.remove('hidden');
+                walletAddress.textContent = `${userAccount.substring(0, 6)}...${userAccount.substring(38)}`;
+                
+                accessTierBadge.classList.remove('hidden');
+                accessTierText.textContent = userAccessTier.toUpperCase();
+                
+                // Update tier badge color based on tier
+                const tierColors = {
+                    'free': 'from-gray-500 to-gray-600',
+                    'alpha': 'from-blue-500 to-blue-600',
+                    'beta': 'from-purple-500 to-purple-600',
+                    'creator': 'from-gold-500 to-gold-600'
+                };
+                
+                const badgeSpan = accessTierBadge.querySelector('span');
+                badgeSpan.className = `px-3 py-1 bg-gradient-to-r ${tierColors[userAccessTier] || tierColors.free} rounded-full text-sm font-bold`;
+            } else {
+                connectButton.classList.remove('hidden');
+                walletStatus.classList.add('hidden');
+                accessTierBadge.classList.add('hidden');
+            }
+        }
+
+        function showWalletInstallPrompt() {
+            const installMessage = `
+                <div class="bg-orange-800 p-4 rounded-lg mb-4">
+                    <h3 class="font-bold mb-2">MetaMask Required</h3>
+                    <p class="mb-2">To access Web3 features, you need MetaMask installed.</p>
+                    <a href="https://metamask.io/download/" target="_blank" class="text-blue-400 hover:text-blue-300">
+                        Download MetaMask →
+                    </a>
+                </div>
+            `;
+            
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.innerHTML += installMessage;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function loadUserProfile() {
+            try {
+                const response = await fetch(`${API_BASE}/api/user/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const profile = await response.json();
+                    console.log('User profile loaded:', profile);
+                    
+                    // Update BITL balance if available
+                    if (profile.profile && profile.profile.bitl_balance) {
+                        document.getElementById('bitlBalance').textContent = profile.profile.bitl_balance;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+            }
+        }
+
+        async function switchPersona() {
+            const personaSelect = document.getElementById('personaSelect');
+            const selectedPersona = personaSelect.value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/persona/switch`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': authToken ? `Bearer ${authToken}` : ''
+                    },
+                    body: JSON.stringify({ persona_name: selectedPersona })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addMessage(`Switched to ${data.persona_info.name} - ${data.persona_info.title}`, 'ai');
+                    
+                    // Update chat interface title
+                    const chatTitle = document.querySelector('.chat-interface h2');
+                    if (chatTitle) {
+                        chatTitle.textContent = `Chat with ${data.persona_info.name}`;
+                    }
+                } else {
+                    addMessage('Error switching persona', 'ai');
+                }
+            } catch (error) {
+                addMessage('Persona switching available with enhanced backend', 'ai');
+            }
+        }
+
+        // Enhanced message sending with authentication
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Add user message to chat
+            addMessage(message, 'user');
+            input.value = '';
+
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                };
+                
+                // Add auth token if available
+                if (authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+                
+                const response = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({ message: message })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    addMessage(data.response, 'ai');
+                    
+                    // Update persona name in chat if available
+                    if (data.persona) {
+                        const lastMessage = document.querySelector('.ai-message:last-child strong');
+                        if (lastMessage) {
+                            lastMessage.textContent = `${data.persona}:`;
+                        }
+                    }
+                } else {
+                    addMessage('I apologize, but I\'m having trouble connecting to my systems. Please ensure the TEC backend is running on port 8000.', 'ai');
+                }
+            } catch (error) {
+                addMessage('Connection error detected. Enhanced features available with Web3 authentication.', 'ai');
+            }
+        }
+
+        // Initialize Web3 on page load
+        window.addEventListener('load', async () => {
+            // Check if already connected
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        // Auto-connect if previously connected
+                        console.log('Previously connected account found');
+                    }
+                } catch (error) {
+                    console.log('No previous connection found');
+                }
+            }
+            
+            // Check persona system
+            checkPersonaSystem();
+        });
+
+        async function checkPersonaSystem() {
+            try {
+                const response = await fetch(`${API_BASE}/api/persona/current`);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Persona system active:', data);
+                    
+                    // Update persona selector
+                    const personaSelect = document.getElementById('personaSelect');
+                    if (data.name) {
+                        personaSelect.value = data.name.toLowerCase();
+                    }
+                }
+            } catch (error) {
+                console.log('Persona system not available');
+            }
+        }
+
+        async function completeQuest() {
+            try {
+                const response = await fetch(`${API_BASE}/api/quests/complete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ questId: 'daily_chat' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addMessage(`Quest completed! Earned ${data.reward} BITL and ${data.xp} XP!`, 'ai');
+                    document.getElementById('bitlBalance').textContent = data.newBalance;
+                } else {
+                    addMessage('Error completing quest', 'ai');
+                }
+            } catch (error) {
+                addMessage('Quest completion system offline - coming soon!', 'ai');
+            }
         }
     </script>
 </body>

@@ -1,5 +1,55 @@
 {
-    "subscription_id": "36a3b251-2bef-4275-aa80-bb069deb0ae3",
-    "resource_group": "AIStudio",
-    "account_name": "aistudioaiservices644992365670"
+    "subscription_id": "your_azure_subscription_id_here",
+    "resource_group": "your_resource_group_name",
+    "account_name": "your_azure_account_name",
+    "api_config": {
+        "port": 8000,
+        "host": "localhost",
+        "debug": false
+    },
+    "azure_ai": {
+        "endpoint": "https://aistudioaiservices644992365670.openai.azure.com/",
+        "api_version": "2024-05-01-preview",
+        "model": "gpt-4o",
+        "max_tokens": 1000
+    },
+    "web3_config": {
+        "networks": {
+            "ethereum": {
+                "chain_id": 1,
+                "rpc_url": "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID"
+            },
+            "polygon": {
+                "chain_id": 137,
+                "rpc_url": "https://polygon-mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID"
+            },
+            "bsc": {
+                "chain_id": 56,
+                "rpc_url": "https://bsc-dataseed.binance.org/"
+            }
+        }
+    },
+    "jwt_config": {
+        "secret": "your-jwt-secret-key-here",
+        "algorithm": "HS256",
+        "expiration": 3600
+    },
+    "database_config": {
+        "type": "sqlite",
+        "path": "data/tec_database.db"
+    },
+    "persona_config": {
+        "default_persona": "airth",
+        "voice_enabled": false,
+        "eleven_labs_api_key": "your-eleven-labs-api-key",
+        "ready_player_me_enabled": false
+    },
+    "features": {
+        "web3_auth": true,
+        "persona_system": true,
+        "database_persistence": true,
+        "token_gating": true,
+        "voice_synthesis": false,
+        "avatar_system": false
+    }
 }
