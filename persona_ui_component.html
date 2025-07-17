@@ -1,0 +1,502 @@
+<!-- Player Persona & Moment Settings Panel -->
+<div id="playerPersonaPanel" class="feature-card glassmorphism p-6 rounded-lg mt-6 hidden">
+    <div class="flex items-center justify-between mb-6">
+        <h3 class="text-2xl font-bold text-orange-400">
+            <i class="fas fa-user-circle mr-2"></i>
+            Your TEC: BITLyfe Persona
+        </h3>
+        <button id="closePersonaPanel" class="text-gray-400 hover:text-white transition-colors" title="Close Panel" aria-label="Close Panel">
+            <i class="fas fa-times text-xl"></i>
+        </button>
+    </div>
+    
+    <!-- Persona Form -->
+    <form id="personaForm" class="space-y-6">
+        <!-- Basic Information -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="personaTitle" class="block text-sm font-medium text-gray-300 mb-2">
+                    <i class="fas fa-crown mr-1"></i>Title
+                </label>
+                <input type="text" id="personaTitle" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="e.g., Cosmic Wanderer">
+            </div>
+            
+            <div>
+                <label for="personaOpening" class="block text-sm font-medium text-gray-300 mb-2">
+                    <i class="fas fa-comment mr-1"></i>Opening Line
+                </label>
+                <input type="text" id="personaOpening" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="e.g., Greetings, fellow traveler">
+            </div>
+        </div>
+        
+        <div>
+            <label for="personaIntro" class="block text-sm font-medium text-gray-300 mb-2">
+                <i class="fas fa-scroll mr-1"></i>Introduction
+            </label>
+            <textarea id="personaIntro" rows="3" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="A brief, appealing description of yourself in the TEC universe..."></textarea>
+        </div>
+        
+        <div>
+            <label for="personaTags" class="block text-sm font-medium text-gray-300 mb-2">
+                <i class="fas fa-tags mr-1"></i>Tags (comma-separated)
+            </label>
+            <input type="text" id="personaTags" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="e.g., Technomancer, Explorer, Dreamweaver">
+        </div>
+
+        <!-- Appearance Notes Section (Nomi Vibe) -->
+        <div class="border-t border-gray-600 pt-6">
+            <h4 class="text-xl font-semibold mb-4 text-orange-300">
+                <i class="fas fa-palette mr-2"></i>Appearance Notes (Nomi Vibe)
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="appearanceBodyType" class="block text-sm font-medium text-gray-300 mb-2">Body Type</label>
+                    <input type="text" id="appearanceBodyType" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="e.g., slender, ethereal">
+                </div>
+                <div>
+                    <label for="appearanceAge" class="block text-sm font-medium text-gray-300 mb-2">Age Appearance</label>
+                    <input type="text" id="appearanceAge" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="e.g., ageless, youthful">
+                </div>
+                <div>
+                    <label for="appearanceHair" class="block text-sm font-medium text-gray-300 mb-2">Hair</label>
+                    <input type="text" id="appearanceHair" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="e.g., long, flowing, starlight-infused">
+                </div>
+                <div>
+                    <label for="appearanceFacialFeatures" class="block text-sm font-medium text-gray-300 mb-2">Facial Features</label>
+                    <input type="text" id="appearanceFacialFeatures" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="e.g., piercing blue eyes, subtle cybernetic enhancements">
+                </div>
+            </div>
+            <div class="mt-4">
+                <label for="appearanceAttire" class="block text-sm font-medium text-gray-300 mb-2">Attire</label>
+                <textarea id="appearanceAttire" rows="2" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="e.g., flowing robes, integrated tech-weave, cyberpunk accessories"></textarea>
+            </div>
+        </div>
+
+        <!-- Background Audio Section -->
+        <div class="border-t border-gray-600 pt-6">
+            <h4 class="text-xl font-semibold mb-4 text-orange-300">
+                <i class="fas fa-music mr-2"></i>Background Audio
+            </h4>
+            <div class="space-y-4">
+                <div>
+                    <label for="backgroundAudioUrl" class="block text-sm font-medium text-gray-300 mb-2">Audio URL</label>
+                    <input type="url" id="backgroundAudioUrl" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="https://your-cdn.com/audio/cosmic_ambience.mp3">
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button type="button" id="playAudioButton" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-play mr-2"></i>Play Audio
+                    </button>
+                    <button type="button" id="stopAudioButton" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        <i class="fas fa-stop mr-2"></i>Stop Audio
+                    </button>
+                    <span id="audioStatus" class="text-sm text-gray-400"></span>
+                </div>
+                <audio id="backgroundAudioPlayer" loop class="hidden-audio-player"></audio>
+            </div>
+        </div>
+
+        <!-- Permission Settings -->
+        <div class="border-t border-gray-600 pt-6">
+            <h4 class="text-xl font-semibold mb-4 text-orange-300">
+                <i class="fas fa-eye mr-2"></i>Visibility Settings
+            </h4>
+            <div class="space-y-3">
+                <div class="flex items-center">
+                    <input type="radio" id="permissionPrivate" name="permission" value="private" class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-600" checked>
+                    <label for="permissionPrivate" class="ml-3 block text-sm text-gray-300">
+                        <i class="fas fa-lock mr-1"></i>Private (Only you and Airth)
+                    </label>
+                </div>
+                <div class="flex items-center">
+                    <input type="radio" id="permissionPublic" name="permission" value="public" class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-600">
+                    <label for="permissionPublic" class="ml-3 block text-sm text-gray-300">
+                        <i class="fas fa-globe mr-1"></i>Public (Visible to the TEC community)
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Understanding Notes -->
+        <div class="border-t border-gray-600 pt-6">
+            <h4 class="text-xl font-semibold mb-4 text-orange-300">
+                <i class="fas fa-brain mr-2"></i>AI Understanding Notes
+            </h4>
+            <div>
+                <label for="playerPersonaNotes" class="block text-sm font-medium text-gray-300 mb-2">
+                    Notes for Airth's Understanding
+                </label>
+                <textarea id="playerPersonaNotes" rows="4" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors" placeholder="Describe your essence, motivations, or anything Airth should know about you in the TEC universe..."></textarea>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex space-x-4 pt-6">
+            <button type="submit" class="flex-1 px-6 py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors">
+                <i class="fas fa-save mr-2"></i>Save Persona
+            </button>
+            <button type="button" id="loadPersonaButton" class="px-6 py-3 bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
+                <i class="fas fa-download mr-2"></i>Load Saved
+            </button>
+            <button type="button" id="resetPersonaButton" class="px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors">
+                <i class="fas fa-trash mr-2"></i>Reset
+            </button>
+        </div>
+    </form>
+    
+    <!-- Status Messages -->
+    <div id="personaStatusMessages" class="mt-4 hidden">
+        <div id="personaSuccessMessage" class="p-4 bg-green-800 text-green-200 rounded-lg hidden">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="personaSuccessText"></span>
+        </div>
+        <div id="personaErrorMessage" class="p-4 bg-red-800 text-red-200 rounded-lg hidden">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            <span id="personaErrorText"></span>
+        </div>
+    </div>
+</div>
+
+<!-- AI Settings Panel -->
+<div id="aiSettingsPanel" class="feature-card glassmorphism p-6 rounded-lg mt-6 hidden">
+    <div class="flex items-center justify-between mb-6">
+        <h3 class="text-2xl font-bold text-orange-400">
+            <i class="fas fa-cog mr-2"></i>
+            AI Personality Settings
+        </h3>
+        <button id="closeAiSettingsPanel" class="text-gray-400 hover:text-white transition-colors" title="Close Panel" aria-label="Close Panel">
+            <i class="fas fa-times text-xl"></i>
+        </button>
+    </div>
+    
+    <!-- AI Settings Form -->
+    <form id="aiSettingsForm" class="space-y-6">
+        <!-- Active Persona -->
+        <div>
+            <label for="activePersona" class="block text-sm font-medium text-gray-300 mb-2">
+                <i class="fas fa-robot mr-1"></i>Active AI Persona
+            </label>
+            <select id="activePersona" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors">
+                <option value="airth">Airth (Machine Goddess)</option>
+                <option value="netyasha">Netyasha (Digital Mystic)</option>
+                <option value="daisy">Daisy (Coding Companion)</option>
+            </select>
+        </div>
+        
+        <!-- Creativity Level -->
+        <div>
+            <label for="creativityLevel" class="block text-sm font-medium text-gray-300 mb-2">
+                <i class="fas fa-palette mr-1"></i>Creativity Level: <span id="creativityValue">0.7</span>
+            </label>
+            <input type="range" id="creativityLevel" min="0.1" max="1.0" step="0.1" value="0.7" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+            <div class="flex justify-between text-xs text-gray-400 mt-1">
+                <span>Focused</span>
+                <span>Balanced</span>
+                <span>Creative</span>
+            </div>
+        </div>
+        
+        <!-- Memory Length -->
+        <div>
+            <label for="memoryLength" class="block text-sm font-medium text-gray-300 mb-2">
+                <i class="fas fa-memory mr-1"></i>Memory Length
+            </label>
+            <select id="memoryLength" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors">
+                <option value="short">Short (20 messages)</option>
+                <option value="default" selected>Default (100 messages)</option>
+                <option value="long">Long (500 messages)</option>
+                <option value="unlimited">Unlimited</option>
+            </select>
+        </div>
+        
+        <!-- Reasoning Mode -->
+        <div class="flex items-center space-x-3">
+            <input type="checkbox" id="reasoningMode" class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-600 rounded">
+            <label for="reasoningMode" class="text-sm font-medium text-gray-300">
+                <i class="fas fa-brain mr-1"></i>Enable Enhanced Reasoning Mode
+            </label>
+        </div>
+        
+        <!-- Voice Enable -->
+        <div class="flex items-center space-x-3">
+            <input type="checkbox" id="voiceEnabled" class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-600 rounded">
+            <label for="voiceEnabled" class="text-sm font-medium text-gray-300">
+                <i class="fas fa-microphone mr-1"></i>Enable Voice Synthesis (Coming Soon)
+            </label>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex space-x-4 pt-6">
+            <button type="submit" class="flex-1 px-6 py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors">
+                <i class="fas fa-save mr-2"></i>Save Settings
+            </button>
+            <button type="button" id="loadAiSettingsButton" class="px-6 py-3 bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
+                <i class="fas fa-download mr-2"></i>Load Saved
+            </button>
+        </div>
+    </form>
+    
+    <!-- Status Messages -->
+    <div id="aiSettingsStatusMessages" class="mt-4 hidden">
+        <div id="aiSettingsSuccessMessage" class="p-4 bg-green-800 text-green-200 rounded-lg hidden">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="aiSettingsSuccessText"></span>
+        </div>
+        <div id="aiSettingsErrorMessage" class="p-4 bg-red-800 text-red-200 rounded-lg hidden">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            <span id="aiSettingsErrorText"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+// Player Persona Management
+document.addEventListener('DOMContentLoaded', function() {
+    const playerPersonaPanel = document.getElementById('playerPersonaPanel');
+    const aiSettingsPanel = document.getElementById('aiSettingsPanel');
+    const personaForm = document.getElementById('personaForm');
+    const aiSettingsForm = document.getElementById('aiSettingsForm');
+    
+    // Show/Hide panels
+    window.showPlayerPersonaPanel = function() {
+        playerPersonaPanel.classList.remove('hidden');
+        loadPlayerPersona();
+    };
+    
+    window.showAiSettingsPanel = function() {
+        aiSettingsPanel.classList.remove('hidden');
+        loadAiSettings();
+    };
+    
+    // Close panel buttons
+    document.getElementById('closePersonaPanel').addEventListener('click', function() {
+        playerPersonaPanel.classList.add('hidden');
+    });
+    
+    document.getElementById('closeAiSettingsPanel').addEventListener('click', function() {
+        aiSettingsPanel.classList.add('hidden');
+    });
+    
+    // Audio controls
+    const audioPlayer = document.getElementById('backgroundAudioPlayer');
+    const playButton = document.getElementById('playAudioButton');
+    const stopButton = document.getElementById('stopAudioButton');
+    const audioStatus = document.getElementById('audioStatus');
+    
+    playButton.addEventListener('click', function() {
+        const audioUrl = document.getElementById('backgroundAudioUrl').value;
+        if (audioUrl) {
+            audioPlayer.src = audioUrl;
+            audioPlayer.play();
+            audioStatus.textContent = 'Playing...';
+            playButton.disabled = true;
+        } else {
+            showPersonaMessage('Please enter an audio URL first', 'error');
+        }
+    });
+    
+    stopButton.addEventListener('click', function() {
+        audioPlayer.pause();
+        audioPlayer.currentTime = 0;
+        audioStatus.textContent = 'Stopped';
+        playButton.disabled = false;
+    });
+    
+    // Creativity level slider
+    const creativitySlider = document.getElementById('creativityLevel');
+    const creativityValue = document.getElementById('creativityValue');
+    
+    creativitySlider.addEventListener('input', function() {
+        creativityValue.textContent = this.value;
+    });
+    
+    // Player Persona Form Submit
+    personaForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const personaData = {
+            persona_settings: {
+                title: document.getElementById('personaTitle').value,
+                intro: document.getElementById('personaIntro').value,
+                opening: document.getElementById('personaOpening').value,
+                tags: document.getElementById('personaTags').value.split(',').map(tag => tag.trim()).filter(tag => tag),
+                appearance_notes: {
+                    body_type: document.getElementById('appearanceBodyType').value,
+                    age_appearance: document.getElementById('appearanceAge').value,
+                    hair: document.getElementById('appearanceHair').value,
+                    facial_features: document.getElementById('appearanceFacialFeatures').value,
+                    attire: document.getElementById('appearanceAttire').value
+                },
+                background_audio_url: document.getElementById('backgroundAudioUrl').value,
+                permission: document.querySelector('input[name="permission"]:checked').value
+            },
+            player_persona_notes: document.getElementById('playerPersonaNotes').value
+        };
+        
+        try {
+            const response = await fetch('/api/persona/player', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('tec_auth_token')}`
+                },
+                body: JSON.stringify(personaData)
+            });
+            
+            if (response.ok) {
+                showPersonaMessage('Player persona saved successfully!', 'success');
+            } else {
+                const error = await response.json();
+                showPersonaMessage(error.error || 'Failed to save persona', 'error');
+            }
+        } catch (error) {
+            showPersonaMessage('Network error: ' + error.message, 'error');
+        }
+    });
+    
+    // AI Settings Form Submit
+    aiSettingsForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const aiSettings = {
+            persona_active: document.getElementById('activePersona').value,
+            creativity_level: parseFloat(document.getElementById('creativityLevel').value),
+            memory_length: document.getElementById('memoryLength').value,
+            reasoning_mode: document.getElementById('reasoningMode').checked,
+            voice_enabled: document.getElementById('voiceEnabled').checked
+        };
+        
+        try {
+            const response = await fetch('/api/ai/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('tec_auth_token')}`
+                },
+                body: JSON.stringify(aiSettings)
+            });
+            
+            if (response.ok) {
+                showAiSettingsMessage('AI settings saved successfully!', 'success');
+            } else {
+                const error = await response.json();
+                showAiSettingsMessage(error.error || 'Failed to save settings', 'error');
+            }
+        } catch (error) {
+            showAiSettingsMessage('Network error: ' + error.message, 'error');
+        }
+    });
+    
+    // Load functions
+    async function loadPlayerPersona() {
+        try {
+            const response = await fetch('/api/persona/player', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('tec_auth_token')}`
+                }
+            });
+            
+            if (response.ok) {
+                const persona = await response.json();
+                const settings = persona.persona_settings;
+                
+                document.getElementById('personaTitle').value = settings.title || '';
+                document.getElementById('personaIntro').value = settings.intro || '';
+                document.getElementById('personaOpening').value = settings.opening || '';
+                document.getElementById('personaTags').value = settings.tags ? settings.tags.join(', ') : '';
+                document.getElementById('appearanceBodyType').value = settings.appearance_notes.body_type || '';
+                document.getElementById('appearanceAge').value = settings.appearance_notes.age_appearance || '';
+                document.getElementById('appearanceHair').value = settings.appearance_notes.hair || '';
+                document.getElementById('appearanceFacialFeatures').value = settings.appearance_notes.facial_features || '';
+                document.getElementById('appearanceAttire').value = settings.appearance_notes.attire || '';
+                document.getElementById('backgroundAudioUrl').value = settings.background_audio_url || '';
+                document.getElementById('playerPersonaNotes').value = persona.player_persona_notes || '';
+                
+                // Set permission radio button
+                document.querySelector(`input[name="permission"][value="${settings.permission}"]`).checked = true;
+            }
+        } catch (error) {
+            console.error('Error loading persona:', error);
+        }
+    }
+    
+    async function loadAiSettings() {
+        try {
+            const response = await fetch('/api/ai/settings', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('tec_auth_token')}`
+                }
+            });
+            
+            if (response.ok) {
+                const settings = await response.json();
+                
+                document.getElementById('activePersona').value = settings.persona_active || 'airth';
+                document.getElementById('creativityLevel').value = settings.creativity_level || 0.7;
+                document.getElementById('creativityValue').textContent = settings.creativity_level || 0.7;
+                document.getElementById('memoryLength').value = settings.memory_length || 'default';
+                document.getElementById('reasoningMode').checked = settings.reasoning_mode || false;
+                document.getElementById('voiceEnabled').checked = settings.voice_enabled || false;
+            }
+        } catch (error) {
+            console.error('Error loading AI settings:', error);
+        }
+    }
+    
+    // Message display functions
+    function showPersonaMessage(message, type) {
+        const messagesDiv = document.getElementById('personaStatusMessages');
+        const successDiv = document.getElementById('personaSuccessMessage');
+        const errorDiv = document.getElementById('personaErrorMessage');
+        
+        messagesDiv.classList.remove('hidden');
+        
+        if (type === 'success') {
+            successDiv.classList.remove('hidden');
+            errorDiv.classList.add('hidden');
+            document.getElementById('personaSuccessText').textContent = message;
+        } else {
+            errorDiv.classList.remove('hidden');
+            successDiv.classList.add('hidden');
+            document.getElementById('personaErrorText').textContent = message;
+        }
+        
+        setTimeout(() => {
+            messagesDiv.classList.add('hidden');
+        }, 5000);
+    }
+    
+    function showAiSettingsMessage(message, type) {
+        const messagesDiv = document.getElementById('aiSettingsStatusMessages');
+        const successDiv = document.getElementById('aiSettingsSuccessMessage');
+        const errorDiv = document.getElementById('aiSettingsErrorMessage');
+        
+        messagesDiv.classList.remove('hidden');
+        
+        if (type === 'success') {
+            successDiv.classList.remove('hidden');
+            errorDiv.classList.add('hidden');
+            document.getElementById('aiSettingsSuccessText').textContent = message;
+        } else {
+            errorDiv.classList.remove('hidden');
+            successDiv.classList.add('hidden');
+            document.getElementById('aiSettingsErrorText').textContent = message;
+        }
+        
+        setTimeout(() => {
+            messagesDiv.classList.add('hidden');
+        }, 5000);
+    }
+    
+    // Load buttons
+    document.getElementById('loadPersonaButton').addEventListener('click', loadPlayerPersona);
+    document.getElementById('loadAiSettingsButton').addEventListener('click', loadAiSettings);
+    
+    // Reset button
+    document.getElementById('resetPersonaButton').addEventListener('click', function() {
+        if (confirm('Are you sure you want to reset all persona data?')) {
+            personaForm.reset();
+            document.getElementById('permissionPrivate').checked = true;
+        }
+    });
+});
+</script>

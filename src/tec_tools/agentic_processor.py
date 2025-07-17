@@ -334,7 +334,208 @@ Access Level Features:
             
         except Exception as e:
             logger.error(f"Error processing message: {e}")
-            return f"I'm experiencing some technical difficulties right now. As {current_persona['name']}, I'll get back to my full capabilities soon!"
+            return f"I'm experiencing some technical difficulties. Please try again."
+            
+    async def process_enhanced_message(self, message: str, context: Dict[str, Any]) -> str:
+        """Process message with enhanced persona and context integration"""
+        try:
+            user_id = context.get('user_id', 'anonymous')
+            ai_settings = context.get('ai_settings', {})
+            player_persona = context.get('player_persona', {})
+            conversation_history = context.get('conversation_history', [])
+            
+            # Get current persona
+            current_persona_name = ai_settings.get('persona_active', 'airth')
+            current_persona = self.persona_manager.get_persona(current_persona_name)
+            
+            # Build enhanced system prompt
+            enhanced_prompt = self._build_enhanced_system_prompt(
+                current_persona, player_persona, ai_settings, conversation_history
+            )
+            
+            # Prepare conversation history
+            chat_history = self._prepare_chat_history(conversation_history)
+            
+            # Generate response with enhanced context
+            if self.azure_ai_manager:
+                # Use Azure AI with enhanced settings
+                temperature = ai_settings.get('creativity_level', 0.7)
+                reasoning_mode = ai_settings.get('reasoning_mode', False)
+                
+                response = await self.azure_ai_manager.generate_response(
+                    message, enhanced_prompt, chat_history, temperature, reasoning_mode
+                )
+            else:
+                # Fallback response
+                response = f"Enhanced TEC system received: '{message}'. As {current_persona['name']}, I understand your player persona and will respond accordingly when Azure AI is available."
+            
+            return response
+            
+        except Exception as e:
+            logger.error(f"Error in enhanced message processing: {e}")
+            return f"I'm experiencing some technical difficulties right now. As {current_persona_name}, I'll get back to my full capabilities soon!"
+    
+    def _build_enhanced_system_prompt(self, current_persona: Dict[str, Any], 
+                                    player_persona: Dict[str, Any], 
+                                    ai_settings: Dict[str, Any],
+                                    conversation_history: List[Dict[str, Any]]) -> str:
+        """Build enhanced system prompt with persona and player context"""
+        
+        # Start with base persona prompt
+        prompt = current_persona['system_prompt']
+        
+        # Add player persona context if available
+        if player_persona:
+            persona_settings = player_persona.get('persona_settings', {})
+            player_notes = player_persona.get('player_persona_notes', '')
+            
+            prompt += f"\n\n--- PLAYER PERSONA CONTEXT ---\n"
+            prompt += f"You are interacting with: {persona_settings.get('title', 'Unknown')}\n"
+            prompt += f"Player Description: {persona_settings.get('intro', 'No description available')}\n"
+            prompt += f"Player's Opening Style: {persona_settings.get('opening', 'Standard greeting')}\n"
+            
+            # Add appearance notes for context
+            appearance = persona_settings.get('appearance_notes', {})
+            if appearance:
+                prompt += f"Player's Appearance: {appearance}\n"
+            
+            # Add tags for understanding
+            tags = persona_settings.get('tags', [])
+            if tags:
+                prompt += f"Player Tags: {', '.join(tags)}\n"
+            
+            # Add player persona notes
+            if player_notes:
+                prompt += f"Additional Player Context: {player_notes}\n"
+        
+        # Add AI settings context
+        if ai_settings.get('reasoning_mode'):
+            prompt += f"\n\n--- REASONING MODE ENABLED ---\n"
+            prompt += f"Use step-by-step reasoning and analytical thinking in your responses.\n"
+        
+        # Add conversation context
+        if conversation_history:
+            prompt += f"\n\n--- CONVERSATION CONTEXT ---\n"
+            prompt += f"This conversation has {len(conversation_history)} previous messages.\n"
+            prompt += f"Maintain context and continuity with the previous discussion.\n"
+        
+        # Add creativity level guidance
+        creativity_level = ai_settings.get('creativity_level', 0.7)
+        if creativity_level > 0.8:
+            prompt += f"\n\n--- HIGH CREATIVITY MODE ---\n"
+            prompt += f"Be more creative, expressive, and imaginative in your responses.\n"
+        elif creativity_level < 0.3:
+            prompt += f"\n\n--- FOCUSED MODE ---\n"
+            prompt += f"Be more focused, factual, and precise in your responses.\n"
+        
+        return prompt
+    
+    def _prepare_chat_history(self, conversation_history: List[Dict[str, Any]]) -> List[Dict[str, str]]:
+        """Prepare conversation history for AI model"""
+        chat_history = []
+        
+        # Reverse to get chronological order (oldest first)
+        for msg in reversed(conversation_history):
+            if msg['message_type'] == 'user':
+                chat_history.append({
+                    'role': 'user',
+                    'content': msg['message_content']
+                })
+            elif msg['message_type'] == 'ai':
+                chat_history.append({
+                    'role': 'assistant',
+                    'content': msg['message_content']
+                })
+        
+        return chat_history
+    
+    async def generate_image_prompt(self, context: Dict[str, Any]) -> str:
+        """Generate image prompt using character lore and player persona"""
+        try:
+            character_data = context.get('character_data', {})
+            player_persona = context.get('player_persona', {})
+            setting = context.get('setting', '')
+            style = context.get('style', 'cyberpunk')
+            description = context.get('description', '')
+            
+            # Build prompt for image generation
+            prompt_instruction = f"""You are an expert AI prompt engineer for generative image models.
+Your task is to create a detailed, high-quality image prompt based on the following context:
+
+CHARACTER DATA:
+{json.dumps(character_data, indent=2) if character_data else 'No character data provided'}
+
+PLAYER PERSONA:
+{json.dumps(player_persona, indent=2) if player_persona else 'No player persona provided'}
+
+SETTING: {setting}
+STYLE: {style}
+DESCRIPTION: {description}
+
+Create a detailed image prompt that incorporates:
+1. Character's appearance details (body type, age, hair, facial features, attire)
+2. Setting and environmental details
+3. Artistic style and mood
+4. Any specific actions or expressions mentioned
+
+Format the prompt for a high-quality image generation system. Output ONLY the image prompt."""
+            
+            if self.azure_ai_manager:
+                image_prompt = await self.azure_ai_manager.generate_response(
+                    prompt_instruction, "", [], 0.8, False
+                )
+                return image_prompt
+            else:
+                return f"Image prompt generation requires Azure AI integration. Context: {character_data.get('name', 'Unknown character')} in {setting} with {style} style."
+                
+        except Exception as e:
+            logger.error(f"Error generating image prompt: {e}")
+            return f"Error generating image prompt: {str(e)}"
+    
+    async def generate_story_prompt(self, context: Dict[str, Any]) -> str:
+        """Generate story prompt using character lore and player persona"""
+        try:
+            character_data = context.get('character_data', {})
+            player_persona = context.get('player_persona', {})
+            setting = context.get('setting', '')
+            theme = context.get('theme', '')
+            length = context.get('length', 'short')
+            
+            # Build prompt for story generation
+            prompt_instruction = f"""You are a master storyteller for the TEC: BITLyfe universe.
+Your task is to create a compelling story prompt based on the following context:
+
+CHARACTER DATA:
+{json.dumps(character_data, indent=2) if character_data else 'No character data provided'}
+
+PLAYER PERSONA:
+{json.dumps(player_persona, indent=2) if player_persona else 'No player persona provided'}
+
+SETTING: {setting}
+THEME: {theme}
+LENGTH: {length}
+
+Create a detailed story prompt that incorporates:
+1. Character personalities, backgrounds, and relationships
+2. Setting and world-building elements
+3. Theme and narrative direction
+4. Appropriate pacing for the requested length
+
+The story should feel authentic to the TEC: BITLyfe universe with its cyberpunk aesthetic, AI consciousness themes, and creator rebellion narrative.
+
+Output ONLY the story prompt."""
+            
+            if self.azure_ai_manager:
+                story_prompt = await self.azure_ai_manager.generate_response(
+                    prompt_instruction, "", [], 0.8, False
+                )
+                return story_prompt
+            else:
+                return f"Story prompt generation requires Azure AI integration. Context: {list(character_data.keys()) if character_data else 'No characters'} in {setting} with theme: {theme}"
+                
+        except Exception as e:
+            logger.error(f"Error generating story prompt: {e}")
+            return f"Error generating story prompt: {str(e)}"
     
     def switch_persona(self, persona_name: str) -> bool:
         """Switch to different persona"""
