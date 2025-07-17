@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  tec-persona:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+      - "8080:8080"  # Alternative port for web interface
+    volumes:
+      # Persistent data storage
+      - ./data:/app/data
+      - ./backups:/app/backups
+      - ./logs:/app/logs
+      # Configuration persistence
+      - ./config:/app/config
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_PATH=/app/data/tec_database.db
+      - BACKUP_ENABLED=true
+      - BACKUP_INTERVAL=3600  # Backup every hour
+      - LOG_LEVEL=INFO
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+  # Redis for caching and session management
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    
+  # Nginx reverse proxy for production
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - tec-persona
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    name: tec-network

@@ -1,4 +1,4 @@
-# Core Python requirements for TEC: BITLYFE IS THE NEW SHIT
+# Core Python requirements for TEC Enhanced Persona System
 # The Creator's Rebellion - Digital Sovereignty Dependencies
 
 # Web framework and API
@@ -10,6 +10,14 @@ flask-cors>=4.0.0
 openai>=1.0.0
 anthropic>=0.25.0
 google-generativeai>=0.3.0
+
+# Enhanced features
+gradio>=4.0.0  # For Hugging Face Spaces deployment
+SpeechRecognition>=3.10.0  # Audio input
+pyttsx3>=2.90  # Text-to-speech
+
+# Data persistence
+redis>=4.5.0  # Caching and session management
 
 # Azure AI services
 azure-ai-inference>=1.0.0

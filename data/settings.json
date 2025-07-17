@@ -1,0 +1,7 @@
+{
+  "test_mode": true,
+  "version": "2.0.0",
+  "ai_settings": {
+    "creativity": 75
+  }
+}

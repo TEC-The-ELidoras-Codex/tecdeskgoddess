@@ -1,7 +1,172 @@
-# 🎯 TEC: BITLYFE Command Cheat Sheet
-*The Creator's Rebellion - Complete Command Reference*
+# 🎯 TEC Enhanced Persona System - Complete Cheatsheet
+*The Creator's Rebellion - Enhanced with Persona System*
 
-## 🚀 STARTUP COMMANDS
+## 📋 **Current System Status**
+✅ **Mobile Optimization** - Responsive design, touch controls  
+✅ **Audio Integration** - TTS, voice input, character voices  
+✅ **Visual Enhancements** - Themes, animations, particles  
+✅ **Web3 Authentication** - MetaMask integration, access tiers  
+✅ **Character System** - Polkin, Mynx, Kaelen with full lore  
+✅ **AI Personality Control** - Creativity, memory, reasoning modes  
+✅ **Gamification** - BITL tokens, quests, XP system  
+
+## 🛠️ **Quick Start Commands**
+```bash
+# Start the persona API server
+python tec_persona_api.py
+
+# Start complete interface server
+python -m http.server 8000
+
+# Test complete system
+python scripts/test_persona_system.py
+
+# Initialize character lore
+python scripts/initialize_character_lore.py
+
+# Open enhanced interface
+start tec_enhanced_interface.html
+
+# Open complete interface (Web3 + Gamification)
+start tec_complete_interface.html
+```
+
+## 📁 **File Structure**
+```
+tecdeskgoddess/
+├── tec_enhanced_interface.html      # Enhanced UI (Persona + Audio + Visual)
+├── tec_complete_interface.html      # Complete UI (Web3 + Gamification)
+├── tec_persona_api.py              # Enhanced API server
+├── src/tec_tools/
+│   ├── persona_manager.py          # Database layer
+│   └── agentic_processor.py        # AI processing
+├── assets/
+│   ├── css/persona_ui.css
+│   └── js/persona_manager.js
+├── data/
+│   └── tec_database.db            # SQLite database
+└── docker/                       # Docker deployment files
+```
+
+## 🎮 **Interface Comparison**
+
+### **tec_enhanced_interface.html** (Primary)
+- ✅ Persona System with Character Lore
+- ✅ Mobile Optimization
+- ✅ Audio Integration (TTS + Voice Input)
+- ✅ Visual Enhancements (Themes + Animations)
+- ✅ AI Settings Control
+- ✅ Character Selection (Polkin, Mynx, Kaelen)
+
+### **tec_complete_interface.html** (Web3 + Gaming)
+- ✅ Web3 Authentication (MetaMask)
+- ✅ BITL Token System
+- ✅ Quest System with XP
+- ✅ Multi-Persona Chat
+- ✅ Portfolio Tracking
+- ✅ Calendar Integration
+
+## 🚀 **Deployment Options**
+
+### **Option 1: Local Development**
+```bash
+# Clone and setup
+git clone [repository]
+cd tecdeskgoddess
+pip install -r requirements.txt
+
+# Start API
+python tec_persona_api.py
+
+# Open interface
+start tec_enhanced_interface.html
+```
+
+### **Option 2: Docker (Cross-Platform)**
+```bash
+# Build container
+docker build -t tec-persona .
+
+# Run with data persistence
+docker run -p 8000:8000 -v ./data:/app/data tec-persona
+```
+
+### **Option 3: Hugging Face Spaces**
+```bash
+# Deploy to HF Spaces
+git push hf main
+```
+
+## 🔧 **System Requirements**
+
+### **Backend Dependencies**
+```bash
+pip install flask flask-cors sqlite3 requests python-dotenv
+pip install SpeechRecognition pyttsx3  # For audio features
+```
+
+### **Environment Variables**
+```bash
+GITHUB_TOKEN=your_github_token
+GOOGLE_API_KEY=your_gemini_key
+DATABASE_PATH=./data/tec_database.db
+BACKUP_ENABLED=true
+```
+
+## 🧪 **Testing Checklist**
+
+### **Core Features**
+- [ ] Character selection (Polkin, Mynx, Kaelen)
+- [ ] Theme switching with character selection
+- [ ] Audio controls (TTS toggle, voice input)
+- [ ] AI settings (creativity, memory, reasoning)
+- [ ] Mobile responsiveness
+- [ ] Persona creation modal
+
+### **Advanced Features**
+- [ ] Web3 wallet connection
+- [ ] BITL token balance
+- [ ] Quest system
+- [ ] Chat with authentication
+- [ ] Profile persistence
+
+## 📊 **Database Tables**
+- `personas` - User persona data
+- `characters` - TEC character lore
+- `universe_lore` - TEC mythology
+- `conversations` - Chat history
+- `character_memories` - Context preservation
+
+## 🎯 **Troubleshooting**
+
+### **API Won't Start**
+```bash
+# Check port availability
+netstat -ano | findstr :8000
+# Kill conflicting processes
+taskkill /PID [PID_NUMBER] /F
+```
+
+### **Database Issues**
+```bash
+# Check database file
+dir tec_database.db
+# Reinitialize if needed
+python scripts/initialize_character_lore.py
+```
+
+### **Frontend Not Loading**
+```bash
+# Verify files exist
+dir tec_enhanced_interface.html
+dir assets\css\persona_ui.css
+```
+
+## 🏆 **Current Status: Production Ready** ✨
+
+---
+
+## 🚀 LEGACY STARTUP COMMANDS
 
 ### Quick Start (Recommended)
 ```bash
