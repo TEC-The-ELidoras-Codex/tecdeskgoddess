@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEC Animated Avatar Component</title>
+    <style>
+        /* Avatar Container */
+        .avatar-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* Main Avatar Circle */
+        .avatar-circle {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        /* Avatar Face */
+        .avatar-face {
+            font-size: 2.5rem;
+            transition: all 0.3s ease;
+            z-index: 3;
+            position: relative;
+        }
+
+        /* Animated Eyes */
+        .avatar-eyes {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 4;
+        }
+
+        .eye {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+            position: relative;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            animation: eyeBlink 4s ease-in-out infinite;
+        }
+
+        .eye::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #333;
+            transition: all 0.2s ease;
+        }
+
+        /* Aura Effects */
+        .avatar-aura {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border-radius: 50%;
+            opacity: 0.7;
+            z-index: 1;
+            animation: auraFloat 3s ease-in-out infinite;
+        }
+
+        .avatar-aura::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50%;
+            background: inherit;
+            filter: blur(8px);
+        }
+
+        /* Particle System */
+        .avatar-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            opacity: 0.8;
+        }
+
+        /* Character-Specific Styles */
+        .avatar-polkin {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #7c3aed 100%);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
+        }
+
+        .avatar-polkin .avatar-aura {
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
+        }
+
+        .avatar-mynx {
+            background: linear-gradient(135deg, #06b6d4 0%, #22d3ee 50%, #0891b2 100%);
+            box-shadow: 0 0 30px rgba(34, 211, 238, 0.6);
+        }
+
+        .avatar-mynx .avatar-aura {
+            background: radial-gradient(circle, rgba(34, 211, 238, 0.3) 0%, transparent 70%);
+        }
+
+        .avatar-kaelen {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #d97706 100%);
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.6);
+        }
+
+        .avatar-kaelen .avatar-aura {
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.3) 0%, transparent 70%);
+        }
+
+        /* Animation States */
+        .avatar-idle {
+            animation: idleBreathing 4s ease-in-out infinite;
+        }
+
+        .avatar-speaking {
+            animation: speakingPulse 0.5s ease-in-out infinite alternate;
+        }
+
+        .avatar-thinking {
+            animation: thinkingGlow 2s ease-in-out infinite;
+        }
+
+        .avatar-excited {
+            animation: excitedBounce 0.8s ease-in-out infinite;
+        }
+
+        .avatar-wise {
+            animation: wiseFloat 6s ease-in-out infinite;
+        }
+
+        /* Emotion-Specific Eye States */
+        .emotion-joy .eye::after {
+            background: #fbbf24;
+            box-shadow: 0 0 5px rgba(251, 191, 36, 0.8);
+        }
+
+        .emotion-curiosity .eye::after {
+            background: #22d3ee;
+            box-shadow: 0 0 5px rgba(34, 211, 238, 0.8);
+            animation: curious 1s ease-in-out infinite;
+        }
+
+        .emotion-wisdom .eye::after {
+            background: #8b5cf6;
+            box-shadow: 0 0 5px rgba(139, 92, 246, 0.8);
+            width: 6px;
+            height: 6px;
+        }
+
+        .emotion-excitement .eye::after {
+            background: #ef4444;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+            animation: excited 0.3s ease-in-out infinite;
+        }
+
+        /* Memory Bond Indicators */
+        .bond-level {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+            z-index: 5;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+        }
+
+        .memory-flash {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
+            opacity: 0;
+            z-index: 6;
+            animation: memoryFlash 1s ease-out;
+        }
+
+        /* Keyframe Animations */
+        @keyframes idleBreathing {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes speakingPulse {
+            0% { transform: scale(1); filter: brightness(1); }
+            100% { transform: scale(1.1); filter: brightness(1.2); }
+        }
+
+        @keyframes thinkingGlow {
+            0%, 100% { box-shadow: 0 0 30px var(--glow-color); }
+            50% { box-shadow: 0 0 50px var(--glow-color), 0 0 80px var(--glow-color); }
+        }
+
+        @keyframes excitedBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.1); }
+        }
+
+        @keyframes wiseFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-5px) rotate(1deg); }
+            75% { transform: translateY(5px) rotate(-1deg); }
+        }
+
+        @keyframes auraFloat {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(180deg); }
+        }
+
+        @keyframes eyeBlink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        @keyframes curious {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-30%, -50%) scale(1.2); }
+        }
+
+        @keyframes excited {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.5); }
+        }
+
+        @keyframes memoryFlash {
+            0% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0; transform: scale(1); }
+        }
+
+        @keyframes particleFloat {
+            0% { opacity: 0; transform: translateY(0) scale(0); }
+            10% { opacity: 1; transform: translateY(-10px) scale(1); }
+            90% { opacity: 1; transform: translateY(-50px) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(0); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .avatar-container {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .avatar-face {
+                font-size: 2rem;
+            }
+            
+            .bond-level {
+                width: 20px;
+                height: 20px;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Avatar Component -->
+    <div class="avatar-container" id="tecAvatar">
+        <!-- Aura Effect -->
+        <div class="avatar-aura"></div>
+        
+        <!-- Particle System -->
+        <div class="avatar-particles" id="particleSystem"></div>
+        
+        <!-- Main Avatar -->
+        <div class="avatar-circle" id="avatarCircle">
+            <!-- Character Face -->
+            <div class="avatar-face" id="avatarFace">🤖</div>
+            
+            <!-- Animated Eyes -->
+            <div class="avatar-eyes" id="avatarEyes">
+                <div class="eye"></div>
+                <div class="eye"></div>
+            </div>
+        </div>
+        
+        <!-- Bond Level Indicator -->
+        <div class="bond-level" id="bondLevel">1</div>
+        
+        <!-- Memory Flash Effect -->
+        <div class="memory-flash" id="memoryFlash"></div>
+    </div>
+
+    <script>
+        class TECAvatarComponent {
+            constructor(containerId = 'tecAvatar') {
+                this.container = document.getElementById(containerId);
+                this.avatarCircle = document.getElementById('avatarCircle');
+                this.avatarFace = document.getElementById('avatarFace');
+                this.avatarEyes = document.getElementById('avatarEyes');
+                this.bondLevel = document.getElementById('bondLevel');
+                this.memoryFlash = document.getElementById('memoryFlash');
+                this.particleSystem = document.getElementById('particleSystem');
+                
+                this.currentCharacter = 'Polkin';
+                this.currentEmotion = 'neutral';
+                this.animationState = 'idle';
+                this.particles = [];
+                
+                this.characterFaces = {
+                    'Polkin': '🔮',
+                    'Mynx': '🤖',
+                    'Kaelen': '⭐',
+                    'default': '🤖'
+                };
+                
+                this.emotionClasses = [
+                    'emotion-joy', 'emotion-curiosity', 'emotion-wisdom', 
+                    'emotion-excitement', 'emotion-neutral'
+                ];
+                
+                this.animationClasses = [
+                    'avatar-idle', 'avatar-speaking', 'avatar-thinking', 
+                    'avatar-excited', 'avatar-wise'
+                ];
+                
+                this.init();
+            }
+            
+            init() {
+                this.setCharacter('Polkin');
+                this.setAnimationState('idle');
+                this.startParticleSystem();
+                
+                // Add click interaction
+                this.container.addEventListener('click', () => {
+                    this.playGreetingAnimation();
+                });
+            }
+            
+            setCharacter(character) {
+                this.currentCharacter = character;
+                
+                // Update face
+                this.avatarFace.textContent = this.characterFaces[character] || this.characterFaces['default'];
+                
+                // Update styling
+                this.avatarCircle.className = `avatar-circle avatar-${character.toLowerCase()}`;
+                
+                // Update CSS custom properties for glow effects
+                const colors = this.getCharacterColors(character);
+                this.container.style.setProperty('--glow-color', colors.primary);
+            }
+            
+            getCharacterColors(character) {
+                const colorMap = {
+                    'Polkin': { primary: 'rgba(139, 92, 246, 0.6)', secondary: 'rgba(168, 85, 247, 0.4)' },
+                    'Mynx': { primary: 'rgba(34, 211, 238, 0.6)', secondary: 'rgba(6, 182, 212, 0.4)' },
+                    'Kaelen': { primary: 'rgba(251, 191, 36, 0.6)', secondary: 'rgba(245, 158, 11, 0.4)' }
+                };
+                return colorMap[character] || colorMap['Polkin'];
+            }
+            
+            setEmotion(emotion, intensity = 0.5) {
+                this.currentEmotion = emotion;
+                
+                // Remove previous emotion classes
+                this.emotionClasses.forEach(cls => {
+                    this.avatarEyes.classList.remove(cls);
+                });
+                
+                // Add new emotion class
+                if (emotion !== 'neutral') {
+                    this.avatarEyes.classList.add(`emotion-${emotion}`);
+                }
+                
+                // Adjust animation intensity
+                this.avatarCircle.style.animationDuration = `${2 / intensity}s`;
+            }
+            
+            setAnimationState(state) {
+                this.animationState = state;
+                
+                // Remove previous animation classes
+                this.animationClasses.forEach(cls => {
+                    this.avatarCircle.classList.remove(cls);
+                });
+                
+                // Add new animation class
+                this.avatarCircle.classList.add(`avatar-${state}`);
+            }
+            
+            updateFromAvatarState(avatarState) {
+                if (!avatarState || !avatarState.animation_config) return;
+                
+                const config = avatarState.animation_config;
+                const instructions = avatarState.avatar_instructions;
+                
+                // Update character
+                this.setCharacter(avatarState.character);
+                
+                // Update emotion
+                if (instructions && instructions.facial_expression) {
+                    this.setEmotion(
+                        instructions.facial_expression.emotion,
+                        instructions.facial_expression.intensity
+                    );
+                }
+                
+                // Update animation state based on emotion
+                const emotionToState = {
+                    'joy': 'excited',
+                    'excitement': 'excited',
+                    'wisdom': 'wise',
+                    'curiosity': 'thinking'
+                };
+                
+                const newState = emotionToState[config.emotion] || 'idle';
+                this.setAnimationState(newState);
+                
+                // Update bond level
+                if (avatarState.memory_context && avatarState.memory_context.relationship_level) {
+                    this.setBondLevel(avatarState.memory_context.relationship_level);
+                }
+                
+                // Trigger memory flash if this is a memory-enhanced response
+                if (avatarState.memory_context && avatarState.memory_context.conversation_count > 0) {
+                    this.flashMemory();
+                }
+                
+                // Update particles
+                if (instructions && instructions.particle_system) {
+                    this.updateParticles(instructions.particle_system);
+                }
+            }
+            
+            setBondLevel(level) {
+                this.bondLevel.textContent = level;
+                
+                // Update bond level styling based on level
+                if (level >= 5) {
+                    this.bondLevel.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                } else if (level >= 3) {
+                    this.bondLevel.style.background = 'linear-gradient(135deg, #3b82f6, #1d4ed8)';
+                } else {
+                    this.bondLevel.style.background = 'linear-gradient(135deg, #6b7280, #4b5563)';
+                }
+            }
+            
+            flashMemory() {
+                // Trigger memory flash animation
+                this.memoryFlash.style.animation = 'none';
+                setTimeout(() => {
+                    this.memoryFlash.style.animation = 'memoryFlash 1s ease-out';
+                }, 10);
+            }
+            
+            playGreetingAnimation() {
+                this.setAnimationState('excited');
+                this.setEmotion('joy', 0.8);
+                
+                setTimeout(() => {
+                    this.setAnimationState('idle');
+                    this.setEmotion('neutral', 0.5);
+                }, 2000);
+            }
+            
+            playSpeakingAnimation() {
+                this.setAnimationState('speaking');
+            }
+            
+            stopSpeakingAnimation() {
+                this.setAnimationState('idle');
+            }
+            
+            startParticleSystem() {
+                setInterval(() => {
+                    this.createParticle();
+                }, 2000);
+            }
+            
+            createParticle() {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Random position around avatar
+                const angle = Math.random() * 2 * Math.PI;
+                const radius = 60 + Math.random() * 20;
+                const x = 50 + Math.cos(angle) * radius;
+                const y = 50 + Math.sin(angle) * radius;
+                
+                particle.style.left = `${x}%`;
+                particle.style.top = `${y}%`;
+                particle.style.backgroundColor = this.getCharacterColors(this.currentCharacter).primary;
+                particle.style.animation = 'particleFloat 3s ease-out forwards';
+                
+                this.particleSystem.appendChild(particle);
+                
+                // Remove particle after animation
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                }, 3000);
+            }
+            
+            updateParticles(particleConfig) {
+                if (!particleConfig) return;
+                
+                // Create burst of particles for special effects
+                const count = Math.min(particleConfig.count || 5, 10);
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        this.createParticle();
+                    }, i * 100);
+                }
+            }
+            
+            showEmotionPreview(emotion) {
+                const originalEmotion = this.currentEmotion;
+                const originalState = this.animationState;
+                
+                this.setEmotion(emotion, 0.8);
+                this.setAnimationState('excited');
+                
+                setTimeout(() => {
+                    this.setEmotion(originalEmotion, 0.5);
+                    this.setAnimationState(originalState);
+                }, 1500);
+            }
+        }
+        
+        // Initialize avatar if this is loaded standalone
+        if (typeof window !== 'undefined' && !window.tecAvatar) {
+            window.tecAvatar = new TECAvatarComponent();
+        }
+    </script>
+</body>
+</html>

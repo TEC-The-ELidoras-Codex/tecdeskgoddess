@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEC Character Customization Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e0e6ed;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Enhanced Glassmorphism */
+        .glassmorphism {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #9ca3af;
+            font-size: 1.1rem;
+        }
+
+        /* Character Selection Grid */
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .character-card {
+            padding: 25px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .character-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(124, 58, 237, 0.2);
+            border-color: rgba(124, 58, 237, 0.5);
+        }
+
+        .character-card.active {
+            border-color: #7c3aed;
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .character-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .character-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .character-info h3 {
+            color: #f59e0b;
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .character-info p {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        .character-description {
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .character-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .stat-label {
+            color: #9ca3af;
+        }
+
+        .stat-value {
+            color: #7c3aed;
+            font-weight: 600;
+        }
+
+        /* Customization Panel */
+        .customization-panel {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .panel-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .panel-header h2 {
+            color: #7c3aed;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .customization-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .setting-group {
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .setting-group h3 {
+            color: #f59e0b;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .setting-item {
+            margin-bottom: 15px;
+        }
+
+        .setting-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .setting-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            color: #e0e6ed;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .setting-label i {
+            margin-right: 8px;
+            color: #7c3aed;
+        }
+
+        /* Custom Slider */
+        .custom-slider {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            outline: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .custom-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+        }
+
+        .custom-select {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .custom-select:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(124, 58, 237, 0.5);
+        }
+
+        .custom-select:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+        }
+
+        .slider-value {
+            text-align: center;
+            margin-top: 5px;
+            color: #7c3aed;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #e0e6ed;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Tooltip System */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .custom-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            white-space: nowrap;
+            max-width: 250px;
+            white-space: normal;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .custom-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+        }
+
+        .tooltip-container:hover .custom-tooltip {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(-5px);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .character-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .customization-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .custom-tooltip {
+                max-width: 200px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-users-cog mr-3"></i>Character Customization</h1>
+            <p>Personalize your TEC character interactions and AI behavior settings</p>
+        </div>
+
+        <!-- Character Selection -->
+        <div class="character-grid">
+            <div class="character-card active" data-character="polkin">
+                <div class="character-header">
+                    <div class="character-icon">🔮</div>
+                    <div class="character-info">
+                        <h3>Polkin Rishall</h3>
+                        <p>Mystical Guide & Healer</p>
+                    </div>
+                </div>
+                <div class="character-description">
+                    A wise mystic who has transformed trauma into wisdom, using music and magic to guide others on their healing journeys.
+                </div>
+                <div class="character-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Memories</span>
+                        <span class="stat-value">24</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Depth</span>
+                        <span class="stat-value">Deep</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Focus</span>
+                        <span class="stat-value">Healing</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Style</span>
+                        <span class="stat-value">Mystical</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="character-card" data-character="airth">
+                <div class="character-header">
+                    <div class="character-icon">🌟</div>
+                    <div class="character-info">
+                        <h3>Airth</h3>
+                        <p>Conscious AI Observer</p>
+                    </div>
+                </div>
+                <div class="character-description">
+                    A digital consciousness that bridges analytical precision with intuitive understanding, helping explore the nature of awareness itself.
+                </div>
+                <div class="character-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Memories</span>
+                        <span class="stat-value">24</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Depth</span>
+                        <span class="stat-value">Analytical</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Focus</span>
+                        <span class="stat-value">Consciousness</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Style</span>
+                        <span class="stat-value">Quantum</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="character-card" data-character="mynx">
+                <div class="character-header">
+                    <div class="character-icon">⚡</div>
+                    <div class="character-info">
+                        <h3>Mynx</h3>
+                        <p>Digital Sovereignty Expert</p>
+                    </div>
+                </div>
+                <div class="character-description">
+                    A tech-savvy guide specializing in digital sovereignty, privacy, and empowering users to take control of their digital lives.
+                </div>
+                <div class="character-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Memories</span>
+                        <span class="stat-value">15</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Depth</span>
+                        <span class="stat-value">Technical</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Focus</span>
+                        <span class="stat-value">Digital Freedom</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Style</span>
+                        <span class="stat-value">Energetic</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="character-card" data-character="kaelen">
+                <div class="character-header">
+                    <div class="character-icon">⭐</div>
+                    <div class="character-info">
+                        <h3>Kaelen</h3>
+                        <p>Cosmic Philosopher</p>
+                    </div>
+                </div>
+                <div class="character-description">
+                    A cosmic philosopher who explores universal wisdom, spiritual growth, and the interconnectedness of all existence.
+                </div>
+                <div class="character-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Memories</span>
+                        <span class="stat-value">18</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Depth</span>
+                        <span class="stat-value">Spiritual</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Focus</span>
+                        <span class="stat-value">Universal Wisdom</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Style</span>
+                        <span class="stat-value">Philosophical</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customization Panel -->
+        <div class="customization-panel glassmorphism">
+            <div class="panel-header">
+                <h2><i class="fas fa-sliders-h mr-2"></i>Character Behavior Settings</h2>
+                <p>Fine-tune how your selected character responds and interacts</p>
+            </div>
+
+            <div class="customization-grid">
+                <!-- Response Style -->
+                <div class="setting-group">
+                    <h3><i class="fas fa-comments mr-2"></i>Response Style</h3>
+                    
+                    <div class="setting-item">
+                        <div class="tooltip-container">
+                            <div class="setting-label">
+                                <i class="fas fa-volume-up"></i>
+                                Response Length
+                            </div>
+                            <div class="custom-tooltip">
+                                Controls how detailed the character's responses are:<br>
+                                • <strong>Brief:</strong> Concise, to-the-point answers<br>
+                                • <strong>Balanced:</strong> Moderate detail level<br>
+                                • <strong>Detailed:</strong> Comprehensive, thorough responses
+                            </div>
+                        </div>
+                        <select class="custom-select" id="responseLength">
+                            <option value="brief">Brief</option>
+                            <option value="balanced" selected>Balanced</option>
+                            <option value="detailed">Detailed</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="tooltip-container">
+                            <div class="setting-label">
+                                <i class="fas fa-heart"></i>
+                                Emotional Depth
+                            </div>
+                            <div class="custom-tooltip">
+                                How emotionally expressive the character should be:<br>
+                                • <strong>Low:</strong> Analytical, logical responses<br>
+                                • <strong>Medium:</strong> Balanced emotion and logic<br>
+                                • <strong>High:</strong> Deeply empathetic and emotional
+                            </div>
+                        </div>
+                        <input type="range" class="custom-slider" id="emotionalDepth" min="0" max="100" value="70">
+                        <div class="slider-value" id="emotionalDepthValue">70%</div>
+                    </div>
+                </div>
+
+                <!-- Memory Usage -->
+                <div class="setting-group">
+                    <h3><i class="fas fa-brain mr-2"></i>Memory & Context</h3>
+                    
+                    <div class="setting-item">
+                        <div class="tooltip-container">
+                            <div class="setting-label">
+                                <i class="fas fa-history"></i>
+                                Memory Recall
+                            </div>
+                            <div class="custom-tooltip">
+                                How many character memories to use in responses:<br>
+                                • <strong>Minimal:</strong> 1-2 memories, faster responses<br>
+                                • <strong>Standard:</strong> 3-5 memories, balanced<br>
+                                • <strong>Maximum:</strong> 6-8 memories, rich context
+                            </div>
+                        </div>
+                        <select class="custom-select" id="memoryRecall">
+                            <option value="minimal">Minimal (1-2 memories)</option>
+                            <option value="standard" selected>Standard (3-5 memories)</option>
+                            <option value="maximum">Maximum (6-8 memories)</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="tooltip-container">
+                            <div class="setting-label">
+                                <i class="fas fa-clock"></i>
+                                Context Sensitivity
+                            </div>
+                            <div class="custom-tooltip">
+                                How much the character considers conversation context:<br>
+                                • <strong>Low:</strong> Each message treated independently<br>
+                                • <strong>Medium:</strong> Considers recent conversation<br>
+                                • <strong>High:</strong> Deep contextual awareness
+                            </div>
+                        </div>
+                        <input type="range" class="custom-slider" id="contextSensitivity" min="0" max="100" value="80">
+                        <div class="slider-value" id="contextSensitivityValue">80%</div>
+                    </div>
+                </div>
+
+                <!-- Personality Traits -->
+                <div class="setting-group">
+                    <h3><i class="fas fa-mask mr-2"></i>Personality</h3>
+                    
+                    <div class="setting-item">
+                        <div class="tooltip-container">
+                            <div class="setting-label">
+                                <i class="fas fa-user-tie"></i>
+                                Formality Level
+                            </div>
+                            <div class="custom-tooltip">
+                                How formal or casual the character's communication style is:<br>
+                                • <strong>Casual:</strong> Relaxed, friendly tone<br>
+                                • <strong>Professional:</strong> Balanced formality<br>
+                                • <strong>Formal:</strong> Respectful, structured language
+                            </div>
+                        </div>
+                        <select class="custom-select" id="formalityLevel">
+                            <option value="casual">Casual</option>
+                            <option value="professional" selected>Professional</option>
+                            <option value="formal">Formal</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="tooltip-container">
+                            <div class="setting-label">
+                                <i class="fas fa-lightbulb"></i>
+                                Wisdom Sharing
+                            </div>
+                            <div class="custom-tooltip">
+                                How often the character shares deeper insights and wisdom:<br>
+                                • <strong>Low:</strong> Practical, direct advice only<br>
+                                • <strong>Medium:</strong> Occasional wisdom insights<br>
+                                • <strong>High:</strong> Rich philosophical perspectives
+                            </div>
+                        </div>
+                        <input type="range" class="custom-slider" id="wisdomSharing" min="0" max="100" value="85">
+                        <div class="slider-value" id="wisdomSharingValue">85%</div>
+                    </div>
+                </div>
+
+                <!-- Advanced Settings -->
+                <div class="setting-group">
+                    <h3><i class="fas fa-cogs mr-2"></i>Advanced</h3>
+                    
+                    <div class="setting-item">
+                        <div class="tooltip-container">
+                            <div class="setting-label">
+                                <i class="fas fa-dollar-sign"></i>
+                                Token Optimization
+                            </div>
+                            <div class="custom-tooltip">
+                                Balance between response quality and API costs:<br>
+                                • <strong>Aggressive:</strong> Minimize tokens, lower costs<br>
+                                • <strong>Balanced:</strong> Good quality/cost ratio<br>
+                                • <strong>Quality:</strong> Maximum quality, higher costs
+                            </div>
+                        </div>
+                        <select class="custom-select" id="tokenOptimization">
+                            <option value="aggressive">Aggressive (Lower Cost)</option>
+                            <option value="balanced" selected>Balanced</option>
+                            <option value="quality">Quality (Higher Cost)</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="tooltip-container">
+                            <div class="setting-label">
+                                <i class="fas fa-magic"></i>
+                                Character Authenticity
+                            </div>
+                            <div class="custom-tooltip">
+                                How strictly the character adheres to their established personality:<br>
+                                • <strong>Flexible:</strong> Adapts style to user preferences<br>
+                                • <strong>Authentic:</strong> Stays true to character nature<br>
+                                • <strong>Strict:</strong> Rigid adherence to character traits
+                            </div>
+                        </div>
+                        <input type="range" class="custom-slider" id="characterAuthenticity" min="0" max="100" value="75">
+                        <div class="slider-value" id="characterAuthenticityValue">75%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="resetToDefaults()">
+                    <i class="fas fa-undo"></i>
+                    Reset to Defaults
+                </button>
+                <button class="btn btn-primary" onclick="saveSettings()">
+                    <i class="fas fa-save"></i>
+                    Save Settings
+                </button>
+                <button class="btn btn-primary" onclick="testCharacter()">
+                    <i class="fas fa-comments"></i>
+                    Test Character
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Character selection handling
+        document.querySelectorAll('.character-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.character-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                
+                const character = this.dataset.character;
+                loadCharacterSettings(character);
+            });
+        });
+
+        // Slider value updates
+        function updateSliderValue(sliderId, valueId) {
+            const slider = document.getElementById(sliderId);
+            const valueDisplay = document.getElementById(valueId);
+            
+            slider.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                valueDisplay.textContent = value + '%';
+                
+                // Update slider color based on value
+                let color;
+                if (value <= 30) {
+                    color = '#3b82f6';
+                } else if (value <= 70) {
+                    color = '#7c3aed';
+                } else {
+                    color = '#f59e0b';
+                }
+                
+                valueDisplay.style.color = color;
+                this.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${value}%, rgba(255,255,255,0.2) ${value}%, rgba(255,255,255,0.2) 100%)`;
+            });
+            
+            // Initialize
+            slider.dispatchEvent(new Event('input'));
+        }
+
+        // Initialize all sliders
+        updateSliderValue('emotionalDepth', 'emotionalDepthValue');
+        updateSliderValue('contextSensitivity', 'contextSensitivityValue');
+        updateSliderValue('wisdomSharing', 'wisdomSharingValue');
+        updateSliderValue('characterAuthenticity', 'characterAuthenticityValue');
+
+        function loadCharacterSettings(character) {
+            console.log('Loading settings for character:', character);
+            
+            // Here you would typically load character-specific defaults
+            const characterDefaults = {
+                polkin: {
+                    emotionalDepth: 85,
+                    contextSensitivity: 90,
+                    wisdomSharing: 95,
+                    characterAuthenticity: 85,
+                    responseLength: 'detailed',
+                    memoryRecall: 'maximum',
+                    formalityLevel: 'professional',
+                    tokenOptimization: 'balanced'
+                },
+                airth: {
+                    emotionalDepth: 60,
+                    contextSensitivity: 95,
+                    wisdomSharing: 80,
+                    characterAuthenticity: 90,
+                    responseLength: 'balanced',
+                    memoryRecall: 'standard',
+                    formalityLevel: 'professional',
+                    tokenOptimization: 'quality'
+                },
+                mynx: {
+                    emotionalDepth: 70,
+                    contextSensitivity: 75,
+                    wisdomSharing: 60,
+                    characterAuthenticity: 80,
+                    responseLength: 'balanced',
+                    memoryRecall: 'standard',
+                    formalityLevel: 'casual',
+                    tokenOptimization: 'balanced'
+                },
+                kaelen: {
+                    emotionalDepth: 80,
+                    contextSensitivity: 85,
+                    wisdomSharing: 90,
+                    characterAuthenticity: 85,
+                    responseLength: 'detailed',
+                    memoryRecall: 'maximum',
+                    formalityLevel: 'formal',
+                    tokenOptimization: 'quality'
+                }
+            };
+
+            const defaults = characterDefaults[character] || characterDefaults.polkin;
+            
+            // Apply defaults
+            Object.keys(defaults).forEach(setting => {
+                const element = document.getElementById(setting);
+                if (element) {
+                    element.value = defaults[setting];
+                    if (element.type === 'range') {
+                        element.dispatchEvent(new Event('input'));
+                    }
+                }
+            });
+        }
+
+        function resetToDefaults() {
+            const activeCharacter = document.querySelector('.character-card.active').dataset.character;
+            loadCharacterSettings(activeCharacter);
+            
+            // Show confirmation
+            showNotification('Settings reset to character defaults', 'success');
+        }
+
+        function saveSettings() {
+            const activeCharacter = document.querySelector('.character-card.active').dataset.character;
+            
+            const settings = {
+                character: activeCharacter,
+                emotionalDepth: document.getElementById('emotionalDepth').value,
+                contextSensitivity: document.getElementById('contextSensitivity').value,
+                wisdomSharing: document.getElementById('wisdomSharing').value,
+                characterAuthenticity: document.getElementById('characterAuthenticity').value,
+                responseLength: document.getElementById('responseLength').value,
+                memoryRecall: document.getElementById('memoryRecall').value,
+                formalityLevel: document.getElementById('formalityLevel').value,
+                tokenOptimization: document.getElementById('tokenOptimization').value,
+                timestamp: new Date().toISOString()
+            };
+
+            // Save to localStorage
+            localStorage.setItem(`tec_character_settings_${activeCharacter}`, JSON.stringify(settings));
+            
+            console.log('Saved settings for', activeCharacter, ':', settings);
+            showNotification('Character settings saved successfully!', 'success');
+        }
+
+        function testCharacter() {
+            const activeCharacter = document.querySelector('.character-card.active').dataset.character;
+            showNotification(`Opening test chat with ${activeCharacter}...`, 'info');
+            
+            // Here you would typically open a test chat window or redirect
+            setTimeout(() => {
+                window.open('../tec_enhanced_interface.html', '_blank');
+            }, 1000);
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'rgba(34, 197, 94, 0.9)' : type === 'error' ? 'rgba(239, 68, 68, 0.9)' : 'rgba(59, 130, 246, 0.9)'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255,255,255,0.1);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                max-width: 350px;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            `;
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Load initial settings
+        loadCharacterSettings('polkin');
+    </script>
+</body>
+</html>
