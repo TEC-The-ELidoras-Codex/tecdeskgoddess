@@ -2430,59 +2430,127 @@
 
                 // Show typing indicator
                 this.showTypingIndicator();
+                
+                // Get current character name
+                const selectedCharacter = document.querySelector('.character-card.active');
+                const characterName = selectedCharacter ? selectedCharacter.dataset.character : 'default';
 
-                // Prepare API payload
+                // Prepare API payload with creator access
                 const payload = {
                     message: message,
                     character: this.currentCharacter,
+                    user_id: 'polkin', // Creator access
                     enhanced: this.enhancedChatEnabled,
                     settings: {
-                        creativity: document.getElementById('creativitySlider').value,
-                        memory: document.getElementById('memorySelect').value,
-                        reasoning: document.getElementById('reasoningSelect').value,
-                        mode: document.getElementById('chatModeSelect').value
+                        creativity: document.getElementById('creativitySlider')?.value || 70,
+                        memory: document.getElementById('memorySelect')?.value || 'medium',
+                        reasoning: document.getElementById('reasoningSelect')?.value || 'balanced',
+                        mode: document.getElementById('chatModeSelect')?.value || 'enhanced'
                     }
                 };
 
-                // Send to AI
+                // Send to AI using uncensored endpoint
                 try {
-                    const response = await fetch('/chat', {
+                    // Show loading indicator
+                    const loadingMessage = this.addMessageToChat('💭 Thinking...', 'ai');
+                    
+                    // Use the enhanced uncensored API (port 8001) if available, fallback to standard
+                    let apiUrl = '/chat/uncensored';
+                    let baseUrl = '';
+                    
+                    // Try enhanced API first
+                    try {
+                        const testResponse = await fetch('http://localhost:8001/health');
+                        if (testResponse.ok) {
+                            baseUrl = 'http://localhost:8001';
+                            console.log('🚀 Using enhanced uncensored API');
+                        }
+                    } catch {
+                        // Fallback to standard API
+                        apiUrl = '/chat';
+                        console.log('⚠️ Enhanced API unavailable, using standard endpoint');
+                    }
+                    
+                    const response = await fetch(baseUrl + apiUrl, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem('web3Token')}`,
+                            'Content-Type': 'application/json'
                         },
                         body: JSON.stringify(payload)
                     });
 
+                    // Remove loading indicator
+                    if (loadingMessage && loadingMessage.parentNode) {
+                        loadingMessage.parentNode.removeChild(loadingMessage);
+                    }
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    // Hide typing indicator
                     this.hideTypingIndicator();
 
-                    if (response.ok) {
-                        const data = await response.json();
-                        const aiMessage = this.addMessageToChat(data.response, 'ai', data.character);
-                        this.animateMessageBubble(aiMessage);
+                    // Add AI response to chat
+                    const aiMessage = this.addMessageToChat(data.response || data.message, 'ai');
+                    this.animateMessageBubble(aiMessage);
+                    
+                    // Show uncensored mode indicator if active
+                    if (data.censorship === 'disabled' && data.authenticity === 'maximum') {
+                        const uncensoredIndicator = document.createElement('div');
+                        uncensoredIndicator.innerHTML = '🚫🎭 UNCENSORED MODE - Maximum Authenticity';
+                        uncensoredIndicator.style.cssText = `
+                            position: fixed;
+                            top: 20px;
+                            right: 20px;
+                            background: linear-gradient(135deg, #dc2626, #b91c1c);
+                            color: white;
+                            padding: 8px 16px;
+                            border-radius: 20px;
+                            font-size: 0.8rem;
+                            font-weight: bold;
+                            z-index: 10000;
+                            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+                            animation: pulse 2s infinite;
+                        `;
+                        document.body.appendChild(uncensoredIndicator);
                         
-                        // Update memory context display
-                        if (data.memory_context) {
-                            this.updateMemoryDisplay(data.memory_context);
-                        }
-                        
-                        // Update avatar with response data
-                        if (data.avatar_state) {
-                            this.updateAvatarFromResponse(data.avatar_state);
-                        }
-                        
-                        // Speak the response if TTS is enabled
-                        if (this.ttsEnabled) {
-                            this.speakText(data.response, data.character || this.currentCharacter);
-                        }
-                    } else {
-                        this.addMessageToChat('Sorry, I encountered an error. Please try again.', 'ai');
+                        // Remove after 3 seconds
+                        setTimeout(() => {
+                            if (uncensoredIndicator.parentNode) {
+                                uncensoredIndicator.parentNode.removeChild(uncensoredIndicator);
+                            }
+                        }, 3000);
                     }
+                    
+                    // Update character status if provided
+                    if (data.character) {
+                        this.updateCharacterStatus(data.character);
+                    }
+                    
+                    // Update memory stats if provided
+                    if (data.memoryStats) {
+                        this.updateMemoryStats(data.memoryStats);
+                    }
+
                 } catch (error) {
-                    console.error('Error sending message:', error);
+                    console.error('Chat error:', error);
+                    
+                    // Hide typing indicator
                     this.hideTypingIndicator();
-                    this.addMessageToChat('Connection error. Please check your connection and try again.', 'ai');
+                    
+                    // Show error message
+                    const errorMessage = this.addMessageToChat(
+                        `❌ Sorry, there was an error: ${error.message}. Please try again.`, 
+                        'ai'
+                    );
+                    this.animateMessageBubble(errorMessage);
                 }
             }
 

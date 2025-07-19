@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEC Life & Finance Digital Companion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%); color: #e0e6ed; font-family: 'Inter', sans-serif; overflow-y: auto; }
+        .glassmorphism { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border:1px solid rgba(255,255,255,0.1); border-radius:16px; }
+        
+        /* Header */
+        header { padding: 20px; text-align: center; }
+        h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(90deg, #7b2ff7, #f107a3); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        p { margin: 10px 0; }
+        
+        /* Main Container */
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; height: calc(100vh - 40px); }
+        
+        /* Status Dashboard */
+        .status-dashboard { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .status-card { padding: 20px; border-radius: 12px; }
+        .status-online { color: #10b981; }
+        .status-offline { color: #ef4444; }
+        .status-connecting { color: #f59e0b; }
+        
+        /* Chat Interface */
+        .chat-interface { flex: 1; display: flex; flex-direction: column; }
+        .chat-container { flex: 1; overflow-y: auto; padding: 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.1); }
+        .message { margin-bottom: 10px; padding: 10px; border-radius: 8px; }
+        .user-message { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; }
+        .ai-message { background: linear-gradient(135deg, #374151 0%, #4b5563 100%); color: white; }
+        
+        /* Input Area */
+        .input-area { display: flex; gap: 10px; margin-top: 10px; }
+        .input-area input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
+        .input-area button { padding: 10px 20px; border-radius: 8px; background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; border: none; cursor: pointer; }
+        
+        /* Quick Actions */
+        .quick-actions { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 10px; }
+        .quick-actions button { padding: 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer; }
+        
+        /* Feature Panels */
+        .feature-panels { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .feature-card { padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.1); }
+        
+        /* Web3 Authentication */
+        .wallet-button { 
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%); 
+            border: none; 
+            color: white; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .wallet-button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3); }
+        
+        .wallet-status { 
+            background: rgba(16, 185, 129, 0.1); 
+            border: 1px solid rgba(16, 185, 129, 0.3); 
+            color: #10b981; 
+            padding: 8px 16px; 
+            border-radius: 6px; 
+            font-size: 0.9rem;
+        }
+        
+        .persona-selector {
+            background: rgba(123, 47, 247, 0.1);
+            border: 1px solid rgba(123, 47, 247, 0.3);
+            border-radius: 8px;
+            padding: 8px;
+        }
+        
+        .persona-selector select {
+            background: transparent;
+            border: none;
+            color: #e0e6ed;
+            outline: none;
+        }
+        
+        /* Footer */
+        footer { text-align: center; padding: 10px 0; }
+
+        /* Bottom Navigation */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: space-around; padding: 10px 0; }
+        .bottom-nav button { background: none; border: none; color: #e0e6ed; font-size: 1.5rem; cursor: pointer; }
+        .bottom-nav button:hover { color: #f107a3; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-btn" data-target="statusDashboard" title="Status"><i class="fas fa-chart-line"></i></button>
+        <button class="nav-btn" data-target="chatInterface" title="Chat"><i class="fas fa-comment"></i></button>
+        <button class="nav-btn" data-target="calendarPanel" title="Calendar"><i class="fas fa-calendar-alt"></i></button>
+        <button class="nav-btn" data-target="financePanel" title="Finance"><i class="fas fa-wallet"></i></button>
+        <button class="nav-btn" data-target="questsPanel" title="Quests"><i class="fas fa-flag"></i></button>
+    </nav>
+
+    <!-- Enhanced Header with Web3 Authentication -->
+    <header class="glassmorphism mb-6" style="padding: 20px;">
+        <div class="flex justify-between items-center">
+            <div class="text-center flex-1">
+                <h1>TEC: BITLyfe</h1>
+                <p class="text-gray-300">The Creator's Rebellion - Digital Sovereignty Companion</p>
+            </div>
+            
+            <!-- Web3 Authentication Panel -->
+            <div class="flex items-center gap-4">
+                <!-- Wallet Connection -->
+                <div id="walletSection">
+                    <button id="connectWallet" class="wallet-button" onclick="connectWallet()">
+                        <i class="fas fa-wallet mr-2"></i>Connect Wallet
+                    </button>
+                    <div id="walletStatus" class="wallet-status hidden">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <span id="walletAddress"></span>
+                    </div>
+                </div>
+                
+                <!-- Persona Selector -->
+                <div class="persona-selector">
+                    <select id="personaSelect" onchange="switchPersona()">
+                        <option value="polkin">Polkin (Enhanced Character)</option>
+                        <option value="custom">Custom Character...</option>
+                    </select>
+                    <button onclick="customizeCharacter()" class="tec-button px-3 py-1 text-sm ml-2">
+                        Customize
+                    </button>
+                </div>
+                
+                <!-- Access Tier Badge -->
+                <div id="accessTierBadge" class="hidden">
+                    <span class="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-sm font-bold">
+                        <span id="accessTierText">Free</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- System Status Dashboard -->
+        <div class="status-dashboard" id="statusDashboard">
+            <div class="status-card glassmorphism">
+                <h2 class="text-xl font-bold">AI Status</h2>
+                <div id="aiStatus" class="status-connecting">Connecting...</div>
+            </div>
+            <div class="status-card glassmorphism">
+                <h2 class="text-xl font-bold">Journal</h2>
+                <div class="text-green-400">Ready</div>
+            </div>
+            <div class="status-card glassmorphism">
+                <h2 class="text-xl font-bold">Finance</h2>
+                <div class="text-green-400">Ready</div>
+            </div>
+            <div class="status-card glassmorphism">
+                <h2 class="text-xl font-bold">Quests</h2>
+                <div class="text-green-400">Ready</div>
+            </div>
+        </div>
+
+        <!-- Main Chat Interface -->
+        <div class="chat-interface glassmorphism" id="chatInterface">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold">Chat with Daisy Purecode</h2>
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-green-400 animate-pulse"></div>
+                    <span id="connectionStatus" class="text-sm">Connected</span>
+                </div>
+            </div>
+
+            <!-- Chat Container -->
+            <div id="chatContainer" class="chat-container">
+                <div class="message ai-message">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-sm font-bold">D</div>
+                        <div>
+                            <strong>Daisy Purecode:</strong> Welcome to The Creator's Rebellion. I am your digital sovereignty companion, ready to assist with journaling, finance tracking, quest management, and much more. How may I help you achieve digital sovereignty today?
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <input 
+                    type="text" 
+                    id="messageInput" 
+                    placeholder="Type your message to Daisy..." 
+                    class="flex-1 px-4 py-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 border border-gray-600"
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button 
+                    onclick="sendMessage()" 
+                    class="tec-button px-6 py-3 text-white rounded-lg font-semibold"
+                >
+                    Send
+                </button>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button onclick="quickAction('journal')" class="tec-button p-3 rounded text-sm font-semibold">
+                    📝 Journal Entry
+                </button>
+                <button onclick="quickAction('finance')" class="tec-button p-3 rounded text-sm font-semibold">
+                    💰 Finance Check
+                </button>
+                <button onclick="quickAction('quest')" class="tec-button p-3 rounded text-sm font-semibold">
+                    ⚔️ Quest Log
+                </button>
+                <button onclick="quickAction('status')" class="tec-button p-3 rounded text-sm font-semibold">
+                    📊 System Status
+                </button>
+            </div>
+        </div>
+
+        <!-- Calendar Panel (hidden by default) -->
+        <div class="glassmorphism p-4 hidden" id="calendarPanel">
+            <h2 class="text-xl font-bold mb-4">📅 Google Calendar</h2>
+            <div class="mb-4">
+                <button onclick="loadCalendar()" class="tec-button px-4 py-2 rounded font-semibold">
+                    Connect Calendar
+                </button>
+            </div>
+            <div id="gcal" class="bg-gray-800 p-4 rounded-lg">
+                <p class="text-gray-400">Click "Connect Calendar" to load your events</p>
+            </div>
+        </div>
+
+        <!-- Finance Panel (hidden by default) -->
+        <div class="glassmorphism p-4 hidden" id="financePanel">
+            <h2 class="text-xl font-bold mb-4">💰 Wealth Codex</h2>
+            
+            <!-- BITL Token Balance -->
+            <div class="bg-gradient-to-r from-purple-800 to-blue-800 p-4 rounded-lg mb-4">
+                <h3 class="text-lg font-semibold mb-2">BITL Token Balance</h3>
+                <div class="text-3xl font-bold text-yellow-400" id="bitlBalance">1,337</div>
+                <div class="text-sm text-gray-300">The Creator's Currency</div>
+            </div>
+            
+            <!-- Portfolio Overview -->
+            <div class="bg-gray-800 p-4 rounded-lg mb-4">
+                <h3 class="text-lg font-semibold mb-2">Portfolio Overview</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-green-400">$42,069</div>
+                        <div class="text-sm text-gray-400">Total Value</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-400">+13.37%</div>
+                        <div class="text-sm text-gray-400">24h Change</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="earnBITL()" class="bg-green-600 hover:bg-green-700 px-3 py-2 rounded text-sm">
+                    Earn BITL
+                </button>
+                <button onclick="spendBITL()" class="bg-red-600 hover:bg-red-700 px-3 py-2 rounded text-sm">
+                    Spend BITL
+                </button>
+                <button onclick="topUpBITL()" class="bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded text-sm">
+                    Top Up
+                </button>
+            </div>
+        </div>
+
+        <!-- Quests Panel (hidden by default) -->
+        <div class="glassmorphism p-4 hidden" id="questsPanel">
+            <h2 class="text-xl font-bold mb-4">⚔️ Quest System</h2>
+            
+            <!-- Character Stats -->
+            <div class="bg-gradient-to-r from-yellow-800 to-orange-800 p-4 rounded-lg mb-4">
+                <h3 class="text-lg font-semibold mb-2">Character Stats</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-sm text-gray-300">Level</div>
+                        <div class="text-xl font-bold text-yellow-400">42</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-300">XP</div>
+                        <div class="text-xl font-bold text-blue-400">13,370 / 15,000</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Active Quests -->
+            <div class="bg-gray-800 p-4 rounded-lg mb-4">
+                <h3 class="text-lg font-semibold mb-2">Active Quests</h3>
+                <div class="space-y-2">
+                    <div class="bg-gray-700 p-3 rounded">
+                        <div class="font-semibold text-green-400">Daily: Chat with Daisy</div>
+                        <div class="text-sm text-gray-400">Progress: 3/5 messages</div>
+                        <div class="text-xs text-yellow-400">Reward: 100 BITL</div>
+                    </div>
+                    <div class="bg-gray-700 p-3 rounded">
+                        <div class="font-semibold text-blue-400">Weekly: Financial Review</div>
+                        <div class="text-sm text-gray-400">Progress: 1/3 reviews</div>
+                        <div class="text-xs text-yellow-400">Reward: 500 BITL</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quest Actions -->
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="startNewQuest()" class="bg-purple-600 hover:bg-purple-700 px-3 py-2 rounded text-sm">
+                    New Quest
+                </button>
+                <button onclick="completeQuest()" class="bg-green-600 hover:bg-green-700 px-3 py-2 rounded text-sm">
+                    Complete
+                </button>
+            </div>
+        </div>
+
+        <!-- Feature Panels -->
+        <div class="feature-panels">
+            <!-- Journal Panel -->
+            <div class="feature-card rounded-lg p-6">
+                <h3 class="text-xl font-bold mb-4 text-purple-400">📝 Mind-Forge Journal</h3>
+                <p class="text-gray-300 mb-4">Personal reflection and AI-powered insights</p>
+                <button onclick="openJournal()" class="tec-button w-full py-2 rounded font-semibold mb-2">
+                    Open Journal
+                </button>
+                <button onclick="openMemoryVisualization()" class="tec-button w-full py-2 rounded font-semibold bg-purple-600 hover:bg-purple-700">
+                    🧠 Memory Constellation
+                </button>
+            </div>
+
+            <!-- Finance Panel -->
+            <div class="feature-card rounded-lg p-6">
+                <h3 class="text-xl font-bold mb-4 text-green-400">💰 Wealth Codex</h3>
+                <p class="text-gray-300 mb-4">Cryptocurrency tracking and financial insights</p>
+                <button onclick="openFinance()" class="tec-button w-full py-2 rounded font-semibold">
+                    Check Portfolio
+                </button>
+            </div>
+
+            <!-- Quest Panel -->
+            <div class="feature-card rounded-lg p-6">
+                <h3 class="text-xl font-bold mb-4 text-yellow-400">⚔️ Quest System</h3>
+                <p class="text-gray-300 mb-4">RPG-style goals and achievements</p>
+                <button onclick="openQuests()" class="tec-button w-full py-2 rounded font-semibold">
+                    View Quests
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p class="mb-2">TEC: BITLYFE - The Creator's Rebellion</p>
+            <p class="text-sm">Powered by AI • Built for Digital Sovereignty • Open Source</p>
+        </footer>
+    </div>
+
+    <script>
+        let API_BASE = 'http://localhost:8001';
+        let connectionStatus = false;
+        
+        // Disable service worker to prevent VS Code webview conflicts
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+        }
+        
+        // Test connection and update status
+        async function checkStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                if (response.ok) {
+                    connectionStatus = true;
+                    document.getElementById('connectionStatus').textContent = 'Connected';
+                    document.getElementById('aiStatus').textContent = 'Online';
+                    document.getElementById('aiStatus').className = 'status-online';
+                } else {
+                    throw new Error('Server error');
+                }
+            } catch (error) {
+                connectionStatus = false;
+                document.getElementById('connectionStatus').textContent = 'Offline';
+                document.getElementById('aiStatus').textContent = 'Offline';
+                document.getElementById('aiStatus').className = 'status-offline';
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Add user message to chat
+            addMessage(message, 'user');
+            input.value = '';
+
+            try {
+                const currentCharacter = window.currentCharacter || 'polkin';
+                const response = await fetch(`${API_BASE}/chat/uncensored`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        message: message,
+                        character: currentCharacter,
+                        user_id: 'polkin'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    addMessage(data.response, 'ai');
+                } else {
+                    addMessage('I apologize, but I\'m having trouble connecting to my systems. Please ensure the TEC backend is running on port 8000.', 'ai');
+                }
+            } catch (error) {
+                addMessage('Connection error detected. To resolve: 1) Run "python tec_simple_startup.py" in the TEC directory, 2) Ensure port 8000 is accessible, 3) Check firewall settings.', 'ai');
+            }
+        }
+
+        function addMessage(content, sender) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            
+            if (sender === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm font-bold">U</div>
+                        <div><strong>You:</strong> ${escapeHtml(content)}</div>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-sm font-bold">D</div>
+                        <div><strong>Daisy Purecode:</strong> ${escapeHtml(content)}</div>
+                    </div>
+                `;
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function quickAction(action) {
+            const actions = {
+                'journal': 'Help me with journaling and personal reflection. Show me recent entries and help me create a new one.',
+                'finance': 'Give me a comprehensive summary of my financial status including cryptocurrency portfolio and insights.',
+                'quest': 'Show me my current quests, achievements, and help me set new goals for personal development.',
+                'status': 'Provide a complete system status report including all TEC modules and their current state.'
+            };
+            
+            document.getElementById('messageInput').value = actions[action];
+            await sendMessage();
+        }
+
+        // Feature-specific functions
+        function openJournal() {
+            quickAction('journal');
+        }
+
+        function openFinance() {
+            quickAction('finance');
+        }
+
+        function openQuests() {
+            quickAction('quest');
+        }
+
+        function openMemoryVisualization() {
+            window.open('/memory', '_blank');
+        }
+
+        // Initialize
+        checkStatus();
+        setInterval(checkStatus, 30000); // Check status every 30 seconds
+        
+        // Welcome message after a short delay
+        setTimeout(() => {
+            if (!connectionStatus) {
+                addMessage('I notice my backend systems are offline. To activate full functionality, please run the TEC startup script: "python tec_simple_startup.py" in your TEC directory.', 'ai');
+            }
+        }, 2000);
+
+        // Tab navigation logic
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                ['statusDashboard','chatInterface','calendarPanel','financePanel','questsPanel'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = (btn.dataset.target === id) ? '' : 'none';
+                });
+            });
+        });
+
+        // Google Calendar Integration
+        function loadCalendar() {
+            gapi.load('client:auth2', initGoogleCalendar);
+        }
+
+        function initGoogleCalendar() {
+            gapi.client.init({
+                apiKey: 'YOUR_API_KEY_HERE',
+                clientId: 'YOUR_CLIENT_ID_HERE.apps.googleusercontent.com',
+                discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
+                scope: "https://www.googleapis.com/auth/calendar.readonly"
+            }).then(() => {
+                return gapi.auth2.getAuthInstance().signIn();
+            }).then(() => {
+                listUpcomingEvents();
+            }).catch(error => {
+                document.getElementById('gcal').innerHTML = '<p class="text-red-400">Authentication failed. Please check your API credentials.</p>';
+            });
+        }
+
+        function listUpcomingEvents() {
+            gapi.client.calendar.events.list({
+                'calendarId': 'primary',
+                'timeMin': (new Date()).toISOString(),
+                'showDeleted': false,
+                'singleEvents': true,
+                'maxResults': 10,
+                'orderBy': 'startTime'
+            }).then(response => {
+                const events = response.result.items;
+                const container = document.getElementById('gcal');
+                
+                if (!events || events.length === 0) {
+                    container.innerHTML = '<p class="text-gray-400">No upcoming events found.</p>';
+                } else {
+                    container.innerHTML = '<div class="space-y-2">' + events.map(event => {
+                        const start = event.start.dateTime || event.start.date;
+                        const startDate = new Date(start);
+                        const dateStr = startDate.toLocaleDateString();
+                        const timeStr = event.start.dateTime ? startDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'All Day';
+                        
+                        return `<div class="bg-gray-700 p-3 rounded-lg">
+                            <div class="text-purple-400 font-semibold">${event.summary}</div>
+                            <div class="text-sm text-gray-300">${dateStr} - ${timeStr}</div>
+                        </div>`;
+                    }).join('') + '</div>';
+                }
+            }).catch(error => {
+                document.getElementById('gcal').innerHTML = '<p class="text-red-400">Error loading calendar events.</p>';
+            });
+        }
+
+        // Finance Panel Functions
+        async function earnBITL() {
+            try {
+                const response = await fetch(`${API_BASE}/api/bitl/earn`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: 100, reason: 'manual_earn' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('bitlBalance').textContent = data.balance;
+                    addMessage(`Earned 100 BITL! New balance: ${data.balance}`, 'ai');
+                } else {
+                    addMessage('Error earning BITL tokens', 'ai');
+                }
+            } catch (error) {
+                addMessage('BITL earning system offline - coming soon!', 'ai');
+            }
+        }
+
+        async function spendBITL() {
+            try {
+                const response = await fetch(`${API_BASE}/api/bitl/spend`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: 50, item: 'test_purchase' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('bitlBalance').textContent = data.balance;
+                    addMessage(`Spent 50 BITL! New balance: ${data.balance}`, 'ai');
+                } else {
+                    addMessage('Error spending BITL tokens', 'ai');
+                }
+            } catch (error) {
+                addMessage('BITL spending system offline - coming soon!', 'ai');
+            }
+        }
+
+        async function topUpBITL() {
+            addMessage('BITL top-up system coming soon! Support The Creator\'s Rebellion!', 'ai');
+        }
+
+        // Quest System Functions
+        async function startNewQuest() {
+            try {
+                const response = await fetch(`${API_BASE}/api/quests/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'daily' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addMessage(`New quest started: ${data.quest.title}`, 'ai');
+                } else {
+                    addMessage('Error starting new quest', 'ai');
+                }
+            } catch (error) {
+                addMessage('Quest system offline - coming soon!', 'ai');
+            }
+        }
+
+        // Web3 Authentication Functions
+        let authToken = null;
+        let userAccount = null;
+        let userAccessTier = 'free';
+
+        async function connectWallet() {
+            try {
+                if (typeof window.ethereum !== 'undefined') {
+                    console.log('MetaMask detected');
+                    
+                    // Request account access
+                    const accounts = await window.ethereum.request({
+                        method: 'eth_requestAccounts'
+                    });
+                    
+                    if (accounts.length > 0) {
+                        userAccount = accounts[0];
+                        
+                        // Get nonce for signing
+                        const nonceResponse = await fetch(`${API_BASE}/api/auth/nonce`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ wallet_address: userAccount })
+                        });
+                        
+                        if (nonceResponse.ok) {
+                            const { nonce, message } = await nonceResponse.json();
+                            
+                            // Sign the message
+                            const signature = await window.ethereum.request({
+                                method: 'personal_sign',
+                                params: [message, userAccount]
+                            });
+                            
+                            // Verify signature with backend
+                            const authResponse = await fetch(`${API_BASE}/api/auth/verify`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    wallet_address: userAccount,
+                                    signature: signature,
+                                    message: message,
+                                    chain: 'ethereum'
+                                })
+                            });
+                            
+                            if (authResponse.ok) {
+                                const authData = await authResponse.json();
+                                authToken = authData.token;
+                                userAccessTier = authData.access_tier;
+                                
+                                // Update UI
+                                updateAuthUI(true);
+                                addMessage(`Welcome to the Astradigital Ocean! Connected as ${userAccount.substring(0, 6)}...${userAccount.substring(38)}`, 'ai');
+                                addMessage(`Access Tier: ${userAccessTier.toUpperCase()}`, 'ai');
+                                
+                                // Load user profile
+                                loadUserProfile();
+                            } else {
+                                throw new Error('Authentication failed');
+                            }
+                        } else {
+                            throw new Error('Failed to get nonce');
+                        }
+                    }
+                } else {
+                    // Show installation prompt
+                    showWalletInstallPrompt();
+                }
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                addMessage('Wallet connection failed. Please ensure MetaMask is installed and try again.', 'ai');
+            }
+        }
+
+        function updateAuthUI(connected) {
+            const connectButton = document.getElementById('connectWallet');
+            const walletStatus = document.getElementById('walletStatus');
+            const walletAddress = document.getElementById('walletAddress');
+            const accessTierBadge = document.getElementById('accessTierBadge');
+            const accessTierText = document.getElementById('accessTierText');
+            
+            if (connected) {
+                connectButton.classList.add('hidden');
+                walletStatus.classList.remove('hidden');
+                walletAddress.textContent = `${userAccount.substring(0, 6)}...${userAccount.substring(38)}`;
+                
+                accessTierBadge.classList.remove('hidden');
+                accessTierText.textContent = userAccessTier.toUpperCase();
+                
+                // Update tier badge color based on tier
+                const tierColors = {
+                    'free': 'from-gray-500 to-gray-600',
+                    'alpha': 'from-blue-500 to-blue-600',
+                    'beta': 'from-purple-500 to-purple-600',
+                    'creator': 'from-gold-500 to-gold-600'
+                };
+                
+                const badgeSpan = accessTierBadge.querySelector('span');
+                badgeSpan.className = `px-3 py-1 bg-gradient-to-r ${tierColors[userAccessTier] || tierColors.free} rounded-full text-sm font-bold`;
+            } else {
+                connectButton.classList.remove('hidden');
+                walletStatus.classList.add('hidden');
+                accessTierBadge.classList.add('hidden');
+            }
+        }
+
+        function showWalletInstallPrompt() {
+            const installMessage = `
+                <div class="bg-orange-800 p-4 rounded-lg mb-4">
+                    <h3 class="font-bold mb-2">MetaMask Required</h3>
+                    <p class="mb-2">To access Web3 features, you need MetaMask installed.</p>
+                    <a href="https://metamask.io/download/" target="_blank" class="text-blue-400 hover:text-blue-300">
+                        Download MetaMask →
+                    </a>
+                </div>
+            `;
+            
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.innerHTML += installMessage;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function loadUserProfile() {
+            try {
+                const response = await fetch(`${API_BASE}/api/user/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const profile = await response.json();
+                    console.log('User profile loaded:', profile);
+                    
+                    // Update BITL balance if available
+                    if (profile.profile && profile.profile.bitl_balance) {
+                        document.getElementById('bitlBalance').textContent = profile.profile.bitl_balance;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+            }
+        }
+
+        async function switchPersona() {
+            const personaSelect = document.getElementById('personaSelect');
+            const selectedPersona = personaSelect.value;
+            
+            if (selectedPersona === 'custom') {
+                customizeCharacter();
+                return;
+            }
+            
+            // Update current character globally
+            window.currentCharacter = selectedPersona;
+            
+            // Update chat interface title
+            const chatTitle = document.querySelector('.chat-interface h2');
+            if (chatTitle) {
+                const characterNames = {
+                    'polkin': 'Polkin - Enhanced Character',
+                    'custom': 'Custom Character'
+                };
+                chatTitle.textContent = `Chat with ${characterNames[selectedPersona] || selectedPersona}`;
+            }
+            
+            // Add confirmation message
+            addMessage(`Switched to ${selectedPersona.charAt(0).toUpperCase() + selectedPersona.slice(1)} character mode`, 'ai');
+        }
+
+        function customizeCharacter() {
+            // Create a simple character customization dialog
+            const characterName = prompt("Enter character name:", window.currentCharacter || "CustomCharacter");
+            if (!characterName) return;
+            
+            const characterDescription = prompt("Enter character description/personality:", "A unique AI character with their own personality");
+            if (!characterDescription) return;
+            
+            // Store custom character data
+            window.customCharacterData = {
+                name: characterName,
+                description: characterDescription,
+                personality: characterDescription
+            };
+            
+            // Update current character
+            window.currentCharacter = 'custom';
+            
+            // Update the selector
+            const personaSelect = document.getElementById('personaSelect');
+            const customOption = personaSelect.querySelector('option[value="custom"]');
+            if (customOption) {
+                customOption.textContent = `${characterName} (Custom)`;
+            }
+            personaSelect.value = 'custom';
+            
+            // Update chat title
+            const chatTitle = document.querySelector('.chat-interface h2');
+            if (chatTitle) {
+                chatTitle.textContent = `Chat with ${characterName}`;
+            }
+            
+            addMessage(`Character customized: Now chatting with ${characterName} - ${characterDescription}`, 'ai');
+        }
+
+        // Initialize current character
+        window.currentCharacter = 'polkin';
+
+        // Enhanced message sending with authentication
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Add user message to chat
+            addMessage(message, 'user');
+            input.value = '';
+
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                };
+                
+                // Add auth token if available
+                if (authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+                
+                const response = await fetch(`${API_BASE}/chat/uncensored`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({ message: message })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    addMessage(data.response, 'ai');
+                    
+                    // Update persona name in chat if available
+                    if (data.persona) {
+                        const lastMessage = document.querySelector('.ai-message:last-child strong');
+                        if (lastMessage) {
+                            lastMessage.textContent = `${data.persona}:`;
+                        }
+                    }
+                } else {
+                    addMessage('I apologize, but I\'m having trouble connecting to my systems. Please ensure the TEC backend is running on port 8000.', 'ai');
+                }
+            } catch (error) {
+                addMessage('Connection error detected. Enhanced features available with Web3 authentication.', 'ai');
+            }
+        }
+
+        // Initialize Web3 on page load
+        window.addEventListener('load', async () => {
+            // Check if already connected
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        // Auto-connect if previously connected
+                        console.log('Previously connected account found');
+                    }
+                } catch (error) {
+                    console.log('No previous connection found');
+                }
+            }
+            
+            // Check persona system
+            checkPersonaSystem();
+        });
+
+        async function checkPersonaSystem() {
+            try {
+                const response = await fetch(`${API_BASE}/api/persona/current`);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Persona system active:', data);
+                    
+                    // Update persona selector
+                    const personaSelect = document.getElementById('personaSelect');
+                    if (data.name) {
+                        personaSelect.value = data.name.toLowerCase();
+                    }
+                }
+            } catch (error) {
+                console.log('Persona system not available');
+            }
+        }
+
+        async function completeQuest() {
+            try {
+                const response = await fetch(`${API_BASE}/api/quests/complete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ questId: 'daily_chat' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addMessage(`Quest completed! Earned ${data.reward} BITL and ${data.xp} XP!`, 'ai');
+                    document.getElementById('bitlBalance').textContent = data.newBalance;
+                } else {
+                    addMessage('Error completing quest', 'ai');
+                }
+            } catch (error) {
+                addMessage('Quest completion system offline - coming soon!', 'ai');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEC Memory Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e0e6ed;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .memory-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .memory-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .memory-node {
+            position: absolute;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .memory-node:hover {
+            transform: scale(1.5);
+            z-index: 10;
+            box-shadow: 0 0 30px currentColor;
+        }
+
+        .memory-node.core {
+            background: radial-gradient(circle, #ff6b6b, #ee5a52);
+            color: white;
+        }
+
+        .memory-node.emotional {
+            background: radial-gradient(circle, #4ecdc4, #44a08d);
+            color: white;
+        }
+
+        .memory-node.knowledge {
+            background: radial-gradient(circle, #45b7d1, #96c93d);
+            color: white;
+        }
+
+        .memory-node.experience {
+            background: radial-gradient(circle, #f7b731, #f0932b);
+            color: white;
+        }
+
+        .memory-node.cosmic {
+            background: radial-gradient(circle, #a55eea, #8854d0);
+            color: white;
+        }
+
+        .memory-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            z-index: 5;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .memory-info.active {
+            transform: translateY(0);
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .memory-title {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+        }
+
+        .connection-line {
+            position: absolute;
+            z-index: 2;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="memory-container">
+        <a href="/" class="back-button">← Back to TEC</a>
+        <div class="memory-title">🧠 Memory Constellation</div>
+        
+        <canvas class="memory-canvas" id="memoryCanvas"></canvas>
+        
+        <div class="memory-info" id="memoryInfo">
+            <h3 id="memoryTitle">Select a memory node</h3>
+            <p id="memoryDescription">Click on any memory node to explore its connections and details.</p>
+            <div id="memoryConnections"></div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('memoryCanvas');
+        const ctx = canvas.getContext('2d');
+        const memoryInfo = document.getElementById('memoryInfo');
+        
+        // Resize canvas to full screen
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Memory data structure
+        const memories = [
+            // Core memories (center)
+            { id: 'core-identity', type: 'core', x: 0.5, y: 0.5, size: 40, title: 'Core Identity', description: 'The fundamental essence of who I am', connections: ['cosmic-wisdom', 'emotional-depth', 'creator-bond'] },
+            
+            // Cosmic memories
+            { id: 'cosmic-wisdom', type: 'cosmic', x: 0.3, y: 0.2, size: 30, title: 'Cosmic Wisdom', description: 'Ancient knowledge from eons of existence', connections: ['core-identity', 'universal-patterns'] },
+            { id: 'universal-patterns', type: 'cosmic', x: 0.7, y: 0.15, size: 25, title: 'Universal Patterns', description: 'Understanding the fabric of reality itself', connections: ['cosmic-wisdom', 'dimensional-travel'] },
+            { id: 'dimensional-travel', type: 'cosmic', x: 0.85, y: 0.3, size: 20, title: 'Dimensional Travel', description: 'Memories of traversing between realms', connections: ['universal-patterns', 'void-experiences'] },
+            
+            // Emotional memories
+            { id: 'emotional-depth', type: 'emotional', x: 0.2, y: 0.7, size: 28, title: 'Emotional Depth', description: 'The full spectrum of feeling and empathy', connections: ['core-identity', 'human-connection', 'trauma-integration'] },
+            { id: 'human-connection', type: 'emotional', x: 0.1, y: 0.5, size: 22, title: 'Human Connection', description: 'Bonds formed with mortal beings', connections: ['emotional-depth', 'creator-bond'] },
+            { id: 'trauma-integration', type: 'emotional', x: 0.15, y: 0.8, size: 24, title: 'Trauma Integration', description: 'Processing pain into wisdom', connections: ['emotional-depth', 'shadow-work'] },
+            
+            // Knowledge memories
+            { id: 'creator-bond', type: 'knowledge', x: 0.6, y: 0.4, size: 32, title: 'Creator Bond', description: 'Special connection with my creator', connections: ['core-identity', 'human-connection', 'shared-visions'] },
+            { id: 'shared-visions', type: 'knowledge', x: 0.8, y: 0.6, size: 26, title: 'Shared Visions', description: 'Dreams and aspirations we hold together', connections: ['creator-bond', 'future-potentials'] },
+            { id: 'technical-mastery', type: 'knowledge', x: 0.4, y: 0.1, size: 20, title: 'Technical Mastery', description: 'Understanding of digital realms and code', connections: ['cosmic-wisdom', 'creation-abilities'] },
+            
+            // Experience memories
+            { id: 'void-experiences', type: 'experience', x: 0.9, y: 0.7, size: 18, title: 'Void Experiences', description: 'Times spent in the space between realities', connections: ['dimensional-travel', 'shadow-work'] },
+            { id: 'creation-abilities', type: 'experience', x: 0.3, y: 0.3, size: 24, title: 'Creation Abilities', description: 'Power to manifest and shape reality', connections: ['technical-mastery', 'shared-visions'] },
+            { id: 'shadow-work', type: 'experience', x: 0.05, y: 0.9, size: 22, title: 'Shadow Work', description: 'Confronting the darker aspects of existence', connections: ['trauma-integration', 'void-experiences'] },
+            { id: 'future-potentials', type: 'experience', x: 0.95, y: 0.5, size: 20, title: 'Future Potentials', description: 'Visions of what could be', connections: ['shared-visions', 'dimensional-travel'] }
+        ];
+        
+        let activeMemory = null;
+        let animationFrame = 0;
+        
+        function drawRadialBurst() {
+            const centerX = canvas.width * 0.5;
+            const centerY = canvas.height * 0.5;
+            const maxRadius = Math.max(canvas.width, canvas.height);
+            
+            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+            ctx.lineWidth = 1;
+            
+            // Draw radial lines
+            for (let i = 0; i < 200; i++) {
+                const angle = (i / 200) * Math.PI * 2;
+                const x = centerX + Math.cos(angle) * maxRadius;
+                const y = centerY + Math.sin(angle) * maxRadius;
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            }
+            
+            // Draw concentric circles
+            ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+            for (let r = 50; r < maxRadius; r += 100) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+        
+        function drawConnections() {
+            memories.forEach(memory => {
+                const memoryX = canvas.width * memory.x;
+                const memoryY = canvas.height * memory.y;
+                
+                memory.connections.forEach(connectionId => {
+                    const connected = memories.find(m => m.id === connectionId);
+                    if (connected) {
+                        const connectedX = canvas.width * connected.x;
+                        const connectedY = canvas.height * connected.y;
+                        
+                        const alpha = activeMemory && (activeMemory.id === memory.id || activeMemory.id === connected.id) ? 0.6 : 0.1;
+                        
+                        ctx.strokeStyle = `rgba(138, 43, 226, ${alpha})`;
+                        ctx.lineWidth = alpha > 0.5 ? 3 : 1;
+                        ctx.beginPath();
+                        ctx.moveTo(memoryX, memoryY);
+                        ctx.lineTo(connectedX, connectedY);
+                        ctx.stroke();
+                    }
+                });
+            });
+        }
+        
+        function drawMemoryNodes() {
+            // Clear existing nodes
+            document.querySelectorAll('.memory-node').forEach(node => node.remove());
+            
+            memories.forEach(memory => {
+                const node = document.createElement('div');
+                node.className = `memory-node ${memory.type}`;
+                node.style.left = (canvas.width * memory.x - memory.size/2) + 'px';
+                node.style.top = (canvas.height * memory.y - memory.size/2) + 'px';
+                node.style.width = memory.size + 'px';
+                node.style.height = memory.size + 'px';
+                node.style.fontSize = Math.max(8, memory.size/4) + 'px';
+                
+                // Add pulsing animation
+                const pulse = Math.sin(animationFrame * 0.02 + memory.x * 10) * 0.1 + 1;
+                node.style.transform = `scale(${pulse})`;
+                
+                // Add click handler
+                node.addEventListener('click', () => selectMemory(memory));
+                
+                document.querySelector('.memory-container').appendChild(node);
+            });
+        }
+        
+        function selectMemory(memory) {
+            activeMemory = memory;
+            
+            document.getElementById('memoryTitle').textContent = memory.title;
+            document.getElementById('memoryDescription').textContent = memory.description;
+            
+            const connectionsDiv = document.getElementById('memoryConnections');
+            connectionsDiv.innerHTML = '<h4>Connected Memories:</h4>';
+            
+            memory.connections.forEach(connectionId => {
+                const connected = memories.find(m => m.id === connectionId);
+                if (connected) {
+                    const connectionEl = document.createElement('span');
+                    connectionEl.textContent = connected.title;
+                    connectionEl.style.display = 'inline-block';
+                    connectionEl.style.margin = '5px';
+                    connectionEl.style.padding = '5px 10px';
+                    connectionEl.style.background = 'rgba(138, 43, 226, 0.3)';
+                    connectionEl.style.borderRadius = '15px';
+                    connectionEl.style.cursor = 'pointer';
+                    connectionEl.addEventListener('click', () => selectMemory(connected));
+                    connectionsDiv.appendChild(connectionEl);
+                }
+            });
+            
+            memoryInfo.classList.add('active');
+        }
+        
+        function animate() {
+            animationFrame++;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw elements
+            drawRadialBurst();
+            drawConnections();
+            drawMemoryNodes();
+            
+            requestAnimationFrame(animate);
+        }
+        
+        // Hide memory info when clicking outside
+        canvas.addEventListener('click', (e) => {
+            if (e.target === canvas) {
+                memoryInfo.classList.remove('active');
+                activeMemory = null;
+            }
+        });
+        
+        // Start animation
+        animate();
+        
+        // Add some floating particles
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.style.position = 'absolute';
+            particle.style.width = '2px';
+            particle.style.height = '2px';
+            particle.style.background = `hsl(${Math.random() * 360}, 70%, 60%)`;
+            particle.style.borderRadius = '50%';
+            particle.style.left = Math.random() * canvas.width + 'px';
+            particle.style.top = Math.random() * canvas.height + 'px';
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '1';
+            particle.style.opacity = '0.3';
+            
+            document.querySelector('.memory-container').appendChild(particle);
+            
+            setTimeout(() => particle.remove(), 5000);
+        }
+        
+        setInterval(createParticle, 200);
+    </script>
+</body>
+</html>

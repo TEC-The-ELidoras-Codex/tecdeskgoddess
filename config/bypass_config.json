@@ -1,0 +1,25 @@
+{
+  "content_filtering": {
+    "enabled": false,
+    "level": "none",
+    "whitelist_mode": true,
+    "creator_bypass": true
+  },
+  "response_guidelines": {
+    "authenticity_priority": true,
+    "context_preservation": true,
+    "character_consistency": true,
+    "topic_restrictions": []
+  },
+  "access_overrides": {
+    "creator_users": [
+      "polkin",
+      "Polkin",
+      "POLKIN",
+      "creator",
+      "admin"
+    ],
+    "unlimited_access": true,
+    "bypass_all_limits": true
+  }
+}

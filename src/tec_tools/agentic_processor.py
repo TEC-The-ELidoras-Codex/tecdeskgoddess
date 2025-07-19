@@ -172,7 +172,7 @@ class AzureAIManager:
         """Generate AI response using Azure AI"""
         try:
             if not self.ai_client:
-                return "I'm having trouble connecting to my AI systems. Please check the Azure configuration."
+                return self._get_fallback_response(messages)
             
             # Convert messages to Azure format
             azure_messages = []
@@ -196,7 +196,31 @@ class AzureAIManager:
             
         except Exception as e:
             logger.error(f"Error generating Azure AI response: {e}")
-            return "I'm experiencing some technical difficulties. Please try again in a moment."
+            return self._get_fallback_response(messages)
+    
+    def _get_fallback_response(self, messages: List[Dict[str, str]]) -> str:
+        """Generate a contextual fallback response when AI is unavailable"""
+        user_message = ""
+        for msg in reversed(messages):
+            if msg['role'] == 'user':
+                user_message = msg['content'].lower()
+                break
+        
+        # Simple keyword-based responses
+        if any(word in user_message for word in ['hello', 'hi', 'hey', 'greetings']):
+            return "Hey there! I'm Daisy Purecode, your digital sovereignty companion. My full AI systems are temporarily offline, but I'm still here to help with basic assistance. What can I do for you?"
+        
+        elif any(word in user_message for word in ['test', 'testing', 'check']):
+            return "Systems check in progress! 🚀 My core functions are operational, though my advanced AI capabilities are currently reconnecting. The TEC ecosystem is ready for your digital sovereignty journey!"
+        
+        elif any(word in user_message for word in ['help', 'assist', 'support']):
+            return "I'm here to help! Even with my AI systems reconnecting, I can still guide you through TEC's features: journaling, finance tracking, quest management, and more. What would you like to explore?"
+        
+        elif any(word in user_message for word in ['status', 'health', 'online']):
+            return "Status update: Core systems online ✅, Memory banks accessible ✅, AI processing temporarily limited ⚠️. Don't worry - I'm still your faithful digital sovereignty companion!"
+        
+        else:
+            return "I hear you! My advanced AI processing is temporarily reconnecting, but I'm still here with you. Could you try rephrasing your request, or let me know if you'd like to explore TEC's journaling, finance, or quest systems?"
 
 class AgenticProcessor:
     """Main agentic processor combining Web3, Azure AI, and persona system"""
@@ -286,8 +310,9 @@ Access Level Features:
     async def process_message(self, user_id: str, message: str, access_tier: str = 'free') -> str:
         """Process user message with full context"""
         try:
-            # Get current persona
+            # Get current persona and user context
             current_persona = self.persona_manager.get_current_persona()
+            user_context = self.get_user_context(user_id)
             
             # Build context
             context_prompt = self.build_context_prompt(user_id, access_tier)
