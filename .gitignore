@@ -1,6 +1,13 @@
 # TEC: BITLYFE IS THE NEW SHIT - Git Ignore Rules
 # The Creator's Rebellion - Keep the repository clean
 
+# API Credentials and Secrets (SECURITY)
+api_credentials.py
+*.key
+*.secret
+*.env
+config/secrets.json
+
 # Python Virtual Environments
 venv/
 env/
