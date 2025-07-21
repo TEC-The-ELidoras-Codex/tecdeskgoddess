@@ -15,12 +15,18 @@ class PlayerStats:
     experience: int = 0
     health: int = 100
     max_health: int = 100
-    mana: int = 50
-    max_mana: int = 50
-    strength: int = 10
-    agility: int = 10
-    intelligence: int = 10
-    charisma: int = 10
+    energy: int = 100  # Renamed from mana for TEC consistency
+    max_energy: int = 100
+    
+    # Combat stats
+    attack: int = 10  # Renamed from strength for clarity
+    defense: int = 10  # New defensive stat
+    speed: int = 10  # Renamed from agility for clarity
+    
+    # TEC-specific stats
+    consciousness: int = 10  # Digital awareness (renamed from intelligence)
+    harmony: int = 10  # Musical/cosmic attunement (renamed from charisma)
+    wisdom: int = 10  # Accumulated knowledge (new)
 
 
 @dataclass
@@ -55,9 +61,23 @@ class Player:
         self.reputation: Dict[str, int] = {}
         self.achievements: List[str] = []
         
+        # TEC character system
+        self.selected_character = "polkin"  # Default persona
+        self.character_affinity: Dict[str, int] = {
+            "polkin": 50,
+            "mynx": 30,
+            "kaelen": 20,
+            "airth": 40
+        }
+        
+        # Ability system
+        self.known_abilities: List[str] = []  # Ability IDs
+        self.equipped_abilities: List[str] = ["basic_attack", "defend", "rest"]  # Up to 4 combat abilities
+        
         # Battle system
         self.in_battle: bool = False
         self.battle_id: Optional[str] = None
+        self.battle_history: List[Dict] = []
     
     def gain_experience(self, amount: int) -> bool:
         """
@@ -85,16 +105,20 @@ class Player:
         """Apply stat bonuses when leveling up"""
         # Base stat increases
         self.stats.max_health += 10
-        self.stats.max_mana += 5
+        self.stats.max_energy += 5
         self.stats.health = self.stats.max_health  # Full heal on level up
-        self.stats.mana = self.stats.max_mana
+        self.stats.energy = self.stats.max_energy
         
-        # Every 5 levels, increase core stats
+        # Combat stat increases
+        self.stats.attack += 2
+        self.stats.defense += 2
+        self.stats.speed += 1
+        
+        # Every 5 levels, increase TEC stats
         if self.stats.level % 5 == 0:
-            self.stats.strength += 1
-            self.stats.agility += 1
-            self.stats.intelligence += 1
-            self.stats.charisma += 1
+            self.stats.consciousness += 1
+            self.stats.harmony += 1
+            self.stats.wisdom += 1
     
     def take_damage(self, amount: int) -> bool:
         """
@@ -108,19 +132,104 @@ class Player:
         """Heal the player"""
         self.stats.health = min(self.stats.max_health, self.stats.health + amount)
     
-    def use_mana(self, amount: int) -> bool:
+    def use_energy(self, amount: int) -> bool:
         """
-        Use mana for abilities
-        Returns True if enough mana was available
+        Use energy for abilities
+        Returns True if enough energy was available
         """
-        if self.stats.mana >= amount:
-            self.stats.mana -= amount
+        if self.stats.energy >= amount:
+            self.stats.energy -= amount
             return True
         return False
     
-    def restore_mana(self, amount: int):
-        """Restore mana"""
-        self.stats.mana = min(self.stats.max_mana, self.stats.mana + amount)
+    def restore_energy(self, amount: int):
+        """Restore energy"""
+        self.stats.energy = min(self.stats.max_energy, self.stats.energy + amount)
+    
+    def learn_ability(self, ability_id: str) -> bool:
+        """
+        Learn a new ability
+        Returns True if ability was learned successfully
+        """
+        if ability_id not in self.known_abilities:
+            self.known_abilities.append(ability_id)
+            return True
+        return False
+    
+    def equip_ability(self, ability_id: str, slot: int) -> bool:
+        """
+        Equip an ability to a combat slot (0-3)
+        Returns True if equipped successfully
+        """
+        if ability_id not in self.known_abilities and ability_id not in ["basic_attack", "defend", "rest"]:
+            return False
+        
+        if slot < 0 or slot >= 4:
+            return False
+        
+        # Ensure equipped_abilities has enough slots
+        while len(self.equipped_abilities) <= slot:
+            self.equipped_abilities.append("")
+        
+        self.equipped_abilities[slot] = ability_id
+        return True
+    
+    def get_equipped_abilities(self) -> List[str]:
+        """Get list of equipped ability IDs"""
+        return [aid for aid in self.equipped_abilities if aid]
+    
+    def select_character(self, character: str) -> bool:
+        """
+        Select active character persona
+        Returns True if character was selected successfully
+        """
+        if character in self.character_affinity:
+            self.selected_character = character
+            return True
+        return False
+    
+    def increase_character_affinity(self, character: str, amount: int) -> None:
+        """Increase affinity with a TEC character"""
+        if character in self.character_affinity:
+            self.character_affinity[character] = min(100, self.character_affinity[character] + amount)
+    
+    def add_battle_result(self, battle_result: Dict) -> None:
+        """Add a battle result to history"""
+        self.battle_history.append({
+            'timestamp': datetime.now().isoformat(),
+            'battle_id': battle_result.get('battle_id'),
+            'result': battle_result.get('result'),  # won, lost, draw
+            'experience_gained': battle_result.get('experience', 0),
+            'opponent': battle_result.get('opponent', 'unknown')
+        })
+        
+        # Keep only last 50 battles
+        if len(self.battle_history) > 50:
+            self.battle_history = self.battle_history[-50:]
+    
+    def get_battle_stats(self) -> Dict:
+        """Get battle statistics"""
+        if not self.battle_history:
+            return {
+                'total_battles': 0,
+                'wins': 0,
+                'losses': 0,
+                'draws': 0,
+                'win_rate': 0.0
+            }
+        
+        wins = sum(1 for battle in self.battle_history if battle['result'] == 'won')
+        losses = sum(1 for battle in self.battle_history if battle['result'] == 'lost')
+        draws = sum(1 for battle in self.battle_history if battle['result'] == 'draw')
+        total = len(self.battle_history)
+        
+        return {
+            'total_battles': total,
+            'wins': wins,
+            'losses': losses,
+            'draws': draws,
+            'win_rate': (wins / total) * 100 if total > 0 else 0.0
+        }
     
     def add_item(self, item_id: str):
         """Add an item to inventory"""

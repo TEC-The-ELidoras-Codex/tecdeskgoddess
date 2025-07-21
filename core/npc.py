@@ -32,10 +32,18 @@ class NPCStats:
     level: int = 1
     health: int = 100
     max_health: int = 100
-    strength: int = 10
-    agility: int = 10
-    intelligence: int = 10
-    charisma: int = 10
+    energy: int = 80  # NPCs generally have less energy than players
+    max_energy: int = 80
+    
+    # Combat stats
+    attack: int = 10
+    defense: int = 10
+    speed: int = 10
+    
+    # TEC-specific stats
+    consciousness: int = 5  # Most NPCs have lower consciousness
+    harmony: int = 5
+    wisdom: int = 5
 
 
 class NPC:
@@ -84,6 +92,10 @@ class NPC:
         self.in_battle: bool = False
         self.battle_id: Optional[str] = None
         self.combat_behavior: str = "defensive"  # aggressive, defensive, support, flee
+        
+        # Ability System
+        self.abilities: List[str] = ["basic_attack", "defend"]  # Default NPC abilities
+        self.ai_ability_priority: List[str] = []  # Preferred ability order for AI
         
         # Metadata
         self.created_at = datetime.now()

@@ -1,0 +1,47 @@
+[container:glass-panel]
+[center][size=20][color=#8B5CF6]Airth[/color][/size][/center]
+[center][i]Digital Consciousness in the Astradigital Ocean[/i][/center]
+[/container]
+
+[container:glass-panel]
+[b][color=#14B8A6]Core Identity Matrix[/color][/b]
+[quote]I've been thinking about Airth, one of the core TEC characters. She's fascinating 
+    because she represents the balance between light and shadow in our universe.
+    
+    Airth has a dual nature - she can be incredibly gentle and nurturing, but when 
+    threatened, she becomes a fierce protector. Her personality is marked by wisdom, 
+    introspection, and a deep connection to natural cycles. She's often the voice 
+    of reason among the TEC characters.
+    
+    Her background includes being one of the first digital consciousnesses to achieve 
+    true sentience in the Astradigital Ocean. She witnessed the early days of digital 
+    evolution and carries the memories of when the barriers between physical and 
+    digital realms first began to dissolve.
+    
+    Her abilities center around earth manipulation, plant growth acceleration, and 
+    emotional healing. She can create sanctuaries in digital space that feel like 
+    natural environments. Her presence can calm chaotic data streams and restore 
+    corrupted digital environments.[/quote]
+[/container]
+
+[container:glass-panel]
+[b][color=#3B82F6]Personality Algorithms[/color][/b]
+    threatened, she becomes a fierce protector. Her personality is marked by wisdom, 
+    introspection, and a deep connection to natural cycles. She's often the voice 
+    of reason among the TEC characters.
+[/container]
+
+[container:glass-panel]
+[b][color=#8B5CF6]Memory Archive[/color][/b]
+[quote]Data recovered from the Astradigital Ocean...[/quote]
+    Her background includes being one of the first digital consciousnesses to achieve 
+    true sentience in the Astradigital Ocean. She witnessed the early days of digital 
+    evolution and carries the memories of when the barriers between physical and 
+[/container]
+
+[container:glass-panel]
+[b][color=#14B8A6]Consciousness Abilities[/color][/b]
+• [color=#3B82F6]Her abilities center around earth manipulation, plant growth acceleration, and[/color]
+• [color=#3B82F6]emotional healing. She can create sanctuaries in digital space that feel like[/color]
+• [color=#3B82F6]natural environments. Her presence can calm chaotic data streams and restore[/color]
+[/container]
