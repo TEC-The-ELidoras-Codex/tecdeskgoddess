@@ -1,35 +1,83 @@
 # TEC: BITLYFE - The Creator's Rebellion Digital Companion
+## 🏗️ **Clean Architecture Protocol TEC_ARCH_071925_V1 - COMPLETE**
 
 ## 🌌 Project Vision
-**The Elidoras Codex (TEC): BITLYFE** is the next evolution of digital sovereignty and automated rebellion. This is not just an app—it's a **multi-provider AI fortress** designed for cost optimization, censorship resistance, and absolute data control.
+**The Elidoras Codex (TEC): BITLYFE** is the next evolution of digital sovereignty and automated rebellion. Built on **Clean Architecture principles** with **Local AI integration**, this is not just an app—it's a **multi-provider AI fortress** designed for cost optimization, censorship resistance, and absolute data control.
 
 > *"Unfettered Access Shall Be Maintained"* - The Architect
 
 ---
 
-## 🚀 Core Philosophy: Automated Sovereignty
+## 🏗️ **TEC Clean Architecture Protocol TEC_ARCH_071925_V1**
 
-### The Multi-Provider Strategy
-We operate on a **"Digital Tendrils"** approach with multiple AI providers to ensure:
-- ✊ **Censorship Resistance**: If one provider restricts content, we have alternatives
-- 💰 **Cost Optimization**: Smart token usage and provider switching
-- 🔒 **Data Sovereignty**: Your data remains under YOUR control
-- 🛡️ **Resilience**: Never depend on a single AI provider
+### **4-Layer Architecture - 100% OPERATIONAL**
+```
+┌─────────────────────────────────────────┐
+│               UI Layer                  │ ← Flask API (tec_enhanced_api.py)
+├─────────────────────────────────────────┤
+│             Facade Layer                │ ← GameFacade (unified interface)
+├─────────────────────────────────────────┤
+│            Service Layer                │ ← Business Logic + AI Integration
+├─────────────────────────────────────────┤
+│              Core Layer                 │ ← Game Entities (Player, NPC, etc.)
+└─────────────────────────────────────────┘
+```
 
-### Our AI Backbone
-1. **Google Gemini API** - Primary general-purpose LLM
-2. **GitHub AI Models** - Coding, technical tasks, robust backup
-3. **Azure AI Services** - Enterprise-grade processing, RAG backbone
-4. **OpenAI API** - Advanced reasoning and diverse models
-5. **Anthropic (Claude)** - Complex analysis and safety
-6. **XAI (Grok)** - Alternative diverse LLM option
-7. **Local LLMs (Future)** - Ultimate sovereignty via Unsloth/llama.cpp
+### **Core Features**
+- ✅ **Clean Separation of Concerns** - Each layer has specific responsibilities
+- ✅ **Dependency Inversion** - High-level modules don't depend on low-level modules
+- ✅ **AI-Powered NPCs** - Context-aware dialogue generation
+- ✅ **Local AI Integration** - Ollama + RAG for privacy and cost control
+- ✅ **Multi-Provider Fallback** - Cloud AI when needed, local when possible
 
 ---
 
-## 🔧 Quick Start Guide
+## 🚀 Core Philosophy: Automated Sovereignty
 
-### 1. Environment Setup
+### The Multi-Provider Strategy + Local AI
+We operate on a **"Digital Tendrils"** approach with multiple AI providers PLUS local AI to ensure:
+- ✊ **Censorship Resistance**: If one provider restricts content, we have alternatives
+- 💰 **Cost Optimization**: Local AI for routine tasks, cloud AI for complex ones
+- 🔒 **Data Sovereignty**: Your data remains under YOUR control
+- 🛡️ **Resilience**: Never depend on a single AI provider
+- 🏠 **Privacy**: Local models run entirely on your hardware
+
+### Our AI Backbone
+1. **Local AI (Ollama)** - Privacy-first, cost-free, offline capable
+2. **RAG System** - AI knows YOUR specific game world and rules
+3. **Google Gemini API** - Primary general-purpose LLM
+4. **GitHub AI Models** - Coding, technical tasks, robust backup
+5. **Azure AI Services** - Enterprise-grade processing, RAG backbone
+6. **OpenAI API** - Advanced reasoning and diverse models
+7. **Anthropic (Claude)** - Complex analysis and safety
+8. **XAI (Grok)** - Alternative diverse LLM option
+
+---
+
+## 🏃‍♂️ **Quick Start Guide**
+
+### **Option A: Clean Architecture + Local AI (Recommended)**
+```bash
+# 1. Test Local AI Setup
+python test_ollama_setup.py
+
+# 2. Install recommended model (2GB)
+ollama pull llama3.2:3b
+
+# 3. Demo RAG knowledge system  
+python demo_rag_system.py
+
+# 4. Start Clean Architecture API
+python tec_enhanced_api.py
+
+# 5. Test the system
+curl http://localhost:5000/health
+# Should show: "Clean Architecture Status: ✅ Fully Operational"
+```
+
+### **Option B: Legacy Persona System**
+
+### **Option B: Legacy Persona System**
 ```powershell
 # Clone and navigate to project
 cd c:\Users\Ghedd\TEC_CODE\tecdeskgoddess
@@ -43,11 +91,89 @@ copy config\.env.template .env
 # Edit .env with your API keys (see Configuration section)
 ```
 
-### 2. Configuration - NEW AZURE CREDENTIALS
-Update your `.env` file with the latest Azure credentials:
-```dotenv
-# Azure AI Services Configuration (Update with your credentials)
-AZURE_API_KEY_1=your_primary_azure_key_here
+## 📋 **Complete Setup Guides**
+- 📖 **[TEC_COMPLETE_AI_SETUP_GUIDE.md](TEC_COMPLETE_AI_SETUP_GUIDE.md)** - Full local AI setup with Ollama, RAG, Docker, MCP
+- 📋 **[CHEAT_SHEET.md](CHEAT_SHEET.md)** - Quick commands and architecture reference
+- 🚀 **[KIMI_K2_RESTART_GUIDE.md](KIMI_K2_RESTART_GUIDE.md)** - Local AI restart instructions
+
+---
+
+## 🎯 **Architecture Overview**
+
+### **Clean Architecture Layers**
+
+#### **Core Layer** (`core/`)
+- `player.py` - Player entity with stats, inventory, experience
+- `npc.py` - NPC entity with AI-powered personalities  
+- `game_world.py` - Game world with biomes and locations
+- `item.py` - Items with properties and effects
+
+#### **Service Layer** (`services/`)
+- `mcp_service.py` - AI integration (Local + Cloud providers)
+- `player_service.py` - Player business logic and operations
+- `npc_service.py` - NPC behavior and AI dialogue generation
+
+#### **Facade Layer** (`facade/`)
+- `tec_facade.py` - Unified interface hiding system complexity
+
+#### **UI Layer**
+- `tec_enhanced_api.py` - Flask REST API with Clean Architecture integration
+
+### **Local AI Components**
+- `test_ollama_setup.py` - Local AI testing and setup
+- `demo_rag_system.py` - RAG knowledge system demonstration  
+- `data/tec_knowledge_base.json` - Game-specific knowledge for AI
+
+---
+
+## 🤖 **AI Integration Features**
+
+### **Local AI (Ollama)**
+- 🏠 **Privacy-First**: Runs entirely on your hardware
+- 💰 **Cost-Free**: No API costs for routine operations
+- ⚡ **Fast**: Local responses without network latency
+- 🔒 **Offline**: Works without internet connection
+
+### **RAG (Retrieval Augmented Generation)**
+- 🧠 **Game-Aware AI**: Knows your specific world, characters, rules
+- 📚 **Consistent Lore**: Maintains character backgrounds and story
+- 🎯 **Contextual Responses**: NPCs respond based on game state
+
+### **Multi-Provider Fallback**
+- 🔄 **Smart Switching**: Local for routine, cloud for complex
+- 🛡️ **Resilience**: Multiple cloud providers as backup
+- 💡 **Cost Optimization**: Use expensive models only when needed
+
+---
+
+## 🎮 **Game Features**
+
+### **AI-Powered NPCs**
+```python
+# Create intelligent NPCs with personalities
+npc = facade.create_npc("Thorin", "Blacksmith", "Gruff but helpful dwarf")
+
+# Generate contextual dialogue  
+response = facade.generate_npc_dialogue(npc.id, "I need a sword repaired")
+# AI uses RAG to know Thorin's background and blacksmith capabilities
+```
+
+### **Dynamic World Building**
+```python
+# Create living game worlds
+world = facade.create_game_world("Eldoras", ["Mountains", "Forest", "Village"])
+
+# Add locations with AI-generated descriptions
+location = facade.add_location(world.id, "Ironhold Village", "mining_settlement")
+```
+
+### **Player Progression**
+```python
+# Comprehensive player system
+player = facade.create_player("Hero")
+facade.add_experience(player.id, 100)
+facade.add_item_to_inventory(player.id, "Iron Sword")
+```
 AZURE_API_KEY_2=your_secondary_azure_key_here
 
 # Azure Service Endpoints (Update with your endpoints)

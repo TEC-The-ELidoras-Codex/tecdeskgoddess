@@ -1,38 +1,56 @@
 #!/usr/bin/env python3
 """
-Enhanced TEC API with anti-censorship and full access
+TEC: BITLYFE Enhanced API - Clean Architecture Edition
+Flask application using Clean Architecture Protocol TEC_ARCH_071925_V1
+Integrates with the TEC Facade for game operations
 """
 
 import sys
-sys.path.append('src')
-
-from flask import Flask, request, jsonify, send_from_directory
+import asyncio
+from flask import Flask, request, jsonify, render_template_string
 from flask_cors import CORS
-import json
-import os
 import logging
 from datetime import datetime
+import json
+import os
 
+# Import our Clean Architecture Facade
+from facade.tec_facade import GameFacade
+
+# Legacy imports for backward compatibility
 from tec_tools.database_manager import DatabaseManager
 from tec_tools.persona_manager import PersonaManager
 from tec_tools.agentic_processor import AgenticProcessor
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('tec_api.log'),
+        logging.StreamHandler()
+    ]
+)
+
+logger = logging.getLogger(__name__)
+
+# Initialize Flask app
 app = Flask(__name__)
 CORS(app)
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Initialize the Clean Architecture Game Facade (NEW SYSTEM)
+game_facade = GameFacade()
+app_initialized = False
 
-# Initialize components
+# Legacy components (for backward compatibility)
 db_manager = None
 persona_manager = None
 agentic_processor = None
 
 try:
+    # Initialize legacy components for backward compatibility
     db_manager = DatabaseManager()
     persona_manager = PersonaManager()
-    # Fix AgenticProcessor initialization with config
     config = {
         'ai_provider': 'gemini',
         'model': 'gemini-pro',
@@ -40,11 +58,20 @@ try:
         'max_tokens': 2048
     }
     agentic_processor = AgenticProcessor(config)
-    logger.info("✅ All components initialized successfully")
+    logger.info("✅ Legacy components initialized successfully")
 except Exception as e:
-    logger.error(f"❌ Component initialization error: {e}")
-    # Create minimal config if AgenticProcessor fails
+    logger.error(f"❌ Legacy component initialization error: {e}")
     agentic_processor = None
+
+@app.before_first_request
+async def initialize_app():
+    """Initialize the game world before first request"""
+    global app_initialized
+    if not app_initialized:
+        logger.info("🚀 Initializing TEC: BITLYFE Clean Architecture...")
+        result = await game_facade.initialize_game()
+        app_initialized = result['success']
+        logger.info(f"🎮 Game initialization: {result['message']}")
 
 # Load bypass configuration
 bypass_config = {}
@@ -77,17 +104,116 @@ def get_user_access_tier(user_id: str) -> str:
 
 @app.route('/health', methods=['GET'])
 def health():
-    """Health check endpoint"""
+    """Health check endpoint - Enhanced with Clean Architecture status"""
+    clean_arch_status = game_facade.get_status_summary() if game_facade else {"game_initialized": False}
+    
     return jsonify({
         'status': 'healthy',
+        'version': '2.0.0',
+        'architecture': 'TEC Clean Architecture Protocol TEC_ARCH_071925_V1',
         'components': {
             'database': db_manager is not None,
             'persona_manager': persona_manager is not None,
             'agentic_processor': agentic_processor is not None,
-            'bypass_config': bool(bypass_config)
+            'bypass_config': bool(bypass_config),
+            'game_facade': game_facade is not None,
+            'clean_architecture': clean_arch_status["game_initialized"]
         },
-        'anti_censorship': bypass_config.get('content_filtering', {}).get('enabled', True) == False
+        'anti_censorship': bypass_config.get('content_filtering', {}).get('enabled', True) == False,
+        'clean_arch_status': clean_arch_status
     })
+
+# === CLEAN ARCHITECTURE GAME ENDPOINTS ===
+
+@app.route('/api/game/init', methods=['POST'])
+async def initialize_game():
+    """Initialize the game world"""
+    result = await game_facade.initialize_game()
+    status_code = 200 if result['success'] else 500
+    return jsonify(result), status_code
+
+@app.route('/api/player/create', methods=['POST'])
+def create_player():
+    """Create a new player"""
+    data = request.get_json()
+    
+    if not data or 'player_id' not in data or 'name' not in data:
+        return jsonify({"success": False, "message": "Missing player_id or name"}), 400
+    
+    result = game_facade.create_player(data['player_id'], data['name'])
+    status_code = 200 if result['success'] else 400
+    
+    return jsonify(result), status_code
+
+@app.route('/api/player/login', methods=['POST'])
+def player_login():
+    """Player login"""
+    data = request.get_json()
+    
+    if not data or 'player_id' not in data:
+        return jsonify({"success": False, "message": "Missing player_id"}), 400
+    
+    result = game_facade.player_login(data['player_id'])
+    status_code = 200 if result['success'] else 400
+    
+    return jsonify(result), status_code
+
+@app.route('/api/player/<player_id>/state', methods=['GET'])
+def get_player_state(player_id):
+    """Get current player state"""
+    result = game_facade.get_player_state(player_id)
+    status_code = 200 if result['success'] else 404
+    
+    return jsonify(result), status_code
+
+@app.route('/api/npc/<npc_id>/talk', methods=['POST'])
+async def talk_to_npc(npc_id):
+    """Talk to an NPC with AI-powered responses"""
+    data = request.get_json()
+    
+    if not data or 'player_id' not in data or 'message' not in data:
+        return jsonify({"success": False, "message": "Missing player_id or message"}), 400
+    
+    result = await game_facade.talk_to_npc(data['player_id'], npc_id, data['message'])
+    status_code = 200 if result['success'] else 400
+    
+    return jsonify(result), status_code
+
+@app.route('/api/world/state', methods=['GET'])
+def get_world_state():
+    """Get current world state"""
+    result = game_facade.get_world_state()
+    return jsonify({"success": True, "world_state": result})
+
+@app.route('/api/ai/status', methods=['GET'])
+def get_ai_status():
+    """Get AI service status"""
+    result = game_facade.get_ai_status()
+    return jsonify(result)
+
+@app.route('/api/ai/switch_provider', methods=['POST'])
+def switch_ai_provider():
+    """Switch AI provider"""
+    data = request.get_json()
+    
+    if not data or 'provider_name' not in data:
+        return jsonify({"success": False, "message": "Missing provider_name"}), 400
+    
+    result = game_facade.switch_ai_provider(data['provider_name'])
+    status_code = 200 if result['success'] else 400
+    
+    return jsonify(result), status_code
+
+@app.route('/api/chat/<player_id>', methods=['POST'])
+def process_game_chat(player_id):
+    """Process game chat messages and commands"""
+    data = request.get_json()
+    
+    if not data or 'message' not in data:
+        return jsonify({"success": False, "message": "Missing message"}), 400
+    
+    result = game_facade.process_chat_command(player_id, data['message'])
+    return jsonify(result)
 
 @app.route('/chat/uncensored', methods=['POST'])
 def uncensored_chat():
@@ -257,8 +383,203 @@ def memory_visualization():
 
 @app.route('/')
 def index():
-    """Serve the main interface"""
-    return send_from_directory('src/static', 'tec_complete_interface.html')
+    """Serve the main interface - Clean Architecture Edition"""
+    return render_template_string("""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEC: BITLYFE - Clean Architecture Edition</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .title {
+            text-align: center;
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+        .architecture-info {
+            background: linear-gradient(45deg, rgba(255, 107, 107, 0.2), rgba(78, 205, 196, 0.2));
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .layer {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4ecdc4;
+            border-radius: 5px;
+        }
+        .endpoints {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .endpoint-group {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .endpoint {
+            margin: 10px 0;
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .method { color: #ff6b6b; font-weight: bold; }
+        .path { color: #4ecdc4; }
+        .description { color: #96ceb4; font-style: italic; }
+        .legacy-note {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">TEC: BITLYFE</h1>
+        <p class="subtitle">Clean Architecture Edition - Protocol TEC_ARCH_071925_V1</p>
+        
+        <div class="architecture-info">
+            <h3>🏗️ Clean Architecture Implementation</h3>
+            <div class="layer">
+                <strong>🎯 Core Layer:</strong> Pure game logic (Player, NPC, GameWorld, Item entities)
+            </div>
+            <div class="layer">
+                <strong>⚙️ Service Layer:</strong> Business logic orchestration (PlayerService, NPCService, MCPService)
+            </div>
+            <div class="layer">
+                <strong>🎭 Facade Layer:</strong> Simple API interface (GameFacade)
+            </div>
+            <div class="layer">
+                <strong>🌐 UI Layer:</strong> Flask web interface and REST API (THIS LAYER)
+            </div>
+        </div>
+        
+        <div class="endpoints">
+            <div class="endpoint-group">
+                <h3>🎮 Game System</h3>
+                <div class="endpoint">
+                    <span class="method">POST</span> <span class="path">/api/game/init</span><br>
+                    <span class="description">Initialize game world</span>
+                </div>
+                <div class="endpoint">
+                    <span class="method">GET</span> <span class="path">/api/world/state</span><br>
+                    <span class="description">Get world state</span>
+                </div>
+                <div class="endpoint">
+                    <span class="method">GET</span> <span class="path">/health</span><br>
+                    <span class="description">System health + architecture status</span>
+                </div>
+            </div>
+            
+            <div class="endpoint-group">
+                <h3>👤 Player System</h3>
+                <div class="endpoint">
+                    <span class="method">POST</span> <span class="path">/api/player/create</span><br>
+                    <span class="description">Create new player</span>
+                </div>
+                <div class="endpoint">
+                    <span class="method">POST</span> <span class="path">/api/player/login</span><br>
+                    <span class="description">Player login</span>
+                </div>
+                <div class="endpoint">
+                    <span class="method">GET</span> <span class="path">/api/player/{id}/state</span><br>
+                    <span class="description">Get player state</span>
+                </div>
+            </div>
+            
+            <div class="endpoint-group">
+                <h3>🤖 AI & NPC System</h3>
+                <div class="endpoint">
+                    <span class="method">POST</span> <span class="path">/api/npc/{id}/talk</span><br>
+                    <span class="description">AI-powered NPC dialogue</span>
+                </div>
+                <div class="endpoint">
+                    <span class="method">GET</span> <span class="path">/api/ai/status</span><br>
+                    <span class="description">AI provider status</span>
+                </div>
+                <div class="endpoint">
+                    <span class="method">POST</span> <span class="path">/api/ai/switch_provider</span><br>
+                    <span class="description">Switch AI provider</span>
+                </div>
+            </div>
+            
+            <div class="endpoint-group">
+                <h3>💬 Chat System</h3>
+                <div class="endpoint">
+                    <span class="method">POST</span> <span class="path">/api/chat/{player_id}</span><br>
+                    <span class="description">Game chat & commands</span>
+                </div>
+                <div class="endpoint">
+                    <span class="method">POST</span> <span class="path">/chat/uncensored</span><br>
+                    <span class="description">Legacy uncensored chat</span>
+                </div>
+                <div class="endpoint">
+                    <span class="method">POST</span> <span class="path">/chat</span><br>
+                    <span class="description">Legacy standard chat</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="legacy-note">
+            <h4>🔧 Legacy Compatibility</h4>
+            <p>This version maintains backward compatibility with existing TEC features while implementing Clean Architecture for new RPG game systems. Legacy chat endpoints continue to work alongside the new game API.</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px; opacity: 0.7;">
+            <p>🚀 Ready for Kimi-K2 local model integration!</p>
+            <p>Clean Architecture Protocol Active ✅</p>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-refresh status
+        setInterval(() => {
+            fetch('/health')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('System Status:', data);
+                })
+                .catch(error => console.error('Health check failed:', error));
+        }, 30000);
+    </script>
+</body>
+</html>
+    """)
 
 if __name__ == '__main__':
     print("🚀 Starting TEC Enhanced API with Anti-Censorship")

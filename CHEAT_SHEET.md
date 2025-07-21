@@ -2,6 +2,7 @@
 *The Creator's Rebellion - Enhanced with Persona System*
 
 ## 📋 **Current System Status**
+✅ **TEC Clean Architecture Protocol TEC_ARCH_071925_V1** - 100% Complete  
 ✅ **Mobile Optimization** - Responsive design, touch controls  
 ✅ **Audio Integration** - TTS, voice input, character voices  
 ✅ **Visual Enhancements** - Themes, animations, particles  
@@ -9,34 +10,58 @@
 ✅ **Character System** - Polkin, Mynx, Kaelen with full lore  
 ✅ **AI Personality Control** - Creativity, memory, reasoning modes  
 ✅ **Gamification** - BITL tokens, quests, XP system  
+✅ **Local AI Integration** - Ollama, RAG, Docker, MCP support  
+✅ **Image Generation** - Draw Things, Docker Stable Diffusion  
 
 ## 🛠️ **Quick Start Commands**
 ```bash
-# Start the persona API server
-python tec_persona_api.py
+# TEC Clean Architecture System
+python tec_enhanced_api.py           # Start enhanced API with Clean Architecture
+python test_ollama_setup.py          # Test local AI (Ollama) setup
+python demo_rag_system.py           # Demo RAG knowledge system
 
-# Start complete interface server
-python -m http.server 8000
+# Legacy Persona System  
+python tec_persona_api.py           # Start persona API server
+python -m http.server 8000          # Start complete interface server
 
-# Test complete system
+# Testing and Setup
 python scripts/test_persona_system.py
-
-# Initialize character lore
 python scripts/initialize_character_lore.py
 
-# Open enhanced interface
-start tec_enhanced_interface.html
+# Local AI Commands (Ollama)
+ollama --version                    # Check Ollama installation
+ollama pull llama3.2:3b            # Install recommended model
+ollama run llama3.2:3b "Hello!"    # Test model
 
-# Open complete interface (Web3 + Gamification)
-start tec_complete_interface.html
+# Docker Stack (Advanced)
+docker-compose up -d                # Start full AI stack
+
+# Web Interfaces
+start tec_enhanced_interface.html   # Enhanced UI (Persona + Audio + Visual)
+start tec_complete_interface.html   # Complete UI (Web3 + Gamification)
 ```
 
 ## 📁 **File Structure**
 ```
 tecdeskgoddess/
-├── tec_enhanced_interface.html      # Enhanced UI (Persona + Audio + Visual)
-├── tec_complete_interface.html      # Complete UI (Web3 + Gamification)
-├── tec_persona_api.py              # Enhanced API server
+├── TEC_COMPLETE_AI_SETUP_GUIDE.md  # Complete AI setup guide
+├── tec_enhanced_api.py             # Enhanced API with Clean Architecture
+├── test_ollama_setup.py            # Local AI testing script
+├── demo_rag_system.py              # RAG knowledge demo
+├── core/                           # Clean Architecture - Core Layer
+│   ├── player.py                   # Player entity
+│   ├── npc.py                      # NPC entity  
+│   ├── game_world.py               # Game world entity
+│   └── item.py                     # Item entity
+├── services/                       # Clean Architecture - Service Layer
+│   ├── mcp_service.py              # AI/MCP integration
+│   ├── player_service.py           # Player business logic
+│   └── npc_service.py              # NPC business logic
+├── facade/                         # Clean Architecture - Facade Layer
+│   └── tec_facade.py               # Unified game interface
+├── tec_enhanced_interface.html     # Enhanced UI (Persona + Audio + Visual)
+├── tec_complete_interface.html     # Complete UI (Web3 + Gamification)  
+├── tec_persona_api.py             # Legacy persona API server
 ├── src/tec_tools/
 │   ├── persona_manager.py          # Database layer
 │   └── agentic_processor.py        # AI processing
@@ -44,11 +69,86 @@ tecdeskgoddess/
 │   ├── css/persona_ui.css
 │   └── js/persona_manager.js
 ├── data/
-│   └── tec_database.db            # SQLite database
+│   ├── tec_database.db            # SQLite database
+│   └── tec_knowledge_base.json    # RAG knowledge base
 └── docker/                       # Docker deployment files
 ```
 
-## 🎮 **Interface Comparison**
+## �️ **TEC Clean Architecture Protocol TEC_ARCH_071925_V1**
+
+### **4-Layer Architecture**
+```
+┌─────────────────────────────────────────┐
+│               UI Layer                  │ ← Flask API (tec_enhanced_api.py)
+├─────────────────────────────────────────┤
+│             Facade Layer                │ ← GameFacade (unified interface)
+├─────────────────────────────────────────┤
+│            Service Layer                │ ← Business Logic + AI Integration
+├─────────────────────────────────────────┤
+│              Core Layer                 │ ← Game Entities (Player, NPC, etc.)
+└─────────────────────────────────────────┘
+```
+
+### **Clean Architecture Endpoints**
+```bash
+# System Health
+GET  /health                        # Architecture status
+
+# Game Management  
+POST /api/game/player/create        # Create player
+GET  /api/game/player/{id}          # Get player
+POST /api/game/npc/create           # Create NPC
+POST /api/game/npc/{id}/dialogue    # Generate NPC dialogue
+POST /api/game/world/create         # Create game world
+POST /api/game/item/create          # Create item
+
+# AI Integration
+POST /api/ai/switch_provider        # Switch AI provider (local/cloud)
+POST /api/ai/chat                   # AI chat with context
+```
+
+## 🤖 **Local AI Integration (Ollama + RAG)**
+
+### **Ollama Models (Choose based on 12GB RAM)**
+```bash
+llama3.2:3b    # 2GB - Recommended balance
+llama3.2:1b    # 1.3GB - Fastest option  
+gemma2:2b      # 1.6GB - Alternative choice
+qwen2:1.5b     # 1GB - Compact option
+```
+
+### **RAG (Retrieval Augmented Generation)**
+- 🧠 AI knows YOUR specific game world
+- 📚 Consistent character backgrounds  
+- 🎯 Up-to-date game rules and lore
+- 🔍 Contextual NPC responses
+
+### **Docker AI Stack**
+```bash
+docker-compose up -d               # Full AI stack
+# Includes: TEC API, Ollama, ChromaDB
+```
+
+## 🖼️ **Image Generation Options**
+```bash
+# Local (Draw Things - you have this)
+Draw Things app                    # Direct from Hugging Face
+
+# Docker Stable Diffusion
+docker pull stabilityai/stable-diffusion:latest
+docker run -p 7860:7860 stabilityai/stable-diffusion:latest
+
+# Ollama (if supported)
+ollama pull stable-diffusion
+```
+
+## 🔗 **MCP + Hugging Face Integration**
+- 🎯 25 minutes daily ZeroGPU compute (H200 hardware)
+- 🚀 Access to 500k+ models  
+- 🔧 VS Code MCP integration
+- 📡 Spaces semantic search
+
+## �🎮 **Interface Comparison**
 
 ### **tec_enhanced_interface.html** (Primary)
 - ✅ Persona System with Character Lore
