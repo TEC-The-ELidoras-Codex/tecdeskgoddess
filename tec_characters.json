@@ -1,0 +1,131 @@
+[
+  {
+    "basic_info": {
+      "name": "Kaelen Crystalcore",
+      "codename": "Matrix Hunter",
+      "faction": "Digital Mystics",
+      "rank": "Digital Oracle",
+      "specialization": "Quantum Communications",
+      "clearance": "Delta - Regional"
+    },
+    "personality": {
+      "positive_trait": "strategic thinking",
+      "negative_trait": "past trauma",
+      "faction_trait": "serene",
+      "core_values": [
+        "wisdom",
+        "harmony",
+        "transcendence",
+        "balance"
+      ]
+    },
+    "background": {
+      "origin": "Born in the digital slums of Neo-Tokyo",
+      "motivation": "Protecting innocent civilians from corporate exploitation",
+      "faction_description": "Spiritual technologists bridging magic and data"
+    },
+    "capabilities": {
+      "skills": [
+        "quantum entanglement",
+        "signal amplification",
+        "encryption protocols"
+      ],
+      "equipment": [
+        "quantum transmitter",
+        "entanglement chamber",
+        "signal processor"
+      ],
+      "equipment_style": "mystical-tech"
+    },
+    "metadata": {
+      "generated_on": "2025-07-21 20:52:45",
+      "generator_version": "TEC_Lore_Forge_v1.0"
+    }
+  },
+  {
+    "basic_info": {
+      "name": "Atlas Netwalk",
+      "codename": "Zero Day",
+      "faction": "Corporate Syndicate",
+      "rank": "Director",
+      "specialization": "Neural Interface Designer",
+      "clearance": "Alpha - Stellar"
+    },
+    "personality": {
+      "positive_trait": "digital intuition",
+      "negative_trait": "memory fragmentation",
+      "faction_trait": "professional",
+      "core_values": [
+        "profit",
+        "efficiency",
+        "competition",
+        "innovation"
+      ]
+    },
+    "background": {
+      "origin": "Raised aboard a deep space mining vessel",
+      "motivation": "Protecting innocent civilians from corporate exploitation",
+      "faction_description": "Business empire controlling vast resources"
+    },
+    "capabilities": {
+      "skills": [
+        "neural mapping",
+        "consciousness transfer",
+        "AI integration"
+      ],
+      "equipment": [
+        "neural crown",
+        "consciousness scanner",
+        "AI companion"
+      ],
+      "equipment_style": "corporate-luxury"
+    },
+    "metadata": {
+      "generated_on": "2025-07-21 20:52:45",
+      "generator_version": "TEC_Lore_Forge_v1.0"
+    }
+  },
+  {
+    "basic_info": {
+      "name": "Mynx Sterling",
+      "codename": "Digital Reaper",
+      "faction": "Astradigital Navy",
+      "rank": "Lieutenant",
+      "specialization": "Neural Interface Designer",
+      "clearance": "Alpha - Stellar"
+    },
+    "personality": {
+      "positive_trait": "natural leadership",
+      "negative_trait": "authority defiance",
+      "faction_trait": "tactical",
+      "core_values": [
+        "honor",
+        "duty",
+        "courage",
+        "loyalty"
+      ]
+    },
+    "background": {
+      "origin": "Born in the digital slums of Neo-Tokyo",
+      "motivation": "Seeking revenge against those who destroyed their family",
+      "faction_description": "Elite space force protecting TEC territories"
+    },
+    "capabilities": {
+      "skills": [
+        "neural mapping",
+        "consciousness transfer",
+        "AI integration"
+      ],
+      "equipment": [
+        "neural crown",
+        "consciousness scanner",
+        "AI companion"
+      ],
+      "equipment_style": "military-naval"
+    },
+    "metadata": {
+      "generated_on": "2025-07-21 20:52:45",
+      "generator_version": "TEC_Lore_Forge_v1.0"
+    }
+  }
+]
