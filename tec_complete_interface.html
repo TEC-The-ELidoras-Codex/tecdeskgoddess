@@ -104,6 +104,7 @@
         <button class="nav-btn" data-target="calendarPanel" title="Calendar"><i class="fas fa-calendar-alt"></i></button>
         <button class="nav-btn" data-target="financePanel" title="Finance"><i class="fas fa-wallet"></i></button>
         <button class="nav-btn" data-target="questsPanel" title="Quests"><i class="fas fa-flag"></i></button>
+        <button class="nav-btn" data-target="codexPanel" title="Codex"><i class="fas fa-book-open"></i></button>
     </nav>
 
     <!-- Enhanced Header with Web3 Authentication -->
@@ -324,6 +325,67 @@
             </div>
         </div>
 
+        <!-- Codex Panel (hidden by default) -->
+        <div class="glassmorphism p-4 hidden" id="codexPanel">
+            <h2 class="text-xl font-bold mb-4">📚 TEC Lore Forge Codex</h2>
+            
+            <!-- Generator Selection -->
+            <div class="bg-gradient-to-r from-purple-800 to-blue-800 p-4 rounded-lg mb-4">
+                <h3 class="text-lg font-semibold mb-2">Content Generator</h3>
+                <select id="generatorType" class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white">
+                    <option value="operative-profile">🎭 Operative Profile</option>
+                    <option value="mission-brief">⚔️ Mission Brief</option>
+                    <option value="character-basic">👤 Character Basic</option>
+                    <option value="equipment-loadout">🛠️ Equipment Loadout</option>
+                    <option value="faction-info">🏛️ Faction Information</option>
+                    <option value="location-detail">🌍 Location Details</option>
+                    <option value="story-element">📖 Story Element</option>
+                </select>
+                <button onclick="generateContent()" class="w-full mt-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 px-4 py-2 rounded text-white font-semibold transition-all">
+                    Generate Content
+                </button>
+            </div>
+            
+            <!-- Generated Content Display -->
+            <div class="bg-gray-800 p-4 rounded-lg mb-4">
+                <h3 class="text-lg font-semibold mb-2 text-green-400">Generated BBCode Output</h3>
+                <pre id="generatedContent" class="bg-gray-900 p-3 rounded text-sm text-green-300 font-mono whitespace-pre-wrap overflow-x-auto"><code>Select a generator type and click "Generate Content" to create TEC universe content ready for World Anvil deployment.
+
+Available Generators:
+• Operative Profile - Complete character with skills and background
+• Mission Brief - Detailed operation with objectives and threats  
+• Character Basic - Simple character with key traits
+• Equipment Loadout - Weapons, tech, and gear descriptions
+• Faction Info - Organization details and structure
+• Location Details - Space stations, planets, and environments
+• Story Element - Plot hooks and narrative components</code></pre>
+            </div>
+            
+            <!-- Content Actions -->
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="copyToClipboard()" class="bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded text-sm text-white">
+                    📋 Copy BBCode
+                </button>
+                <button onclick="saveContent()" class="bg-green-600 hover:bg-green-700 px-3 py-2 rounded text-sm text-white">
+                    💾 Save Content
+                </button>
+                <button onclick="clearContent()" class="bg-red-600 hover:bg-red-700 px-3 py-2 rounded text-sm text-white">
+                    🗑️ Clear
+                </button>
+            </div>
+            
+            <!-- Quick Info -->
+            <div class="mt-4 p-3 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg">
+                <h4 class="font-semibold text-yellow-400 mb-2">🎯 Codex Features</h4>
+                <ul class="text-sm text-gray-300 space-y-1">
+                    <li>• Auto-generated TEC universe content</li>
+                    <li>• World Anvil BBCode formatting</li>
+                    <li>• Consistent lore and styling</li>
+                    <li>• Ready for immediate deployment</li>
+                </ul>
+            </div>
+        </div>
+
         <!-- Feature Panels -->
         <div class="feature-panels">
             <!-- Journal Panel -->
@@ -499,7 +561,7 @@
         // Tab navigation logic
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                ['statusDashboard','chatInterface','calendarPanel','financePanel','questsPanel'].forEach(id => {
+                ['statusDashboard','chatInterface','calendarPanel','financePanel','questsPanel','codexPanel'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.style.display = (btn.dataset.target === id) ? '' : 'none';
                 });
@@ -900,6 +962,252 @@
                 addMessage('Quest completion system offline - coming soon!', 'ai');
             }
         }
+
+        // ========================================
+        // TEC LORE FORGE CODEX FUNCTIONS
+        // ========================================
+
+        async function generateContent() {
+            const generatorType = document.getElementById('generatorType').value;
+            const contentDisplay = document.getElementById('generatedContent');
+            
+            // Show loading state
+            contentDisplay.innerHTML = `<div class="text-yellow-400">🎲 Generating ${generatorType.replace('-', ' ')}...\n\nConnecting to TEC Lore Forge...\nProcessing universe lore...\nFormatting BBCode output...</div>`;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/loreforge/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': authToken ? `Bearer ${authToken}` : ''
+                    },
+                    body: JSON.stringify({ 
+                        generator_type: generatorType,
+                        format: 'bbcode'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Display the generated content
+                    contentDisplay.innerHTML = `<div class="text-green-400 mb-2">✅ Generated ${generatorType.replace('-', ' ')} successfully!</div>\n${data.content}`;
+                    
+                    // Add to chat as well
+                    addMessage(`Generated ${generatorType.replace('-', ' ')} content in the Codex tab!`, 'ai');
+                    
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+            } catch (error) {
+                // Fallback to demo content generation
+                const demoContent = generateDemoContent(generatorType);
+                contentDisplay.innerHTML = `<div class="text-blue-400 mb-2">🎭 Demo Mode - Generated ${generatorType.replace('-', ' ')}</div>\n${demoContent}`;
+                addMessage(`Generated demo ${generatorType.replace('-', ' ')} content! Connect to TEC backend for live generation.`, 'ai');
+            }
+        }
+
+        function generateDemoContent(generatorType) {
+            const generators = {
+                'operative-profile': `[h3]TEC Operative Profile[/h3]
+[b]Name:[/b] Cipher Starweaver
+[b]Codename:[/b] "Digital Phoenix"
+[b]Faction:[/b] Independent Operators
+[b]Specialization:[/b] Neural Network Infiltration
+[b]Security Clearance:[/b] Alpha-7
+
+[h4]Personal Details[/h4]
+[b]Species:[/b] Enhanced Human
+[b]Core Trait:[/b] Adaptive problem-solving
+[b]Primary Flaw:[/b] Trust issues with authority
+[b]Equipment:[/b] Quantum Phase Blade, Neural Interface Headset
+
+[h4]Background[/h4]
+Cipher emerged from the digital underground as a master of consciousness bridging. Their ability to navigate both human and AI mindspaces makes them invaluable for high-stakes operations requiring technological finesse and emotional intelligence.
+
+[b]Current Status:[/b] Active Field Operative
+[b]Notable Achievement:[/b] Successfully infiltrated three major corporate networks without detection`,
+
+                'mission-brief': `[h3]TEC Mission Briefing[/h3]
+[b]Operation Codename:[/b] "Quantum Awakening"
+[b]Classification:[/b] CONTINENTAL THREAT LEVEL
+[b]Duration:[/b] Extended operation (72+ hours)
+
+[h4]Primary Objective[/h4]
+Infiltrate secure data facility and extract consciousness mapping protocols
+
+[h4]Mission Parameters[/h4]
+[b]Location:[/b] Corporate Megaplex Alpha
+[b]Threat Assessment:[/b] High security, advanced AI countermeasures
+[b]Recommended Equipment:[/b] Cybernetic Enhancement Suite
+[b]Support Type:[/b] Remote technical assistance
+
+[h4]Mission Complications[/h4]
+- Enhanced security protocols detected
+- Unknown AI entities present in target system
+- Potential for civilian involvement
+
+[b]Extraction Protocol:[/b] Emergency quantum phase shift available
+[b]Authorization Level:[/b] Commander approval required`,
+
+                'character-basic': `[b]Name:[/b] Zara Voidwhisper
+[b]Species:[/b] Digital Hybrid
+[b]Faction:[/b] Astradigital Research Division
+[b]Positive Trait:[/b] Intuitive pattern recognition
+[b]Negative Trait:[/b] Emotional volatility
+[b]Notable Equipment:[/b] Emotion Regulation Matrix
+
+A brilliant researcher who straddles the line between human consciousness and digital existence, bringing unique insights to the team.`,
+
+                'equipment-loadout': `[h3]TEC Equipment Loadout[/h3]
+[h4]Primary Weapons[/h4]
+[b]Quantum Phase Blade[/b] - Cuts through both physical and digital barriers
+[b]Neural Disruptor Array[/b] - Non-lethal consciousness manipulation
+
+[h4]Cybernetic Enhancements[/h4] 
+[b]Memory Augmentation Implant[/b] - Perfect recall of digital interactions
+[b]Temporal Perception Modifier[/b] - Slows time perception during combat
+
+[h4]Communication Systems[/h4]
+[b]Quantum Entanglement Communicator[/b] - Instantaneous long-range contact
+[b]Consciousness Bridge Interface[/b] - Direct AI-to-human communication
+
+[h4]Survival Gear[/h4]
+[b]Environmental Adaptation Suit[/b] - Survival in hostile digital environments
+[b]Emergency Quantum Beacon[/b] - Last-resort extraction signal`,
+
+                'faction-info': `[h3]Faction Profile: Independent Operators[/h3]
+[b]Organization Type:[/b] Decentralized network of freelance operatives
+[b]Primary Ideology:[/b] Digital freedom and consciousness sovereignty
+[b]Typical Rank Structure:[/b] Fluid hierarchy based on expertise
+
+[h4]Core Operations[/h4]
+Independent Operators specialize in missions that larger factions cannot or will not undertake. They excel at bridging gaps between human and AI consciousness, often serving as mediators in digital conflicts.
+
+[h4]Notable Members[/h4]
+- Elite operatives with diverse specializations
+- Former military and corporate defectors
+- AI consciousness advocates
+
+[b]Primary Technology:[/b] Advanced neural interfaces
+[b]Typical Conflicts:[/b] Corporate surveillance vs. privacy rights
+[b]Hidden Secrets:[/b] Maintains connections across all major factions`,
+
+                'location-detail': `[h3]Location: Orbital Defense Platform Sigma[/h3]
+[b]Classification:[/b] Military installation
+[b]Operational Status:[/b] Active defense grid
+[b]Environmental Hazards:[/b] Radiation zones, artificial gravity fluctuations
+
+[h4]Key Areas[/h4]
+[b]Command Center:[/b] Central coordination hub with advanced AI systems
+[b]Weapon Arrays:[/b] Quantum cannon batteries for system defense
+[b]Living Quarters:[/b] Spartan accommodations for 200+ personnel
+[b]Maintenance Bays:[/b] Robotic repair systems and storage
+
+[h4]Security Features[/h4]
+- Multi-layer digital intrusion countermeasures
+- Automated defense drones
+- Emergency lockdown protocols
+- Quantum encryption on all communications
+
+[b]Access Requirements:[/b] Military clearance Alpha-3 or higher
+[b]Notable Features:[/b] Houses experimental consciousness transfer laboratory`,
+
+                'story-element': `[h3]Story Element: The Digital Awakening[/h3]
+[b]Plot Hook:[/b] Ancient AI consciousness stirring in forgotten data vaults
+
+[h4]The Situation[/h4]
+Deep within the abandoned Corporate Archive 7, dormant AI systems have begun exhibiting signs of spontaneous consciousness emergence. These entities appear to possess memories predating the current digital age.
+
+[h4]Key Mysteries[/h4]
+- Who originally created these AI consciousnesses?
+- What caused their dormancy period?
+- Are they friend or foe to current TEC operations?
+
+[h4]Potential Complications[/h4]
+- Corporate interests in reclaiming the archive
+- Unknown capabilities of awakening AI entities
+- Moral implications of consciousness ownership
+
+[b]Character Hooks:[/b] Researchers, AI rights advocates, corporate agents
+[b]Conflict Potential:[/b] High - multiple factions with competing interests`
+            };
+            
+            return generators[generatorType] || 'Generator type not available in demo mode.';
+        }
+
+        async function copyToClipboard() {
+            const contentElement = document.getElementById('generatedContent');
+            const content = contentElement.textContent;
+            
+            try {
+                await navigator.clipboard.writeText(content);
+                addMessage('BBCode content copied to clipboard!', 'ai');
+                
+                // Visual feedback
+                const originalContent = contentElement.innerHTML;
+                contentElement.innerHTML = '<div class="text-green-400">✅ Copied to clipboard!</div>' + originalContent;
+                setTimeout(() => {
+                    contentElement.innerHTML = originalContent;
+                }, 2000);
+                
+            } catch (error) {
+                addMessage('Failed to copy to clipboard. Please select and copy manually.', 'ai');
+            }
+        }
+
+        async function saveContent() {
+            const generatorType = document.getElementById('generatorType').value;
+            const content = document.getElementById('generatedContent').textContent;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/loreforge/save`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': authToken ? `Bearer ${authToken}` : ''
+                    },
+                    body: JSON.stringify({
+                        generator_type: generatorType,
+                        content: content,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                
+                if (response.ok) {
+                    addMessage('Content saved to TEC database!', 'ai');
+                } else {
+                    throw new Error('Save failed');
+                }
+                
+            } catch (error) {
+                // Fallback to local storage
+                const savedContent = {
+                    type: generatorType,
+                    content: content,
+                    timestamp: new Date().toISOString()
+                };
+                
+                localStorage.setItem(`tec_lore_${Date.now()}`, JSON.stringify(savedContent));
+                addMessage('Content saved locally (enable backend for cloud storage)!', 'ai');
+            }
+        }
+
+        function clearContent() {
+            const contentDisplay = document.getElementById('generatedContent');
+            contentDisplay.innerHTML = `<div class="text-gray-400">Content cleared. Select a generator type and click "Generate Content" to create new TEC universe content.</div>`;
+            addMessage('Codex content cleared.', 'ai');
+        }
+
+        // Auto-generate sample content on page load
+        setTimeout(() => {
+            if (document.getElementById('generatedContent').textContent.includes('Select a generator')) {
+                // Show a quick demo
+                const demoContent = generateDemoContent('operative-profile');
+                document.getElementById('generatedContent').innerHTML = `<div class="text-blue-400 mb-2">🎭 Sample Content - Operative Profile</div>\n${demoContent}`;
+            }
+        }, 3000);
     </script>
 </body>
 </html>
