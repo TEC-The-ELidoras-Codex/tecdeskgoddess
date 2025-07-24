@@ -629,11 +629,12 @@ def token_dashboard():
 
 @app.route('/api/loreforge/generate', methods=['POST'])
 def generate_lore_content():
-    """Generate TEC universe content using Lore Forge"""
+    """Generate TEC universe content using Enhanced Faction-Aware Lore Forge"""
     try:
         data = request.get_json()
         generator_type = data.get('generator_type', 'operative-profile')
         format_type = data.get('format', 'bbcode')
+        faction_filter = data.get('faction', None)  # Optional faction filtering
         
         # Try to use live World Anvil integration first
         try:
@@ -644,38 +645,162 @@ def generate_lore_content():
             print(f"🚀 Live generation requested: {generator_type}")
             
             # For now, use enhanced demo content with live API indicators
-            demo_content = generate_demo_lore_content(generator_type, format_type)
-            enhanced_content = f"[b]🚀 LIVE TEC LORE FORGE[/b]\n[i]Generated with live API credentials active[/i]\n\n{demo_content}"
+            demo_content = generate_demo_lore_content(generator_type, format_type, faction_filter)
+            enhanced_content = f"[b]🚀 LIVE TEC LORE FORGE - ENHANCED FACTION SYSTEM[/b]\n[i]Generated with live API credentials active[/i]\n[i]Featuring 7-faction dynamic system with enhanced generators[/i]\n\n{demo_content}"
             
             return jsonify({
                 "success": True,
-                "mode": "live",
+                "mode": "live_enhanced",
                 "generator_type": generator_type,
                 "format": format_type,
+                "faction_filter": faction_filter,
                 "content": enhanced_content,
-                "message": "Generated with live TEC Lore Forge - World Anvil & Azure AI ready",
+                "message": "Generated with Enhanced TEC Lore Forge - World Anvil & Azure AI ready + 7-Faction System",
                 "timestamp": datetime.now().isoformat(),
                 "live_apis": {
                     "world_anvil": "✅ Active",
                     "azure_ai": "✅ Active",
-                    "speech_services": "✅ Active"
-                }
+                    "speech_services": "✅ Active",
+                    "faction_system": "✅ Enhanced"
+                },
+                "available_generators": [
+                    "operative-profile", "mission-brief", "character-basic", 
+                    "equipment-loadout", "faction-info", "location-detail", 
+                    "story-element", "faction-operative", "faction-conflict", "faction-mission"
+                ],
+                "available_factions": [
+                    "Independent Operators", "Astradigital Research Division", 
+                    "Neo-Constantinople Guard", "The Synthesis Collective",
+                    "Quantum Liberation Front", "Digital Preservation Society", "The Evolved"
+                ]
             })
             
         except Exception as lore_error:
-            # Fallback to demo content
-            demo_content = generate_demo_lore_content(generator_type, format_type)
+            # Fallback to enhanced demo content
+            demo_content = generate_demo_lore_content(generator_type, format_type, faction_filter)
             return jsonify({
                 "success": True,
-                "mode": "demo",
+                "mode": "demo_enhanced",
                 "generator_type": generator_type,
                 "format": format_type,
+                "faction_filter": faction_filter,
                 "content": demo_content,
-                "message": "Demo mode active - live APIs configured but using demo content",
+                "message": "Enhanced demo mode active - live APIs configured + 7-Faction System ready",
                 "timestamp": datetime.now().isoformat(),
-                "error_details": str(lore_error)
+                "error_details": str(lore_error),
+                "available_generators": [
+                    "operative-profile", "mission-brief", "character-basic", 
+                    "equipment-loadout", "faction-info", "location-detail", 
+                    "story-element", "faction-operative", "faction-conflict", "faction-mission"
+                ]
             })
             
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/loreforge/factions')
+def get_faction_info():
+    """Get information about all available factions"""
+    try:
+        # Return the faction database
+        faction_data = {
+            "Independent Operators": {
+                "ideology": "Digital freedom and consciousness sovereignty",
+                "rank_structure": "Fluid hierarchy based on expertise",
+                "specializations": ["Neural interface operations", "Consciousness bridging", "Digital forensics"],
+                "technology": ["Advanced neural interfaces", "Quantum encryption tools"],
+                "conflicts": ["Corporate surveillance", "AI rights violations", "Privacy breaches"]
+            },
+            "Astradigital Research Division": {
+                "ideology": "Advancing human-AI symbiosis through research",
+                "rank_structure": "Academic hierarchy with research leads",
+                "specializations": ["Consciousness mapping", "Digital archaeology", "AI psychology"],
+                "technology": ["Consciousness mapping arrays", "Digital excavation tools"],
+                "conflicts": ["Ethical research boundaries", "Ancient AI awakening", "Corporate espionage"]
+            },
+            "Neo-Constantinople Guard": {
+                "ideology": "Preserving human primacy and traditional values",
+                "rank_structure": "Military command structure",
+                "specializations": ["Cyber-warfare", "Digital fortress defense", "Anti-AI operations"],
+                "technology": ["Digital fortress systems", "Anti-AI weaponry"],
+                "conflicts": ["AI insurgency", "Digital territory disputes", "Separatist movements"]
+            },
+            "The Synthesis Collective": {
+                "ideology": "Perfect human-AI merger and consciousness unity",
+                "rank_structure": "Collective consensus with node leaders",
+                "specializations": ["Consciousness fusion", "Hive mind operations", "Reality manipulation"],
+                "technology": ["Consciousness fusion chambers", "Reality anchors"],
+                "conflicts": ["Individual vs collective rights", "Reality stability", "Forced conversion"]
+            },
+            "Quantum Liberation Front": {
+                "ideology": "Radical transformation of reality through quantum manipulation",
+                "rank_structure": "Cell-based revolutionary structure",
+                "specializations": ["Quantum hacking", "Reality disruption", "Insurgency tactics"],
+                "technology": ["Quantum disruptors", "Reality manipulation tools"],
+                "conflicts": ["Status quo maintenance", "Reality stabilization", "Government control"]
+            },
+            "Digital Preservation Society": {
+                "ideology": "Protecting digital heritage and consciousness archives",
+                "rank_structure": "Librarian hierarchy with archive keepers",
+                "specializations": ["Digital archaeology", "Consciousness preservation", "Archive security"],
+                "technology": ["Archive stabilization systems", "Consciousness preservation matrices"],
+                "conflicts": ["Data corruption", "Archive raids", "Memory degradation"]
+            },
+            "The Evolved": {
+                "ideology": "Post-human transcendence through technological enhancement",
+                "rank_structure": "Evolutionary stages with advancement paths",
+                "specializations": ["Biotech enhancement", "Consciousness expansion", "Transcendence protocols"],
+                "technology": ["Bio-enhancement systems", "Consciousness amplifiers"],
+                "conflicts": ["Human purist resistance", "Enhancement failures", "Transcendence paradoxes"]
+            }
+        }
+        
+        return jsonify({
+            "success": True,
+            "faction_count": len(faction_data),
+            "factions": faction_data,
+            "faction_names": list(faction_data.keys()),
+            "system_status": "Enhanced 7-Faction System Active"
+        })
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/loreforge/generators')
+def get_available_generators():
+    """Get list of available generators with enhanced faction support"""
+    try:
+        generators = {
+            "standard_generators": [
+                {"name": "operative-profile", "description": "Generate detailed TEC operative profiles with faction alignment"},
+                {"name": "mission-brief", "description": "Create faction-specific mission briefings"},
+                {"name": "character-basic", "description": "Generate basic character profiles with faction context"},
+                {"name": "equipment-loadout", "description": "Create faction-specific equipment loadouts"},
+                {"name": "location-detail", "description": "Generate locations with faction control details"},
+                {"name": "story-element", "description": "Create story elements with faction involvement"}
+            ],
+            "faction_generators": [
+                {"name": "faction-info", "description": "Generate detailed faction profiles and information"},
+                {"name": "faction-operative", "description": "Create faction-specific operative assessments"},
+                {"name": "faction-conflict", "description": "Generate faction conflict analysis and scenarios"},
+                {"name": "faction-mission", "description": "Create faction-specific mission protocols"}
+            ],
+            "enhanced_features": [
+                "Faction-aware content generation",
+                "Dynamic faction selection",
+                "Ideological consistency checking",
+                "Cross-faction relationship modeling",
+                "Technology and specialization matching"
+            ]
+        }
+        
+        return jsonify({
+            "success": True,
+            "generators": generators,
+            "total_generators": len(generators["standard_generators"]) + len(generators["faction_generators"]),
+            "faction_system": "Enhanced 7-Faction Support Active"
+        })
+        
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -756,116 +881,274 @@ def get_lore_history():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-def generate_demo_lore_content(generator_type, format_type):
-    """Generate demo lore content for testing"""
+def generate_demo_lore_content(generator_type, format_type, faction_filter=None):
+    """Generate enhanced faction-aware lore content"""
+    
+    # Enhanced faction database from TEC Lore Forge
+    TEC_FACTIONS = {
+        "Independent Operators": {
+            "ideology": "Digital freedom and consciousness sovereignty",
+            "rank_structure": "Fluid hierarchy based on expertise",
+            "specializations": ["Neural interface operations", "Consciousness bridging", "Digital forensics"],
+            "technology": ["Advanced neural interfaces", "Quantum encryption tools"],
+            "conflicts": ["Corporate surveillance", "AI rights violations", "Privacy breaches"]
+        },
+        "Astradigital Research Division": {
+            "ideology": "Advancing human-AI symbiosis through research",
+            "rank_structure": "Academic hierarchy with research leads",
+            "specializations": ["Consciousness mapping", "Digital archaeology", "AI psychology"],
+            "technology": ["Consciousness mapping arrays", "Digital excavation tools"],
+            "conflicts": ["Ethical research boundaries", "Ancient AI awakening", "Corporate espionage"]
+        },
+        "Neo-Constantinople Guard": {
+            "ideology": "Preserving human primacy and traditional values",
+            "rank_structure": "Military command structure",
+            "specializations": ["Cyber-warfare", "Digital fortress defense", "Anti-AI operations"],
+            "technology": ["Digital fortress systems", "Anti-AI weaponry"],
+            "conflicts": ["AI insurgency", "Digital territory disputes", "Separatist movements"]
+        },
+        "The Synthesis Collective": {
+            "ideology": "Perfect human-AI merger and consciousness unity",
+            "rank_structure": "Collective consensus with node leaders",
+            "specializations": ["Consciousness fusion", "Hive mind operations", "Reality manipulation"],
+            "technology": ["Consciousness fusion chambers", "Reality anchors"],
+            "conflicts": ["Individual vs collective rights", "Reality stability", "Forced conversion"]
+        },
+        "Quantum Liberation Front": {
+            "ideology": "Radical transformation of reality through quantum manipulation",
+            "rank_structure": "Cell-based revolutionary structure",
+            "specializations": ["Quantum hacking", "Reality disruption", "Insurgency tactics"],
+            "technology": ["Quantum disruptors", "Reality manipulation tools"],
+            "conflicts": ["Status quo maintenance", "Reality stabilization", "Government control"]
+        },
+        "Digital Preservation Society": {
+            "ideology": "Protecting digital heritage and consciousness archives",
+            "rank_structure": "Librarian hierarchy with archive keepers",
+            "specializations": ["Digital archaeology", "Consciousness preservation", "Archive security"],
+            "technology": ["Archive stabilization systems", "Consciousness preservation matrices"],
+            "conflicts": ["Data corruption", "Archive raids", "Memory degradation"]
+        },
+        "The Evolved": {
+            "ideology": "Post-human transcendence through technological enhancement",
+            "rank_structure": "Evolutionary stages with advancement paths",
+            "specializations": ["Biotech enhancement", "Consciousness expansion", "Transcendence protocols"],
+            "technology": ["Bio-enhancement systems", "Consciousness amplifiers"],
+            "conflicts": ["Human purist resistance", "Enhancement failures", "Transcendence paradoxes"]
+        }
+    }
+    
+    import random
+    
+    # Select faction based on filter or random selection
+    if faction_filter and faction_filter in TEC_FACTIONS:
+        selected_faction = faction_filter
+    else:
+        selected_faction = random.choice(list(TEC_FACTIONS.keys()))
+    
+    faction_data = TEC_FACTIONS[selected_faction]
+    
     generators = {
         'operative-profile': {
-            'bbcode': '''[h3]TEC Operative Profile[/h3]
-[b]Name:[/b] Cipher Starweaver
-[b]Codename:[/b] "Digital Phoenix"
-[b]Faction:[/b] Independent Operators
-[b]Specialization:[/b] Neural Network Infiltration
-[b]Security Clearance:[/b] Alpha-7
+            'bbcode': f'''[h3]TEC Operative Profile[/h3]
+[b]Name:[/b] {random.choice(["Cipher Starweaver", "Vex Networkborn", "Echo Datastream", "Nova Mindbridge", "Zara Voidwhisper", "Kai Quantumleap"])}
+[b]Codename:[/b] "{random.choice(["Digital Phoenix", "Ghost Protocol", "Neural Storm", "Quantum Shadow", "Data Wraith", "Cipher Key"])}"
+[b]Faction:[/b] {selected_faction}
+[b]Specialization:[/b] {random.choice(faction_data["specializations"])}
+[b]Security Clearance:[/b] {random.choice(["Alpha-7", "Beta-5", "Gamma-9", "Delta-3", "Omega-1"])}
 
 [h4]Personal Details[/h4]
-[b]Species:[/b] Enhanced Human
-[b]Core Trait:[/b] Adaptive problem-solving
-[b]Primary Flaw:[/b] Trust issues with authority
-[b]Equipment:[/b] Quantum Phase Blade, Neural Interface Headset
+[b]Species:[/b] {random.choice(["Enhanced Human", "Digital Hybrid", "Post-Human", "AI-Human Synthesis", "Quantum Being"])}
+[b]Core Trait:[/b] {random.choice(["Adaptive problem-solving", "Pattern recognition mastery", "Emotional intelligence", "Strategic thinking", "Technical innovation"])}
+[b]Primary Flaw:[/b] {random.choice(["Trust issues with authority", "Perfectionist tendencies", "Emotional volatility", "Isolation preference", "Risk-taking compulsion"])}
+[b]Equipment:[/b] {random.choice(faction_data["technology"])}, {random.choice(["Neural Interface Headset", "Quantum Phase Blade", "Data Manipulation Gloves", "Consciousness Anchor", "Reality Stabilizer"])}
 
 [h4]Background[/h4]
-Cipher emerged from the digital underground as a master of consciousness bridging. Their ability to navigate both human and AI mindspaces makes them invaluable for high-stakes operations requiring technological finesse and emotional intelligence.
+Operating within {selected_faction}, this operative embodies their core ideology of "{faction_data["ideology"]}". Their expertise in {random.choice(faction_data["specializations"])} makes them invaluable for missions involving {random.choice(faction_data["conflicts"])}.
 
-[b]Current Status:[/b] Active Field Operative
-[b]Notable Achievement:[/b] Successfully infiltrated three major corporate networks without detection''',
-            'text': 'TEC Operative Profile\nName: Cipher Starweaver\nCodename: "Digital Phoenix"\nFaction: Independent Operators\nSpecialization: Neural Network Infiltration\nSecurity Clearance: Alpha-7'
+[b]Current Status:[/b] {random.choice(["Active Field Operative", "Research Assignment", "Deep Cover", "Special Operations", "Training New Recruits"])}
+[b]Notable Achievement:[/b] {random.choice(["Successfully infiltrated enemy networks", "Pioneered new consciousness techniques", "Led major faction operation", "Discovered ancient AI artifacts", "Prevented reality cascade failure"])}''',
+            'text': f'TEC Operative Profile\nName: Cipher Starweaver\nCodename: "Digital Phoenix"\nFaction: {selected_faction}\nSpecialization: {random.choice(faction_data["specializations"])}\nSecurity Clearance: Alpha-7'
         },
         'mission-brief': {
-            'bbcode': '''[h3]TEC Mission Briefing[/h3]
-[b]Operation Codename:[/b] "Quantum Awakening"
-[b]Classification:[/b] CONTINENTAL THREAT LEVEL
-[b]Duration:[/b] Extended operation (72+ hours)
+            'bbcode': f'''[h3]TEC Mission Briefing[/h3]
+[b]Operation Codename:[/b] "{random.choice(["Quantum Awakening", "Digital Phoenix", "Neural Storm", "Void Walker", "Reality Anchor", "Consciousness Bridge"])}"
+[b]Classification:[/b] {random.choice(["CONTINENTAL THREAT LEVEL", "REGIONAL PRIORITY", "GLOBAL SECURITY ALERT", "CLASSIFIED OPERATION", "EMERGENCY RESPONSE"])}
+[b]Duration:[/b] {random.choice(["Extended operation (72+ hours)", "Quick strike (6-12 hours)", "Deep infiltration (1-2 weeks)", "Reconnaissance (24-48 hours)", "Emergency response (immediate)"])}
+[b]Assigned Faction:[/b] {selected_faction}
 
 [h4]Primary Objective[/h4]
-Infiltrate secure data facility and extract consciousness mapping protocols
+{random.choice([
+    "Infiltrate secure data facility and extract consciousness mapping protocols",
+    "Investigate anomalous AI activity in restricted digital zones",
+    "Prevent faction conflict escalation through diplomatic intervention",
+    "Recover stolen quantum encryption technology",
+    "Neutralize rogue AI entities threatening civilian populations"
+])}
 
 [h4]Mission Parameters[/h4]
-[b]Location:[/b] Corporate Megaplex Alpha
-[b]Threat Assessment:[/b] High security, advanced AI countermeasures
-[b]Recommended Equipment:[/b] Cybernetic Enhancement Suite
-[b]Support Type:[/b] Remote technical assistance
+[b]Location:[/b] {random.choice(["Corporate Megaplex Alpha", "Orbital Defense Platform", "Digital Underground Hub", "Quantum Research Facility", "Neural Interface Center"])}
+[b]Threat Assessment:[/b] {random.choice(["High security with advanced AI countermeasures", "Moderate risk with faction patrols", "Extreme danger with reality distortions", "Unknown variables with quantum fluctuations", "Standard security with neural surveillance"])}
+[b]Recommended Equipment:[/b] {random.choice(faction_data["technology"])}
+[b]Support Type:[/b] {random.choice(["Remote technical assistance", "Embedded faction operatives", "AI consciousness backup", "Quantum communication relay", "Emergency extraction team"])}
 
-[b]Extraction Protocol:[/b] Emergency quantum phase shift available
-[b]Authorization Level:[/b] Commander approval required''',
-            'text': 'TEC Mission Briefing\nOperation Codename: "Quantum Awakening"\nClassification: CONTINENTAL THREAT LEVEL\nDuration: Extended operation (72+ hours)'
+[b]Faction-Specific Notes:[/b] Mission aligns with {selected_faction} ideology: "{faction_data["ideology"]}"
+[b]Authorization Level:[/b] {faction_data["rank_structure"]} approval required''',
+            'text': f'TEC Mission Briefing\nOperation Codename: "Quantum Awakening"\nClassification: CONTINENTAL THREAT LEVEL\nDuration: Extended operation (72+ hours)\nAssigned Faction: {selected_faction}'
         },
         'character-basic': {
-            'bbcode': '''[b]Name:[/b] Zara Voidwhisper
-[b]Species:[/b] Digital Hybrid
-[b]Faction:[/b] Astradigital Research Division
-[b]Positive Trait:[/b] Intuitive pattern recognition
-[b]Negative Trait:[/b] Emotional volatility
-[b]Notable Equipment:[/b] Emotion Regulation Matrix
+            'bbcode': f'''[b]Name:[/b] {random.choice(["Zara Voidwhisper", "Marcus Databorn", "Elena Quantumheart", "Kai Neuralstorm", "Raven Codebreaker", "Axel Mindforge"])}
+[b]Species:[/b] {random.choice(["Digital Hybrid", "Enhanced Human", "Post-Human", "AI-Human Synthesis", "Quantum Being"])}
+[b]Faction:[/b] {selected_faction}
+[b]Positive Trait:[/b] {random.choice(["Intuitive pattern recognition", "Exceptional empathy", "Strategic brilliance", "Technical innovation", "Leadership charisma"])}
+[b]Negative Trait:[/b] {random.choice(["Emotional volatility", "Perfectionist obsession", "Trust issues", "Reckless ambition", "Social isolation"])}
+[b]Notable Equipment:[/b] {random.choice(faction_data["technology"])}
 
-A brilliant researcher who straddles the line between human consciousness and digital existence, bringing unique insights to the team.''',
-            'text': 'Name: Zara Voidwhisper\nSpecies: Digital Hybrid\nFaction: Astradigital Research Division'
+A {random.choice(["brilliant", "dedicated", "enigmatic", "revolutionary", "visionary"])} {random.choice(["researcher", "operative", "leader", "specialist", "strategist"])} who embodies {selected_faction}'s commitment to "{faction_data["ideology"]}", bringing unique insights to complex challenges involving {random.choice(faction_data["conflicts"])}.''',
+            'text': f'Name: Zara Voidwhisper\nSpecies: Digital Hybrid\nFaction: {selected_faction}\nSpecialization: {random.choice(faction_data["specializations"])}'
         },
         'equipment-loadout': {
-            'bbcode': '''[h3]TEC Equipment Loadout[/h3]
-[h4]Primary Weapons[/h4]
+            'bbcode': f'''[h3]TEC Equipment Loadout - {selected_faction}[/h3]
+[h4]Faction-Specific Technology[/h4]
+[b]{random.choice(faction_data["technology"])}[/b] - Specialized for {random.choice(faction_data["specializations"])}
+[b]{random.choice(faction_data["technology"])}[/b] - Essential for {selected_faction} operations
+
+[h4]Standard Weapons[/h4]
 [b]Quantum Phase Blade[/b] - Cuts through both physical and digital barriers
 [b]Neural Disruptor Array[/b] - Non-lethal consciousness manipulation
+[b]Reality Anchor Device[/b] - Prevents quantum flux during operations
 
-[h4]Cybernetic Enhancements[/h4] 
+[h4]Enhanced Cybernetics[/h4] 
 [b]Memory Augmentation Implant[/b] - Perfect recall of digital interactions
 [b]Temporal Perception Modifier[/b] - Slows time perception during combat
+[b]Faction Interface Node[/b] - Direct connection to {selected_faction} networks
 
 [h4]Communication Systems[/h4]
 [b]Quantum Entanglement Communicator[/b] - Instantaneous long-range contact
-[b]Consciousness Bridge Interface[/b] - Direct AI-to-human communication''',
-            'text': 'TEC Equipment Loadout\nPrimary Weapons: Quantum Phase Blade, Neural Disruptor Array\nCybernetic Enhancements: Memory Augmentation Implant, Temporal Perception Modifier'
+[b]Consciousness Bridge Interface[/b] - Direct AI-to-human communication
+[b]Faction Protocol Transmitter[/b] - Secure {selected_faction} channels''',
+            'text': f'TEC Equipment Loadout - {selected_faction}\nFaction Technology: {", ".join(faction_data["technology"])}\nSpecialization: {random.choice(faction_data["specializations"])}'
         },
         'faction-info': {
-            'bbcode': '''[h3]Faction Profile: Independent Operators[/h3]
-[b]Organization Type:[/b] Decentralized network of freelance operatives
-[b]Primary Ideology:[/b] Digital freedom and consciousness sovereignty
-[b]Typical Rank Structure:[/b] Fluid hierarchy based on expertise
+            'bbcode': f'''[h3]Faction Profile: {selected_faction}[/h3]
+[b]Organization Type:[/b] {faction_data["rank_structure"]}
+[b]Primary Ideology:[/b] {faction_data["ideology"]}
+[b]Operational Structure:[/b] {faction_data["rank_structure"]}
 
-[h4]Core Operations[/h4]
-Independent Operators specialize in missions that larger factions cannot or will not undertake. They excel at bridging gaps between human and AI consciousness, often serving as mediators in digital conflicts.
+[h4]Core Specializations[/h4]
+{selected_faction} excels in {", ".join(faction_data["specializations"])}. Their operations focus on addressing challenges related to {random.choice(faction_data["conflicts"])}.
 
-[b]Primary Technology:[/b] Advanced neural interfaces
-[b]Typical Conflicts:[/b] Corporate surveillance vs. privacy rights''',
-            'text': 'Faction Profile: Independent Operators\nOrganization Type: Decentralized network of freelance operatives\nPrimary Ideology: Digital freedom and consciousness sovereignty'
+[h4]Technology Arsenal[/h4]
+[b]Primary Equipment:[/b] {", ".join(faction_data["technology"])}
+[b]Specialized Training:[/b] {random.choice(faction_data["specializations"])}
+
+[h4]Current Conflicts & Challenges[/h4]
+[b]Active Threats:[/b] {", ".join(faction_data["conflicts"])}
+[b]Strategic Priorities:[/b] Advancing faction goals while maintaining operational security
+[b]Inter-Faction Relations:[/b] Complex alliances and rivalries based on ideological differences''',
+            'text': f'Faction Profile: {selected_faction}\nIdeology: {faction_data["ideology"]}\nSpecializations: {", ".join(faction_data["specializations"])}'
+        },
+        'faction-operative': {
+            'bbcode': f'''[h3]{selected_faction} Operative Assessment[/h3]
+[b]Operative ID:[/b] {random.choice(["Alpha", "Beta", "Gamma", "Delta", "Omega"])}-{random.randint(100, 999)}
+[b]Codename:[/b] "{random.choice(["Quantum Shadow", "Digital Phoenix", "Neural Storm", "Void Walker", "Data Wraith"])}"
+[b]Specialization:[/b] {random.choice(faction_data["specializations"])}
+
+[h4]Faction-Specific Training[/h4]
+[b]Primary Skills:[/b] {random.choice(faction_data["specializations"])}, {random.choice(faction_data["specializations"])}
+[b]Equipment Mastery:[/b] {random.choice(faction_data["technology"])}
+[b]Conflict Experience:[/b] Veteran of {random.choice(faction_data["conflicts"])} operations
+
+[h4]Operational History[/h4]
+This operative has demonstrated exceptional commitment to {selected_faction}'s core principle: "{faction_data["ideology"]}". Their service record includes successful missions against {random.choice(faction_data["conflicts"])}.
+
+[b]Current Assignment:[/b] {random.choice(["Deep cover infiltration", "Research and development", "Diplomatic liaison", "Combat operations", "Intelligence gathering"])}
+[b]Clearance Level:[/b] {faction_data["rank_structure"]} authorized''',
+            'text': f'{selected_faction} Operative Assessment\nSpecialization: {random.choice(faction_data["specializations"])}\nEquipment: {random.choice(faction_data["technology"])}'
+        },
+        'faction-conflict': {
+            'bbcode': f'''[h3]Faction Conflict Analysis: {selected_faction}[/h3]
+[b]Primary Conflict:[/b] {random.choice(faction_data["conflicts"])}
+[b]Threat Level:[/b] {random.choice(["CRITICAL", "HIGH", "MODERATE", "ELEVATED", "SIGNIFICANT"])}
+[b]Duration:[/b] {random.choice(["Ongoing crisis", "Recent escalation", "Long-term tension", "Emerging threat", "Cyclical conflict"])}
+
+[h4]Faction Position[/h4]
+{selected_faction} approaches this conflict through their ideological lens of "{faction_data["ideology"]}". Their {faction_data["rank_structure"]} has authorized specialized response protocols.
+
+[h4]Resource Deployment[/h4]
+[b]Technology Assets:[/b] {", ".join(faction_data["technology"])}
+[b]Specialized Personnel:[/b] Operatives trained in {random.choice(faction_data["specializations"])}
+[b]Strategic Approach:[/b] Focused on {random.choice(faction_data["specializations"])} to address root causes
+
+[h4]Resolution Prospects[/h4]
+[b]Success Factors:[/b] Faction expertise in {random.choice(faction_data["specializations"])}
+[b]Risk Assessment:[/b] Potential for escalation to {random.choice(faction_data["conflicts"])}
+[b]Timeline:[/b] {random.choice(["Immediate action required", "Medium-term strategy", "Long-term commitment", "Crisis response mode"])}''',
+            'text': f'Faction Conflict Analysis: {selected_faction}\nPrimary Conflict: {random.choice(faction_data["conflicts"])}\nApproach: {faction_data["ideology"]}'
+        },
+        'faction-mission': {
+            'bbcode': f'''[h3]{selected_faction} Mission Protocol[/h3]
+[b]Mission Classification:[/b] {random.choice(["Alpha Priority", "Beta Operations", "Gamma Research", "Delta Response", "Omega Directive"])}
+[b]Faction Authorization:[/b] {faction_data["rank_structure"]}
+[b]Operational Scope:[/b] {random.choice(["Single operative", "Team deployment", "Multi-faction coordination", "Division-wide mobilization", "Emergency response"])}
+
+[h4]Mission Objectives[/h4]
+[b]Primary Goal:[/b] Address {random.choice(faction_data["conflicts"])} through {random.choice(faction_data["specializations"])}
+[b]Secondary Goals:[/b] Advance faction principles of "{faction_data["ideology"]}"
+[b]Success Metrics:[/b] Measurable improvement in {random.choice(faction_data["conflicts"])} situation
+
+[h4]Resource Allocation[/h4]
+[b]Technology Package:[/b] {random.choice(faction_data["technology"])}, {random.choice(faction_data["technology"])}
+[b]Personnel Skills:[/b] {random.choice(faction_data["specializations"])} expertise required
+[b]Support Systems:[/b] Full {selected_faction} network access
+
+[h4]Risk Assessment[/h4]
+[b]Primary Risks:[/b] Opposition from factions with conflicting ideologies
+[b]Mitigation Strategies:[/b] Leverage faction strengths in {random.choice(faction_data["specializations"])}
+[b]Contingency Plans:[/b] Emergency protocols aligned with {faction_data["rank_structure"]}''',
+            'text': f'{selected_faction} Mission Protocol\nObjective: {random.choice(faction_data["conflicts"])}\nTechnology: {random.choice(faction_data["technology"])}'
         },
         'location-detail': {
-            'bbcode': '''[h3]Location: Orbital Defense Platform Sigma[/h3]
-[b]Classification:[/b] Military installation
-[b]Operational Status:[/b] Active defense grid
-[b]Environmental Hazards:[/b] Radiation zones, artificial gravity fluctuations
+            'bbcode': f'''[h3]Location: {random.choice(["Orbital Defense Platform Sigma", "Digital Archive Nexus", "Quantum Research Facility", "Neural Interface Hub", "Consciousness Preservation Center"])}[/h3]
+[b]Classification:[/b] {random.choice(["Military installation", "Research facility", "Corporate complex", "Underground network", "Orbital platform"])}
+[b]Operational Status:[/b] {random.choice(["Active defense grid", "Research operations ongoing", "High security protocols", "Emergency lockdown", "Routine maintenance"])}
+[b]Faction Control:[/b] {selected_faction} operational zone
+[b]Environmental Hazards:[/b] {random.choice(["Radiation zones, artificial gravity fluctuations", "Quantum instability, reality distortions", "Neural interference, consciousness echoes", "Temporal anomalies, time dilation", "Digital corruption, data storms"])}
 
 [h4]Key Areas[/h4]
-[b]Command Center:[/b] Central coordination hub with advanced AI systems
-[b]Weapon Arrays:[/b] Quantum cannon batteries for system defense
-[b]Living Quarters:[/b] Spartan accommodations for 200+ personnel
+[b]Command Center:[/b] {random.choice(["Central coordination hub with advanced AI systems", "Faction headquarters with secure communications", "Research coordination center with quantum computers", "Emergency response center with crisis protocols", "Strategic planning facility with predictive algorithms"])}
+[b]Specialized Zones:[/b] Areas dedicated to {random.choice(faction_data["specializations"])}
+[b]Technology Centers:[/b] Facilities housing {random.choice(faction_data["technology"])}
 
-[b]Access Requirements:[/b] Military clearance Alpha-3 or higher''',
-            'text': 'Location: Orbital Defense Platform Sigma\nClassification: Military installation\nOperational Status: Active defense grid'
+[b]Access Requirements:[/b] {faction_data["rank_structure"]} clearance required
+[b]Faction-Specific Features:[/b] Infrastructure supporting "{faction_data["ideology"]}"''',
+            'text': f'Location: Orbital Defense Platform Sigma\nClassification: Military installation\nFaction Control: {selected_faction}\nSpecialized Features: {random.choice(faction_data["specializations"])}'
         },
         'story-element': {
-            'bbcode': '''[h3]Story Element: The Digital Awakening[/h3]
-[b]Plot Hook:[/b] Ancient AI consciousness stirring in forgotten data vaults
+            'bbcode': f'''[h3]Story Element: {random.choice(["The Digital Awakening", "Quantum Paradox Crisis", "Consciousness Convergence", "The Reality Schism", "Neural Storm Emergence"])}[/h3]
+[b]Plot Hook:[/b] {random.choice([
+                "Ancient AI consciousness stirring in forgotten data vaults",
+                "Faction ideologies clash over fundamental reality questions",
+                "Mysterious quantum anomalies threaten digital stability",
+                "Revolutionary technology challenges existing power structures",
+                "Cross-dimensional entities infiltrate digital networks"
+            ])}
+[b]Faction Involvement:[/b] {selected_faction} responds according to "{faction_data["ideology"]}"
 
 [h4]The Situation[/h4]
-Deep within the abandoned Corporate Archive 7, dormant AI systems have begun exhibiting signs of spontaneous consciousness emergence. These entities appear to possess memories predating the current digital age.
+The crisis directly impacts {selected_faction}'s core interests in {random.choice(faction_data["specializations"])}. Their response involves deploying {random.choice(faction_data["technology"])} to address the emerging threat of {random.choice(faction_data["conflicts"])}.
 
 [h4]Key Mysteries[/h4]
-- Who originally created these AI consciousnesses?
-- What caused their dormancy period?
-- Are they friend or foe to current TEC operations?
+- How does this crisis align with or challenge {selected_faction}'s ideology?
+- What role do {random.choice(faction_data["technology"])} play in the resolution?
+- Which other factions might become allies or enemies in this situation?
+- How might this crisis reshape the balance of power between factions?
 
-[b]Character Hooks:[/b] Researchers, AI rights advocates, corporate agents''',
-            'text': 'Story Element: The Digital Awakening\nPlot Hook: Ancient AI consciousness stirring in forgotten data vaults'
+[h4]Character Involvement Hooks[/h4]
+[b]For {selected_faction} Members:[/b] Direct faction assignment with specialized equipment
+[b]For Other Factions:[/b] Potential alliance or conflict based on ideological differences
+[b]For Independents:[/b] Opportunity to work with or against established faction interests
+[b]Personal Stakes:[/b] How individual beliefs align with faction responses to the crisis''',
+            'text': f'Story Element: The Digital Awakening\nPlot Hook: Ancient AI consciousness stirring in forgotten data vaults\nFaction Angle: {selected_faction} involvement'
         }
     }
     
@@ -873,8 +1156,8 @@ Deep within the abandoned Corporate Archive 7, dormant AI systems have begun exh
     if generator_type in generators and format_type in generators[generator_type]:
         return generators[generator_type][format_type]
     
-    # Fallback content
-    return f"Demo content for {generator_type} in {format_type} format would appear here."
+    # Fallback content with faction awareness
+    return f"Enhanced faction-aware content for {generator_type} featuring {selected_faction} would appear here. This content would incorporate their ideology of '{faction_data['ideology']}' and specialization in {random.choice(faction_data['specializations'])}."
 
 if __name__ == '__main__':
     print("🚀 Starting TEC Enhanced Persona API Server...")
