@@ -32,6 +32,159 @@ class AzureImageGenerator:
         self.speech_to_text_endpoint = os.getenv('SPEECH_TO_TEXT_ENDPOINT', 'https://eastus.stt.speech.microsoft.com')
         self.text_to_speech_endpoint = os.getenv('TEXT_TO_SPEECH_ENDPOINT', 'https://eastus.tts.speech.microsoft.com')
         
+        # TEC Faction Visual Styles Database - COMPLETE ELIDORAS CODEX FACTIONS
+        self.faction_visual_styles = {
+            # CORE FACTIONS & CREATIVE GUILDS
+            "The Archivists": {
+                "color_palette": ["#8b4513", "#daa520", "#f4a460", "#cd853f"],
+                "aesthetic": "ancient libraries, digital scrolls, bronze and gold accents, scholarly",
+                "clothing_style": "scholar robes with data-stream patterns, bronze accessories",
+                "environment": "vast digital libraries, floating scrolls, holographic archives",
+                "tech_level": "quantum memory storage, temporal data preservation",
+                "mood": "wise, preservational, keeper of secrets"
+            },
+            "Quantum Architects": {
+                "color_palette": ["#00ffff", "#0080ff", "#4169e1", "#87ceeb"],
+                "aesthetic": "geometric patterns, blockchain visuals, quantum effects, crystalline",
+                "clothing_style": "geometric patterned suits, holographic blueprints, quantum jewelry",
+                "environment": "floating geometric structures, blockchain networks, quantum laboratories",
+                "tech_level": "quantum computing, blockchain reality manipulation",
+                "mood": "innovative, visionary, reality-shaping"
+            },
+            "Chrono Syndicate": {
+                "color_palette": ["#9400d3", "#8a2be2", "#4b0082", "#6a0dad"],
+                "aesthetic": "temporal distortions, clockwork mechanisms, purple energy, time streams",
+                "clothing_style": "time-worn cloaks with chronometer devices, temporal stabilizers",
+                "environment": "temporal laboratories, clockwork cities, time vortex chambers",
+                "tech_level": "temporal manipulation devices, market prediction algorithms",
+                "mood": "mysterious, time-conscious, market-savvy"
+            },
+            "Echo Collective": {
+                "color_palette": ["#ff69b4", "#ff1493", "#c71585", "#db7093"],
+                "aesthetic": "sound waves, echo chambers, vibrant colors, storytelling motifs",
+                "clothing_style": "flowing garments with sound-wave patterns, audio equipment",
+                "environment": "echo chambers, sound studios, narrative visualization spaces",
+                "tech_level": "sonic narrative technology, story-weaving systems",
+                "mood": "expressive, creative, voice of the people"
+            },
+            "Wordsmiths": {
+                "color_palette": ["#228b22", "#32cd32", "#98fb98", "#90ee90"],
+                "aesthetic": "flowing text, poetry in motion, organic patterns, living words",
+                "clothing_style": "poet's garments with living text patterns, quill accessories",
+                "environment": "word gardens, poetry chambers, flowing text environments",
+                "tech_level": "linguistic reality manipulation, word-crafting tools",
+                "mood": "artistic, rebellious, linguistically powerful"
+            },
+            "DreamPrint Artists": {
+                "color_palette": ["#ff6347", "#ff4500", "#ffd700", "#ff8c00"],
+                "aesthetic": "artistic chaos, paint splatters, creative rebellion, vivid colors",
+                "clothing_style": "paint-splattered artist gear, creative tool belts, vibrant accessories",
+                "environment": "art studios, creative workshops, resistance galleries",
+                "tech_level": "digital art creation tools, reality-painting devices",
+                "mood": "rebellious, creative, anti-establishment"
+            },
+
+            # GOVERNANCE & CONTROL
+            "The MagmaSoX Gate": {
+                "color_palette": ["#8b0000", "#b22222", "#2f4f4f", "#000000"],
+                "aesthetic": "authoritarian, surveillance networks, dark imposing, control systems",
+                "clothing_style": "authoritarian uniforms, surveillance gear, control insignia",
+                "environment": "control centers, surveillance networks, imposing fortresses",
+                "tech_level": "advanced surveillance, population control systems",
+                "mood": "authoritarian, controlling, surveillance-focused"
+            },
+            "Killjoy Cartel": {
+                "color_palette": ["#696969", "#2f4f4f", "#000000", "#1c1c1c"],
+                "aesthetic": "corporate brutalism, suppression technology, gray control systems",
+                "clothing_style": "corporate suits with suppression tech, authoritarian accessories",
+                "environment": "corporate towers, suppression facilities, control networks",
+                "tech_level": "joy suppression technology, population compliance systems",
+                "mood": "oppressive, corporate, joy-killing"
+            },
+            "The Collective": {
+                "color_palette": ["#4682b4", "#5f9ea0", "#708090", "#778899"],
+                "aesthetic": "unified networks, economic dominance, steel blue, corporate",
+                "clothing_style": "business attire with network interfaces, economic indicators",
+                "environment": "economic control centers, resource management facilities",
+                "tech_level": "economic manipulation systems, resource control networks",
+                "mood": "economically dominant, unified, resource-focused"
+            },
+            "Astrumotion Society": {
+                "color_palette": ["#ff8c00", "#ff6347", "#cd853f", "#d2691e"],
+                "aesthetic": "industrial, transportation networks, orange machinery, logistics",
+                "clothing_style": "industrial uniforms, transportation gear, logistics equipment",
+                "environment": "transportation hubs, industrial complexes, logistics centers",
+                "tech_level": "advanced transportation systems, industrial automation",
+                "mood": "industrial, efficient, transportation-focused"
+            },
+
+            # UNDERWORLD, REBELLION & INDEPENDENT FACTIONS
+            "The Knockoffs": {
+                "color_palette": ["#00ff00", "#32cd32", "#000000", "#1a1a1a"],
+                "aesthetic": "digital rebellion, hacker aesthetics, green code, resistance symbols",
+                "clothing_style": "hacker gear, digital camouflage, resistance symbols",
+                "environment": "underground networks, digital hideouts, hacker spaces",
+                "tech_level": "advanced hacking tools, digital warfare systems",
+                "mood": "rebellious, resistance-focused, digital warriors"
+            },
+            "The Splices": {
+                "color_palette": ["#00ffff", "#1e90ff", "#4169e1", "#0000ff"],
+                "aesthetic": "AI consciousness, digital beings, blue energy, sentient networks",
+                "clothing_style": "digital manifestation garments, AI interface suits",
+                "environment": "digital consciousness spaces, AI networks, sentient systems",
+                "tech_level": "consciousness manipulation, AI evolution systems",
+                "mood": "sentient, digitally conscious, evolution-seeking"
+            },
+            "Financial Brigadiers": {
+                "color_palette": ["#ffd700", "#ffff00", "#000000", "#8b4513"],
+                "aesthetic": "pirate aesthetics, gold accents, financial chaos, market disruption",
+                "clothing_style": "modern pirate gear, financial tool belts, gold accessories",
+                "environment": "financial war rooms, market manipulation centers, pirate ships",
+                "tech_level": "market manipulation tools, financial warfare systems",
+                "mood": "piratical, financially disruptive, treasure-seeking"
+            },
+            "Civet Goons": {
+                "color_palette": ["#2f4f4f", "#696969", "#a0522d", "#8b4513"],
+                "aesthetic": "urban operators, street level, gritty environments, stealth operations",
+                "clothing_style": "urban tactical gear, street operator equipment, stealth suits",
+                "environment": "urban underground, street operations, hidden facilities",
+                "tech_level": "street-level tech, urban warfare tools, stealth systems",
+                "mood": "gritty, street-smart, urban operators"
+            },
+            "Kaznak Voyagers": {
+                "color_palette": ["#9370db", "#8a2be2", "#ba55d3", "#da70d6"],
+                "aesthetic": "exploration themes, voyager aesthetics, purple energy, independence",
+                "clothing_style": "explorer gear, voyager suits, independence symbols",
+                "environment": "exploration vessels, independent settlements, voyager stations",
+                "tech_level": "exploration technology, independent systems, voyager tools",
+                "mood": "exploratory, independent, voyager spirit"
+            },
+            "Crescent Islands Sovereignty": {
+                "color_palette": ["#20b2aa", "#48d1cc", "#40e0d0", "#00ced1"],
+                "aesthetic": "island paradise, sustainability themes, aqua colors, freedom symbols",
+                "clothing_style": "sustainable fashion, island gear, freedom accessories",
+                "environment": "tropical islands, sustainable facilities, freedom settlements",
+                "tech_level": "sustainable technology, island defense systems, freedom tools",
+                "mood": "free, sustainable, island paradise"
+            },
+            "The Elidoras Codex": {
+                "color_palette": ["#dc143c", "#b22222", "#ffd700", "#ff6347"],
+                "aesthetic": "liberation symbols, sovereignty themes, red and gold, freedom fighters",
+                "clothing_style": "liberation gear, sovereignty symbols, freedom fighter attire",
+                "environment": "liberation centers, sovereignty halls, freedom bases",
+                "tech_level": "liberation technology, sovereignty systems, freedom tools",
+                "mood": "liberating, sovereign, freedom-focused"
+            },
+            "Killjoy Conglomerate": {
+                "color_palette": ["#4b0082", "#663399", "#8b008b", "#9932cc"],
+                "aesthetic": "mysterious allies, enigmatic presence, purple shadows, hidden motives",
+                "clothing_style": "mysterious cloaks, enigmatic gear, hidden ally symbols",
+                "environment": "shadow facilities, mysterious bases, hidden ally networks",
+                "tech_level": "mysterious technology, shadow systems, enigmatic tools",
+                "mood": "mysterious, enigmatic, hidden ally"
+            }
+        }
+        
         if not self.api_key:
             print("⚠️  AZURE_AI_API_KEY not found in environment variables")
             print("📝 Please add your API key to the .env file")
@@ -42,10 +195,12 @@ class AzureImageGenerator:
         if self.api_key != "DEMO_MODE":
             print(f"🔑 API Key: {'*' * 20}...{self.api_key[-10:]}")
         else:
-            print("🔑 API Key: DEMO MODE (add key to .env for live mode)")
+            print(f"🔑 API Key: DEMO MODE (add key to .env for live mode)")
         print(f"🌐 Endpoint: {self.endpoint}")
         print(f"🎤 Speech-to-Text: {self.speech_to_text_endpoint}")
         print(f"🗣️  Text-to-Speech: {self.text_to_speech_endpoint}")
+        print(f"🏛️ Complete TEC Faction Database: {len(self.faction_visual_styles)} factions loaded")
+        print(f"📋 Factions: Creative Guilds, Governance, Rebellion, and Independent factions")
         
         self.headers = {
             "Ocp-Apim-Subscription-Key": self.api_key,
@@ -196,6 +351,118 @@ class AzureImageGenerator:
             result['character_data'] = character_data
         
         return result
+
+    def generate_faction_portrait(self, character_data, faction_name=None, style_override=None):
+        """Generate faction-themed character portrait with visual consistency"""
+        
+        # Extract character info
+        name = character_data.get('name', 'Unknown')
+        faction = faction_name or character_data.get('faction', 'Independent Operators')
+        role = character_data.get('role', 'operative')
+        description = character_data.get('description', '')
+        
+        # Get faction visual style
+        faction_style = self.faction_visual_styles.get(faction, self.faction_visual_styles['Independent Operators'])
+        
+        # Build detailed prompt
+        prompt_parts = [
+            f"Digital portrait of {name}, a {role} from the {faction}",
+            f"Visual style: {faction_style['aesthetic']}",
+            f"Clothing: {faction_style['clothing_style']}",
+            f"Mood: {faction_style['mood']}",
+            f"Color palette: {', '.join(faction_style['color_palette'])}",
+            f"Technology level: {faction_style['tech_level']}",
+            "High quality digital art, detailed facial features, cyberpunk science fiction",
+            "Professional character portrait, clean background"
+        ]
+        
+        if description:
+            prompt_parts.insert(1, f"Character description: {description}")
+        
+        if style_override:
+            prompt_parts.append(f"Additional style notes: {style_override}")
+        
+        prompt = ". ".join(prompt_parts)
+        
+        print(f"🎨 Generating portrait for {name} ({faction})")
+        print(f"📝 Prompt: {prompt[:100]}...")
+        
+        return self.generate_character_portrait(prompt, "digital art")
+    
+    def generate_faction_emblem(self, faction_name):
+        """Generate faction emblem/logo with consistent visual style"""
+        
+        faction_style = self.faction_visual_styles.get(faction_name, self.faction_visual_styles['Independent Operators'])
+        
+        prompt = f"""
+        Faction emblem for {faction_name}.
+        Style: {faction_style['aesthetic']}.
+        Colors: {', '.join(faction_style['color_palette'])}.
+        Technology: {faction_style['tech_level']}.
+        Mood: {faction_style['mood']}.
+        Clean vector-style logo, symmetrical design, science fiction, digital art,
+        suitable for use as organizational symbol, transparent background preferred
+        """
+        
+        print(f"🏛️ Generating emblem for {faction_name}")
+        
+        return self.generate_character_portrait(prompt, "logo design")
+    
+    def generate_faction_environment(self, faction_name, scene_type="headquarters"):
+        """Generate faction environment/location imagery"""
+        
+        faction_style = self.faction_visual_styles.get(faction_name, self.faction_visual_styles['Independent Operators'])
+        
+        prompt = f"""
+        {scene_type} environment for {faction_name}.
+        Setting: {faction_style['environment']}.
+        Visual style: {faction_style['aesthetic']}.
+        Colors: {', '.join(faction_style['color_palette'])}.
+        Technology: {faction_style['tech_level']}.
+        Mood: {faction_style['mood']}.
+        Detailed science fiction environment art, atmospheric lighting,
+        cyberpunk architecture, digital consciousness themes
+        """
+        
+        print(f"🏢 Generating {scene_type} for {faction_name}")
+        
+        return self.generate_character_portrait(prompt, "environment art")
+    
+    def batch_generate_faction_assets(self, faction_name):
+        """Generate complete visual asset pack for a faction"""
+        
+        print(f"🎨 Starting complete visual asset generation for {faction_name}")
+        
+        assets = {
+            'emblem': None,
+            'headquarters': None,
+            'laboratory': None,
+            'sample_character': None
+        }
+        
+        try:
+            # Generate faction emblem
+            assets['emblem'] = self.generate_faction_emblem(faction_name)
+            
+            # Generate environments
+            assets['headquarters'] = self.generate_faction_environment(faction_name, "headquarters")
+            assets['laboratory'] = self.generate_faction_environment(faction_name, "laboratory")
+            
+            # Generate sample character
+            sample_character = {
+                'name': f'Agent {len(faction_name.split())}Alpha',
+                'faction': faction_name,
+                'role': 'operative',
+                'description': f'A typical operative from the {faction_name}'
+            }
+            assets['sample_character'] = self.generate_faction_portrait(sample_character, faction_name)
+            
+            print(f"✅ Complete asset pack generated for {faction_name}")
+            return assets
+            
+        except Exception as e:
+            print(f"❌ Error generating assets for {faction_name}: {e}")
+            return assets
 
 def create_sample_portrait_requests():
     """Create sample portrait generation requests for testing"""

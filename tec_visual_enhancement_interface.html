@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEC Visual Enhancement System - Complete Faction Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3a 50%, #2d2d4a 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 2px solid #4a9eff;
+            box-shadow: 0 0 30px rgba(74, 158, 255, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #4a9eff, #00ff88, #ff6b9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.8;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .faction-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid #333;
+        }
+
+        .generation-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid #333;
+        }
+
+        .panel-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #4a9eff;
+            border-bottom: 2px solid #4a9eff;
+            padding-bottom: 10px;
+        }
+
+        .faction-categories {
+            margin-bottom: 20px;
+        }
+
+        .category {
+            margin-bottom: 15px;
+        }
+
+        .category-title {
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .faction-list {
+            margin-left: 15px;
+        }
+
+        .faction-item {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .faction-item:hover {
+            background: rgba(74, 158, 255, 0.2);
+            border-left-color: #4a9eff;
+            transform: translateX(5px);
+        }
+
+        .faction-item.selected {
+            background: rgba(74, 158, 255, 0.3);
+            border-left-color: #4a9eff;
+            color: #fff;
+        }
+
+        .faction-item .name {
+            font-weight: bold;
+        }
+
+        .faction-item .role {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 3px;
+        }
+
+        .generation-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .option-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #4a9eff;
+            transform: translateY(-3px);
+        }
+
+        .option-card.selected {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .option-card .icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .option-card .title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .option-card .description {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4a9eff, #00ff88);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(74, 158, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            border: 1px solid #555;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .results-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid #333;
+            margin-top: 20px;
+        }
+
+        .generation-status {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1em;
+        }
+
+        .status-generating {
+            color: #ffaa00;
+        }
+
+        .status-success {
+            color: #00ff88;
+        }
+
+        .status-error {
+            color: #ff6b6b;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #555;
+            border-radius: 50%;
+            border-top-color: #4a9eff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .visual-result {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+        }
+
+        .visual-result .asset-info {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .visual-result .asset-preview {
+            text-align: center;
+        }
+
+        .visual-result .asset-details {
+            font-size: 0.9em;
+        }
+
+        .asset-link {
+            color: #4a9eff;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .asset-link:hover {
+            text-decoration: underline;
+        }
+
+        .faction-info {
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #00ff88;
+        }
+
+        .faction-info .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .faction-info .info-item {
+            font-size: 0.9em;
+        }
+
+        .faction-info .info-label {
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .batch-controls {
+            background: rgba(255, 107, 157, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #ff6b9d;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #4a9eff, #00ff88);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            font-size: 0.9em;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .generation-options {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 TEC Visual Enhancement System</h1>
+            <p>Complete Faction-Aware Visual Asset Generation for The Elidoras Codex</p>
+        </div>
+
+        <div class="main-grid">
+            <!-- Faction Selection Panel -->
+            <div class="faction-panel">
+                <div class="panel-title">🏛️ Faction Database</div>
+                
+                <div class="faction-categories" id="factionCategories">
+                    <!-- Factions will be loaded here -->
+                </div>
+
+                <div id="selectedFactionInfo" class="faction-info" style="display: none;">
+                    <div class="info-label">Selected Faction Information</div>
+                    <div id="factionDetails"></div>
+                </div>
+            </div>
+
+            <!-- Generation Panel -->
+            <div class="generation-panel">
+                <div class="panel-title">🎨 Visual Generation Options</div>
+                
+                <div class="generation-options">
+                    <div class="option-card" data-type="character">
+                        <div class="icon">🎭</div>
+                        <div class="title">Character Portrait</div>
+                        <div class="description">Generate faction-styled character portrait</div>
+                    </div>
+                    
+                    <div class="option-card" data-type="emblem">
+                        <div class="icon">🏛️</div>
+                        <div class="title">Faction Emblem</div>
+                        <div class="description">Create faction logo and insignia</div>
+                    </div>
+                    
+                    <div class="option-card" data-type="environment">
+                        <div class="icon">🏢</div>
+                        <div class="title">Environment Art</div>
+                        <div class="description">Generate headquarters and facilities</div>
+                    </div>
+                    
+                    <div class="option-card" data-type="collection">
+                        <div class="icon">📦</div>
+                        <div class="title">Complete Collection</div>
+                        <div class="description">Full asset pack for faction</div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="generateBtn" disabled>
+                        Generate Visual Assets
+                    </button>
+                    <button class="btn btn-secondary" id="clearBtn">
+                        Clear Selection
+                    </button>
+                </div>
+
+                <div class="batch-controls">
+                    <div class="panel-title">⚡ Batch Generation</div>
+                    <button class="btn btn-secondary" id="generateAllBtn">
+                        Generate All Faction Assets
+                    </button>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div id="batchStatus"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="results-panel">
+            <div class="panel-title">🖼️ Generation Results</div>
+            <div id="resultsContainer">
+                <div class="generation-status">
+                    Select a faction and generation type to begin creating visual assets
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            TEC Visual Enhancement System | Complete Faction Database | Azure AI Integration
+        </div>
+    </div>
+
+    <script>
+        class TECVisualGenerator {
+            constructor() {
+                this.selectedFaction = null;
+                this.selectedType = null;
+                this.factionDatabase = {};
+                this.apiBase = '';  // Will be set to current origin
+                
+                this.init();
+            }
+
+            async init() {
+                this.setupEventListeners();
+                await this.loadFactionDatabase();
+            }
+
+            setupEventListeners() {
+                // Generation type selection
+                document.querySelectorAll('.option-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                        this.selectedType = card.dataset.type;
+                        this.updateGenerateButton();
+                    });
+                });
+
+                // Generation buttons
+                document.getElementById('generateBtn').addEventListener('click', () => {
+                    this.generateAssets();
+                });
+
+                document.getElementById('clearBtn').addEventListener('click', () => {
+                    this.clearSelection();
+                });
+
+                document.getElementById('generateAllBtn').addEventListener('click', () => {
+                    this.generateAllAssets();
+                });
+            }
+
+            async loadFactionDatabase() {
+                try {
+                    this.showStatus('Loading faction database...', 'generating');
+                    
+                    const response = await fetch('/api/visual/factions');
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.factionDatabase = data.factions;
+                        this.renderFactionList(data.categories);
+                        this.showStatus(`Loaded ${data.total_factions} factions from ${data.total_categories} categories`, 'success');
+                    } else {
+                        throw new Error(data.error || 'Failed to load faction database');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error loading faction database:', error);
+                    this.showStatus(`Error loading factions: ${error.message}`, 'error');
+                    this.renderDemoFactionList();
+                }
+            }
+
+            renderFactionList(categories) {
+                const container = document.getElementById('factionCategories');
+                container.innerHTML = '';
+
+                for (const [category, factions] of Object.entries(categories)) {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'category';
+                    
+                    categoryDiv.innerHTML = `
+                        <div class="category-title">${category}</div>
+                        <div class="faction-list" id="category-${category.replace(/\s+/g, '-')}">
+                        </div>
+                    `;
+                    
+                    container.appendChild(categoryDiv);
+                    
+                    const factionList = categoryDiv.querySelector('.faction-list');
+                    
+                    factions.forEach(factionName => {
+                        const factionInfo = this.factionDatabase[factionName];
+                        const factionDiv = document.createElement('div');
+                        factionDiv.className = 'faction-item';
+                        factionDiv.dataset.faction = factionName;
+                        
+                        factionDiv.innerHTML = `
+                            <div class="name">${factionName}</div>
+                            <div class="role">${factionInfo?.info?.role || 'No description available'}</div>
+                        `;
+                        
+                        factionDiv.addEventListener('click', () => {
+                            this.selectFaction(factionName);
+                        });
+                        
+                        factionList.appendChild(factionDiv);
+                    });
+                }
+            }
+
+            renderDemoFactionList() {
+                // Fallback demo faction list if API is not available
+                const demoFactions = {
+                    'Creative Guilds': ['The Archivists', 'Quantum Architects', 'Echo Collective'],
+                    'Control Factions': ['The MagmaSoX Gate', 'Killjoy Cartel'],
+                    'Rebel Factions': ['The Knockoffs', 'The Splices', 'Financial Brigadiers']
+                };
+                
+                const container = document.getElementById('factionCategories');
+                container.innerHTML = '<div class="generation-status">Demo mode - API not available</div>';
+                
+                for (const [category, factions] of Object.entries(demoFactions)) {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'category';
+                    categoryDiv.innerHTML = `
+                        <div class="category-title">${category}</div>
+                        <div class="faction-list"></div>
+                    `;
+                    container.appendChild(categoryDiv);
+                    
+                    const factionList = categoryDiv.querySelector('.faction-list');
+                    factions.forEach(faction => {
+                        const factionDiv = document.createElement('div');
+                        factionDiv.className = 'faction-item';
+                        factionDiv.innerHTML = `<div class="name">${faction}</div>`;
+                        factionList.appendChild(factionDiv);
+                    });
+                }
+            }
+
+            selectFaction(factionName) {
+                // Update UI selection
+                document.querySelectorAll('.faction-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                
+                document.querySelector(`[data-faction="${factionName}"]`).classList.add('selected');
+                
+                this.selectedFaction = factionName;
+                this.showFactionInfo(factionName);
+                this.updateGenerateButton();
+            }
+
+            showFactionInfo(factionName) {
+                const factionInfo = this.factionDatabase[factionName];
+                if (!factionInfo) return;
+                
+                const infoContainer = document.getElementById('selectedFactionInfo');
+                const detailsContainer = document.getElementById('factionDetails');
+                
+                detailsContainer.innerHTML = `
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Category:</div>
+                            ${factionInfo.info.category}
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Alignment:</div>
+                            ${factionInfo.info.alignment}
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Role:</div>
+                            ${factionInfo.info.role}
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Specialties:</div>
+                            ${factionInfo.info.specialties?.join(', ') || 'Unknown'}
+                        </div>
+                    </div>
+                `;
+                
+                infoContainer.style.display = 'block';
+            }
+
+            updateGenerateButton() {
+                const generateBtn = document.getElementById('generateBtn');
+                generateBtn.disabled = !(this.selectedFaction && this.selectedType);
+                
+                if (this.selectedFaction && this.selectedType) {
+                    generateBtn.textContent = `Generate ${this.selectedType} for ${this.selectedFaction}`;
+                } else {
+                    generateBtn.textContent = 'Generate Visual Assets';
+                }
+            }
+
+            async generateAssets() {
+                if (!this.selectedFaction || !this.selectedType) return;
+                
+                this.showStatus('Generating visual assets...', 'generating');
+                
+                try {
+                    let endpoint, payload;
+                    
+                    if (this.selectedType === 'collection') {
+                        endpoint = '/api/visual/generate/faction';
+                        payload = { faction_name: this.selectedFaction };
+                    } else {
+                        endpoint = '/api/visual/generate/character';
+                        payload = {
+                            character_data: {
+                                name: `${this.selectedFaction} Representative`,
+                                faction: this.selectedFaction,
+                                role: 'faction operative'
+                            },
+                            faction_name: this.selectedFaction
+                        };
+                    }
+                    
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.displayResults(data);
+                        this.showStatus('Visual assets generated successfully!', 'success');
+                    } else {
+                        throw new Error(data.error || 'Generation failed');
+                    }
+                    
+                } catch (error) {
+                    console.error('Generation error:', error);
+                    this.showStatus(`Generation failed: ${error.message}`, 'error');
+                }
+            }
+
+            async generateAllAssets() {
+                this.showStatus('Starting batch generation for all factions...', 'generating');
+                
+                try {
+                    const response = await fetch('/api/visual/generate/batch', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ generate_all: true })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const results = data.batch_results;
+                        this.displayBatchResults(results);
+                        this.showStatus(
+                            `Batch generation complete! ${results.successful_generations.length} successful, ${results.failed_generations.length} failed`, 
+                            results.failed_generations.length > 0 ? 'error' : 'success'
+                        );
+                    } else {
+                        throw new Error(data.error || 'Batch generation failed');
+                    }
+                    
+                } catch (error) {
+                    console.error('Batch generation error:', error);
+                    this.showStatus(`Batch generation failed: ${error.message}`, 'error');
+                }
+            }
+
+            displayResults(data) {
+                const container = document.getElementById('resultsContainer');
+                
+                let resultHtml = `
+                    <div class="visual-result">
+                        <h3>✅ Generation Complete - ${data.faction_name || data.character_name}</h3>
+                `;
+                
+                if (data.visual_profile) {
+                    resultHtml += `
+                        <div class="asset-info">
+                            <div class="asset-preview">
+                                <strong>Character Portrait Generated</strong>
+                            </div>
+                            <div class="asset-details">
+                                <div><strong>Character:</strong> ${data.visual_profile.character_name}</div>
+                                <div><strong>Faction:</strong> ${data.visual_profile.faction}</div>
+                                <div><strong>Generated:</strong> ${new Date(data.visual_profile.generated_at).toLocaleString()}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (data.faction_collection) {
+                    const assets = data.faction_collection.assets;
+                    resultHtml += `
+                        <div class="asset-info">
+                            <div class="asset-preview">
+                                <strong>Complete Faction Collection</strong>
+                            </div>
+                            <div class="asset-details">
+                                <div><strong>Assets Generated:</strong> ${Object.keys(assets).length}</div>
+                                <div><strong>Category:</strong> ${data.faction_collection.faction_info.category}</div>
+                                <div><strong>Generated:</strong> ${new Date(data.faction_collection.generated_at).toLocaleString()}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                resultHtml += '</div>';
+                container.innerHTML = resultHtml;
+            }
+
+            displayBatchResults(results) {
+                const container = document.getElementById('resultsContainer');
+                
+                container.innerHTML = `
+                    <div class="visual-result">
+                        <h3>⚡ Batch Generation Results</h3>
+                        <div class="asset-info">
+                            <div class="asset-preview">
+                                <strong>Batch Processing Complete</strong>
+                            </div>
+                            <div class="asset-details">
+                                <div><strong>Total Processed:</strong> ${results.factions_processed.length}</div>
+                                <div><strong>Successful:</strong> ${results.successful_generations.length}</div>
+                                <div><strong>Failed:</strong> ${results.failed_generations.length}</div>
+                                <div><strong>Total Assets:</strong> ${results.total_assets_generated}</div>
+                                <div><strong>Duration:</strong> ${new Date(results.generation_completed) - new Date(results.generation_started)}ms</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            clearSelection() {
+                this.selectedFaction = null;
+                this.selectedType = null;
+                
+                document.querySelectorAll('.faction-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                
+                document.querySelectorAll('.option-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                document.getElementById('selectedFactionInfo').style.display = 'none';
+                document.getElementById('resultsContainer').innerHTML = `
+                    <div class="generation-status">
+                        Select a faction and generation type to begin creating visual assets
+                    </div>
+                `;
+                
+                this.updateGenerateButton();
+            }
+
+            showStatus(message, type) {
+                const container = document.getElementById('resultsContainer');
+                const icon = type === 'generating' ? '<div class="loading-spinner"></div>' : 
+                           type === 'success' ? '✅' : 
+                           type === 'error' ? '❌' : '📊';
+                
+                container.innerHTML = `
+                    <div class="generation-status status-${type}">
+                        ${icon} ${message}
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize the application when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new TECVisualGenerator();
+        });
+    </script>
+</body>
+</html>

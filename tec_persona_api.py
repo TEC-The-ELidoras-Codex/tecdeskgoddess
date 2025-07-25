@@ -23,6 +23,20 @@ from tec_tools.avatar_system import TECAvatarSystem
 from tec_tools.token_manager import TECTokenManager
 from tec_tools.character_memory_system import TECCharacterMemorySystem
 
+# Enhanced imports for visual asset generation
+try:
+    from tec_visual_asset_generator import TECVisualAssetGenerator
+    from azure_image_tools import AzureImageGenerator
+    visual_generator = TECVisualAssetGenerator()
+    azure_image_gen = AzureImageGenerator()
+    VISUAL_FEATURES_ENABLED = True
+    print("✅ Visual asset generation features enabled")
+except ImportError as e:
+    print(f"⚠️  Visual features disabled - missing dependencies: {e}")
+    VISUAL_FEATURES_ENABLED = False
+    visual_generator = None
+    azure_image_gen = None
+
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)
@@ -34,6 +48,12 @@ memory_system = TECMemorySystem()
 avatar_system = TECAvatarSystem()
 token_manager = TECTokenManager()
 character_memory_system = TECCharacterMemorySystem()
+
+# Initialize enhanced visual generator
+if VISUAL_FEATURES_ENABLED:
+    print("🎨 Visual Asset Generator initialized with complete faction database")
+else:
+    print("⚠️  Visual features not available - install Azure AI dependencies")
 
 # Load settings
 settings = data_manager.load_settings()
@@ -1158,6 +1178,311 @@ The crisis directly impacts {selected_faction}'s core interests in {random.choic
     
     # Fallback content with faction awareness
     return f"Enhanced faction-aware content for {generator_type} featuring {selected_faction} would appear here. This content would incorporate their ideology of '{faction_data['ideology']}' and specialization in {random.choice(faction_data['specializations'])}."
+
+# ============================
+# VISUAL ASSET GENERATION API
+# ============================
+
+@app.route('/api/visual/character-portrait', methods=['POST'])
+def generate_character_portrait():
+    """Generate AI portrait for character with faction-aware styling"""
+    try:
+        character_data = request.get_json()
+        
+        # Validate required fields
+        if not character_data or 'name' not in character_data:
+            return jsonify({
+                'success': False,
+                'error': 'Character name required'
+            }), 400
+        
+        print(f"🎨 Generating portrait for: {character_data['name']}")
+        
+        # Generate visual profile
+        visual_profile = visual_generator.generate_character_visual_profile(character_data)
+        
+        return jsonify({
+            'success': True,
+            'visual_profile': visual_profile,
+            'character_name': character_data['name'],
+            'faction': character_data.get('faction', 'Independent Operators'),
+            'generation_timestamp': visual_profile.get('generation_timestamp')
+        })
+        
+    except Exception as e:
+        print(f"❌ Error generating character portrait: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/visual/faction-collection', methods=['POST'])
+def generate_faction_collection():
+    """Generate complete visual asset collection for a faction"""
+    try:
+        request_data = request.get_json()
+        faction_name = request_data.get('faction_name')
+        
+        if not faction_name:
+            return jsonify({
+                'success': False,
+                'error': 'Faction name required'
+            }), 400
+        
+        print(f"🏛️ Generating asset collection for: {faction_name}")
+        
+        # Generate faction collection
+        collection = visual_generator.generate_faction_asset_collection(faction_name)
+        
+        return jsonify({
+            'success': True,
+            'faction_collection': collection,
+            'faction_name': faction_name,
+            'assets_generated': len([a for a in collection.get('assets', {}).values() if a])
+        })
+        
+    except Exception as e:
+        print(f"❌ Error generating faction collection: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/visual/batch-generate', methods=['POST'])
+def batch_generate_all_factions():
+    """Generate visual assets for all TEC factions"""
+    try:
+        print(f"🚀 Starting batch visual generation for all factions")
+        
+        # Generate all faction assets
+        batch_results = visual_generator.batch_generate_all_factions()
+        
+        return jsonify({
+            'success': True,
+            'batch_results': batch_results,
+            'summary': batch_results.get('summary', {}),
+            'total_factions': batch_results['summary']['total_factions'],
+            'successful_generations': batch_results['summary']['successful']
+        })
+        
+    except Exception as e:
+        print(f"❌ Error in batch generation: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/visual/inventory', methods=['GET'])
+def get_visual_asset_inventory():
+    """Get current inventory of generated visual assets"""
+    try:
+        inventory = visual_generator.get_asset_inventory()
+        
+        return jsonify({
+            'success': True,
+            'inventory': inventory,
+            'total_collections': len(inventory['collections']),
+            'total_assets': inventory['total_assets'],
+            'storage_info': inventory['storage_paths']
+        })
+        
+    except Exception as e:
+        print(f"❌ Error getting asset inventory: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# ====================================================================
+# VISUAL ASSET GENERATION API ENDPOINTS
+# ====================================================================
+
+@app.route('/api/visual/generate/character', methods=['POST'])
+def generate_character_visual():
+    """Generate character portrait with faction styling"""
+    
+    if not VISUAL_FEATURES_ENABLED:
+        return jsonify({
+            'success': False,
+            'error': 'Visual features not available - Azure AI dependencies not installed'
+        }), 503
+    
+    try:
+        data = request.get_json()
+        character_data = data.get('character_data', {})
+        faction_name = data.get('faction_name')
+        
+        if not character_data.get('name'):
+            return jsonify({
+                'success': False,
+                'error': 'Character name is required'
+            }), 400
+        
+        print(f"🎭 Generating visual for {character_data.get('name')} ({faction_name})")
+        
+        # Generate visual profile
+        visual_profile = visual_generator.generate_character_visual_profile(character_data, faction_name)
+        
+        return jsonify({
+            'success': True,
+            'visual_profile': visual_profile,
+            'character_name': character_data.get('name'),
+            'faction': faction_name
+        })
+        
+    except Exception as e:
+        print(f"❌ Error generating character visual: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/visual/generate/faction', methods=['POST'])
+def generate_faction_assets():
+    """Generate complete asset collection for a faction"""
+    
+    if not VISUAL_FEATURES_ENABLED:
+        return jsonify({
+            'success': False,
+            'error': 'Visual features not available - Azure AI dependencies not installed'
+        }), 503
+    
+    try:
+        data = request.get_json()
+        faction_name = data.get('faction_name')
+        
+        if not faction_name:
+            return jsonify({
+                'success': False,
+                'error': 'Faction name is required'
+            }), 400
+        
+        if faction_name not in visual_generator.faction_database:
+            return jsonify({
+                'success': False,
+                'error': f'Unknown faction: {faction_name}'
+            }), 400
+        
+        print(f"🏛️ Generating complete asset collection for {faction_name}")
+        
+        # Generate faction asset collection
+        collection = visual_generator.generate_faction_asset_collection(faction_name)
+        
+        return jsonify({
+            'success': True,
+            'faction_collection': collection,
+            'faction_name': faction_name
+        })
+        
+    except Exception as e:
+        print(f"❌ Error generating faction assets: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/visual/factions')
+def get_visual_factions():
+    """Get complete faction database with visual styling information"""
+    
+    if not VISUAL_FEATURES_ENABLED:
+        return jsonify({
+            'success': False,
+            'error': 'Visual features not available'
+        }), 503
+    
+    try:
+        # Get faction list organized by category
+        categories = visual_generator.get_faction_list_by_category()
+        
+        # Get visual styles for all factions
+        faction_styles = azure_image_gen.faction_visual_styles
+        
+        # Combine faction database with visual styles
+        complete_faction_data = {}
+        
+        for faction_name, faction_info in visual_generator.faction_database.items():
+            complete_faction_data[faction_name] = {
+                'info': faction_info,
+                'visual_style': faction_styles.get(faction_name, {}),
+                'category': faction_info['category']
+            }
+        
+        return jsonify({
+            'success': True,
+            'factions': complete_faction_data,
+            'categories': categories,
+            'total_factions': len(complete_faction_data),
+            'total_categories': len(categories)
+        })
+        
+    except Exception as e:
+        print(f"❌ Error getting faction data: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/visual/generate/batch', methods=['POST'])
+def generate_batch_assets():
+    """Generate visual assets for multiple factions or all factions"""
+    
+    if not VISUAL_FEATURES_ENABLED:
+        return jsonify({
+            'success': False,
+            'error': 'Visual features not available - Azure AI dependencies not installed'
+        }), 503
+    
+    try:
+        data = request.get_json()
+        faction_list = data.get('faction_list', [])
+        generate_all = data.get('generate_all', False)
+        
+        if generate_all:
+            print(f"🎨 Starting batch generation for all factions")
+            results = visual_generator.generate_all_faction_assets()
+        elif faction_list:
+            print(f"🎨 Starting batch generation for {len(faction_list)} factions")
+            results = {
+                'generation_started': datetime.now().isoformat(),
+                'factions_processed': [],
+                'successful_generations': [],
+                'failed_generations': [],
+                'total_assets_generated': 0
+            }
+            
+            for faction_name in faction_list:
+                try:
+                    collection = visual_generator.generate_faction_asset_collection(faction_name)
+                    if collection.get('success', True):
+                        results['successful_generations'].append(faction_name)
+                        asset_count = len([k for k in collection.get('assets', {}).keys() if collection['assets'][k]])
+                        results['total_assets_generated'] += asset_count
+                    else:
+                        results['failed_generations'].append(faction_name)
+                    results['factions_processed'].append(faction_name)
+                except Exception as e:
+                    print(f"❌ Failed to process {faction_name}: {e}")
+                    results['failed_generations'].append(faction_name)
+            
+            results['generation_completed'] = datetime.now().isoformat()
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Either faction_list or generate_all=true must be provided'
+            }), 400
+        
+        return jsonify({
+            'success': True,
+            'batch_results': results
+        })
+        
+    except Exception as e:
+        print(f"❌ Error in batch generation: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 if __name__ == '__main__':
     print("🚀 Starting TEC Enhanced Persona API Server...")
