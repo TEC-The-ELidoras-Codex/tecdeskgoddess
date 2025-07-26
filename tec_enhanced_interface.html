@@ -13,7 +13,13 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%); color: #e0e6ed; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .glassmorphism { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border:1px solid rgba(255,255,255,0.1); border-radius:16px; }
+        .glassmorphism { 
+            background: rgba(255,255,255,0.05); 
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px); 
+            border:1px solid rgba(255,255,255,0.1); 
+            border-radius:16px; 
+        }
         
         /* Header */
         header { padding: 20px; text-align: center; }
@@ -1334,7 +1340,7 @@
                         • <strong>High (80-100%):</strong> Highly creative, imaginative, unexpected responses
                     </div>
                 </div>
-                <input type="range" id="creativitySlider" min="0" max="100" value="70">
+                <input type="range" id="creativitySlider" min="0" max="100" value="70" title="Creativity Level" aria-label="Creativity Level">
                 <span id="creativityValue">70%</span>
             </div>
             <div class="ai-setting">
@@ -1350,7 +1356,7 @@
                         • <strong>Long:</strong> Last 50 messages - Full context, slower
                     </div>
                 </div>
-                <select id="memorySelect">
+                <select id="memorySelect" title="Memory Settings" aria-label="Memory Settings">
                     <option value="short">Short (10 msgs)</option>
                     <option value="medium" selected>Medium (25 msgs)</option>
                     <option value="long">Long (50 msgs)</option>
@@ -1369,7 +1375,7 @@
                         • <strong>Thorough:</strong> Slow but very detailed analysis
                     </div>
                 </div>
-                <select id="reasoningSelect">
+                <select id="reasoningSelect" title="Reasoning Style" aria-label="Reasoning Style">
                     <option value="fast">Fast</option>
                     <option value="balanced" selected>Balanced</option>
                     <option value="thorough">Thorough</option>
@@ -1388,7 +1394,7 @@
                         • <strong>Character:</strong> Role-plays as selected TEC character
                     </div>
                 </div>
-                <select id="chatModeSelect">
+                <select id="chatModeSelect" title="Chat Mode" aria-label="Chat Mode">
                     <option value="standard">Standard</option>
                     <option value="enhanced" selected>Enhanced</option>
                     <option value="character">Character</option>
@@ -2628,6 +2634,54 @@
                     'Kaelen': 'fas fa-star'
                 };
                 return icons[character] || 'fas fa-robot';
+            }
+
+            updateCharacterStatus(character) {
+                // Update current character
+                this.currentCharacter = character;
+                
+                // Update character selector if it exists
+                const characterSelect = document.getElementById('characterSelect');
+                if (characterSelect) {
+                    characterSelect.value = character;
+                }
+                
+                // Update character status display
+                const characterStatus = document.getElementById('characterStatus');
+                if (characterStatus) {
+                    characterStatus.textContent = character;
+                    characterStatus.className = 'status-active';
+                }
+                
+                // Update character details
+                const characterDetails = document.getElementById('characterDetails');
+                if (characterDetails) {
+                    const characterInfo = {
+                        'Polkin': 'Mystical Guide | Level: Advanced',
+                        'Mynx': 'Tech Companion | Level: Neural',
+                        'Kaelen': 'Cosmic Explorer | Level: Transcendent',
+                        'default': 'AI Assistant | Level: Basic'
+                    };
+                    characterDetails.textContent = characterInfo[character] || characterInfo['default'];
+                }
+                
+                console.log(`Character status updated to: ${character}`);
+            }
+
+            updateMemoryStats(memoryStats) {
+                // Update memory statistics display
+                if (memoryStats) {
+                    this.updateMemoryDisplay(memoryStats);
+                }
+                
+                // Update memory-related UI elements
+                const memoryIndicator = document.getElementById('memoryIndicator');
+                if (memoryIndicator && memoryStats) {
+                    memoryIndicator.style.display = 'block';
+                    memoryIndicator.textContent = `Bond: ${memoryStats.relationship_level || 1}`;
+                }
+                
+                console.log('Memory stats updated:', memoryStats);
             }
 
             updateMemoryDisplay(memoryContext) {
