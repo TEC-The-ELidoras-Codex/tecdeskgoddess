@@ -1456,6 +1456,9 @@
                 <button onclick="sendQuickMessage('What are my persona options?')">
                     <i class="fas fa-user-circle mr-2"></i>Persona Help
                 </button>
+                <button onclick="clearChat()" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                    <i class="fas fa-trash mr-2"></i>Clear Chat
+                </button>
             </div>
         </div>
 
@@ -1728,7 +1731,9 @@
         // Enhanced TEC Interface with Persona Integration and Audio
         class TECEnhancedInterface {
             constructor() {
-                this.currentCharacter = 'default';
+                // Initialize with the active character or default to Polkin
+                const activeCharacter = document.querySelector('.character-card.active');
+                this.currentCharacter = activeCharacter ? activeCharacter.dataset.character : 'Polkin';
                 this.enhancedChatEnabled = true;
                 this.persona = null;
                 this.audioEnabled = false;
@@ -2743,6 +2748,27 @@
         function sendQuickMessage(message) {
             document.getElementById('messageInput').value = message;
             tecInterface.sendMessage();
+        }
+
+        // Clear chat function
+        function clearChat() {
+            const chatContainer = document.getElementById('chatContainer');
+            if (chatContainer) {
+                // Clear all messages except welcome message
+                chatContainer.innerHTML = `
+                    <div class="message ai-message animate-fadeInUp">
+                        <div class="message-header">
+                            <span><i class="fas fa-robot mr-2"></i>TEC AI</span>
+                            <span id="currentTime">${new Date().toLocaleTimeString()}</span>
+                        </div>
+                        <div class="message-content">
+                            Welcome to TEC: BITLyfe Enhanced! I'm your AI companion with advanced persona capabilities. 
+                            Configure your persona settings to personalize our interactions, or chat with the TEC characters directly.
+                        </div>
+                    </div>
+                `;
+                console.log('Chat cleared successfully');
+            }
         }
 
         // Open character customization panel

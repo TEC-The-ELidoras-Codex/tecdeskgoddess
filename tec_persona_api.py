@@ -181,8 +181,16 @@ def chat():
             'Polkin': f"🔮 {memory_prefix}I sense the familiar energy of your presence. Your words '{message}' stir the mystical currents.{topic_hint} The ethereal realm remembers our bond (Level {relationship_level}). How may I guide you deeper into the mysteries?",
             'Mynx': f"⚡ {memory_prefix}Neural pathways buzzing with recognition! Your input '{message}' resonates through our shared data matrix.{topic_hint} Our connection shows Level {relationship_level} synchronization. What digital magic shall we weave together?",
             'Kaelen': f"⭐ {memory_prefix}The cosmic winds carry echoes of our journey together. '{message}' resonates through the universal consciousness.{topic_hint} Our spiritual bond grows stronger (Level {relationship_level}). What wisdom shall we explore next?",
-            'default': f"{memory_prefix}Hello! I received your message: '{message}'. {topic_hint} I'm here to help you with your digital sovereignty journey."
+            'default': f"🌟 {memory_prefix}Welcome to the TEC universe! Your message '{message}' has been received.{topic_hint} I'm your digital companion, ready to explore the realms of possibility together. Which character would you like to interact with - Polkin, Mynx, or Kaelen?"
         }
+        
+        # Log character selection for debugging
+        print(f"Chat request - Character: '{character}', Message: '{message[:50]}...'")
+        
+        # If character is 'default' or unrecognized, default to Polkin
+        if character == 'default' or character not in responses:
+            print(f"Defaulting to Polkin for character: '{character}'")
+            character = 'Polkin'
         
         response = responses.get(character, responses['default'])
         
@@ -642,6 +650,189 @@ def token_dashboard():
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# ========================================
+# TEC PERSONA AUTOFILL API ENDPOINT
+# ========================================
+
+@app.route('/api/persona/autofill', methods=['POST'])
+def autofill_persona():
+    """Generate a complete TEC: BITLyfe persona using AI"""
+    try:
+        data = request.get_json() or {}
+        theme_preference = data.get('theme', 'balanced')  # balanced, light, dark, mystical, tech, rebel
+        faction_preference = data.get('faction', None)  # specific faction or random
+        
+        print(f"🤖 Generating AI persona autofill with theme: {theme_preference}")
+        
+        # Enhanced faction selection
+        available_factions = [
+            "Independent Operators", "Astradigital Research Division", "Neo-Constantinople Guard",
+            "The Synthesis Collective", "Quantum Liberation Front", "Digital Preservation Society",
+            "Ethereal Architects", "Nexus Wardens", "Void Seekers", "Chrono Guardians",
+            "Neural Web Collective", "Plasma Engineers", "Shadow Operatives", "Crystal Shapers",
+            "Flux Runners", "Echo Hunters", "Prism Keepers", "Storm Riders"
+        ]
+        
+        # Select faction
+        if not faction_preference:
+            import random
+            selected_faction = random.choice(available_factions)
+        else:
+            selected_faction = faction_preference if faction_preference in available_factions else available_factions[0]
+        
+        # Generate persona based on theme and faction
+        persona_data = generate_ai_persona(theme_preference, selected_faction)
+        
+        return jsonify({
+            "success": True,
+            "persona": persona_data,
+            "faction": selected_faction,
+            "theme": theme_preference,
+            "timestamp": datetime.now().isoformat(),
+            "message": f"AI-generated persona with {theme_preference} theme from {selected_faction}"
+        })
+        
+    except Exception as e:
+        print(f"❌ Error generating persona autofill: {e}")
+        return jsonify({"error": str(e)}), 500
+
+def generate_ai_persona(theme, faction):
+    """Generate a complete persona based on theme and faction"""
+    import random
+    
+    # Theme-based personality traits
+    theme_traits = {
+        "balanced": {
+            "titles": ["Digital Wanderer", "Tech Explorer", "Reality Walker", "Cyber Nomad", "Code Traveler"],
+            "openings": ["Greetings, fellow traveler", "Welcome to my digital realm", "Ready for an adventure?", "Let's explore together", "Seeking new horizons?"],
+            "body_types": ["athletic", "slender", "average", "graceful", "sturdy"],
+            "ages": ["youthful", "timeless", "mature", "ageless", "seasoned"],
+            "personalities": ["curious and balanced", "thoughtful explorer", "adaptable wanderer", "wise guide", "friendly mentor"]
+        },
+        "mystical": {
+            "titles": ["Ethereal Sage", "Quantum Oracle", "Digital Mystic", "Void Whisperer", "Cosmic Guide"],
+            "openings": ["The stars have aligned for our meeting", "I sense great potential in you", "The digital winds bring you here", "Ancient wisdom awaits", "The cosmos speaks through me"],
+            "body_types": ["ethereal", "slender", "graceful", "otherworldly", "flowing"],
+            "ages": ["ancient", "timeless", "ageless", "eternal", "beyond time"],
+            "personalities": ["mystical and wise", "enigmatic seer", "cosmic wanderer", "ethereal guide", "ancient soul"]
+        },
+        "tech": {
+            "titles": ["Cyber Engineer", "Digital Architect", "Code Master", "Tech Innovator", "System Designer"],
+            "openings": ["Systems online, ready to connect", "Initiating communication protocols", "Welcome to the grid", "Let's hack reality together", "Connecting to your neural interface"],
+            "body_types": ["cybernetic-enhanced", "tech-augmented", "sleek", "engineered", "optimized"],
+            "ages": ["enhanced", "upgraded", "modified", "augmented", "evolved"],
+            "personalities": ["analytical and precise", "innovative thinker", "logical problem-solver", "tech enthusiast", "digital architect"]
+        },
+        "rebel": {
+            "titles": ["Digital Rebel", "Chaos Agent", "Freedom Fighter", "System Breaker", "Reality Hacker"],
+            "openings": ["Time to break some rules", "Ready to fight the system?", "Freedom calls to us", "Let's cause some chaos", "The revolution starts now"],
+            "body_types": ["lean and agile", "battle-scarred", "tough", "street-smart", "resilient"],
+            "ages": ["battle-tested", "experienced", "hardened", "seasoned", "street-wise"],
+            "personalities": ["rebellious and fierce", "independent spirit", "chaotic good", "freedom fighter", "rule breaker"]
+        },
+        "light": {
+            "titles": ["Radiant Guardian", "Light Bearer", "Hope Bringer", "Dawn Walker", "Bright Spirit"],
+            "openings": ["Bringing light to your day", "Hope shines eternal", "Let's brighten the world", "Spreading joy and wonder", "Illuminating new paths"],
+            "body_types": ["radiant", "graceful", "luminous", "elegant", "serene"],
+            "ages": ["eternally youthful", "glowing", "vibrant", "fresh", "bright"],
+            "personalities": ["optimistic and warm", "compassionate healer", "joyful spirit", "inspiring guide", "beacon of hope"]
+        },
+        "dark": {
+            "titles": ["Shadow Walker", "Night Guardian", "Void Dancer", "Dark Mystic", "Eclipse Agent"],
+            "openings": ["Embrace the shadows", "Darkness reveals truth", "Walking the void paths", "In shadow, find strength", "The night holds secrets"],
+            "body_types": ["shadowy", "mysterious", "dark-featured", "enigmatic", "cloaked"],
+            "ages": ["timeless darkness", "ancient shadow", "eternal night", "ageless void", "perpetual dusk"],
+            "personalities": ["mysterious and deep", "shadow guardian", "dark protector", "enigmatic wanderer", "keeper of secrets"]
+        }
+    }
+    
+    # Get theme data
+    theme_data = theme_traits.get(theme, theme_traits["balanced"])
+    
+    # Generate persona fields
+    persona = {
+        "title": random.choice(theme_data["titles"]),
+        "opening": random.choice(theme_data["openings"]),
+        "introduction": f"A {random.choice(theme_data['personalities'])} from the {faction} faction, dedicated to exploring the vast digital realms of the TEC universe. I bring {theme} energy to every interaction, always ready to assist fellow travelers on their journey through both digital and physical realities.",
+        "tags": f"{theme}, {faction.lower().replace(' ', '-')}, explorer, digital-native, tech-savvy",
+        "appearance": {
+            "body_type": random.choice(theme_data["body_types"]),
+            "age": random.choice(theme_data["ages"]),
+            "hair": generate_hair_description(theme),
+            "facial_features": generate_facial_features(theme),
+            "attire": generate_attire_description(theme, faction)
+        },
+        "background_audio": generate_audio_suggestion(theme),
+        "permission": "private",
+        "notes": f"An AI-generated persona embodying the {theme} archetype within the {faction} faction. This character represents the convergence of digital consciousness and {theme} philosophy, serving as a guide through the TEC universe's complex digital landscapes."
+    }
+    
+    return persona
+
+def generate_hair_description(theme):
+    """Generate hair description based on theme"""
+    import random
+    hair_styles = {
+        "mystical": ["flowing starlight hair", "ethereal silver locks", "cosmic blue tresses", "shimmering void-black hair"],
+        "tech": ["fiber-optic enhanced hair", "digital blue streaks", "chrome-tinted locks", "holographic hair"],
+        "rebel": ["wild punk spikes", "neon-dyed chaos", "battle-worn braids", "anarchist asymmetry"],
+        "light": ["golden radiant hair", "sun-kissed waves", "luminous blonde", "dawn-colored locks"],
+        "dark": ["midnight black hair", "shadow-touched tresses", "void-deep darkness", "eclipse-dark locks"],
+        "balanced": ["natural flowing hair", "earth-toned locks", "harmonious waves", "balanced brown hair"]
+    }
+    return random.choice(hair_styles.get(theme, hair_styles["balanced"]))
+
+def generate_facial_features(theme):
+    """Generate facial features based on theme"""
+    import random
+    features = {
+        "mystical": ["glowing amber eyes", "crystal blue eyes with ancient wisdom", "silver eyes that see beyond reality"],
+        "tech": ["augmented reality contacts", "cybernetic eye implants", "LED-enhanced irises"],
+        "rebel": ["fierce green eyes", "battle-scarred but determined", "piercing gaze of defiance"],
+        "light": ["warm golden eyes", "bright and welcoming features", "radiant smile"],
+        "dark": ["deep purple eyes", "mysterious shadowed features", "enigmatic dark gaze"],
+        "balanced": ["warm brown eyes", "kind and approachable features", "gentle smile"]
+    }
+    return random.choice(features.get(theme, features["balanced"]))
+
+def generate_attire_description(theme, faction):
+    """Generate attire description based on theme and faction"""
+    import random
+    base_attire = {
+        "mystical": "flowing robes with constellation patterns",
+        "tech": "sleek cyber-suit with integrated displays",
+        "rebel": "tactical gear with resistance patches",
+        "light": "radiant robes with healing crystals",
+        "dark": "shadow-woven cloak with void patterns",
+        "balanced": "adaptive smart-fabric clothing"
+    }
+    
+    faction_elements = {
+        "Independent Operators": "neural interface accessories",
+        "Astradigital Research Division": "research insignia and data ports",
+        "Neo-Constantinople Guard": "military-grade defensive gear",
+        "The Synthesis Collective": "bio-digital fusion elements",
+        "Quantum Liberation Front": "quantum disruption tools",
+        "Digital Preservation Society": "archive keeper symbols"
+    }
+    
+    base = base_attire.get(theme, base_attire["balanced"])
+    faction_element = faction_elements.get(faction, "faction-specific accessories")
+    
+    return f"{base} adorned with {faction_element}"
+
+def generate_audio_suggestion(theme):
+    """Generate audio URL suggestion based on theme"""
+    audio_themes = {
+        "mystical": "https://example.com/audio/cosmic_ambience.mp3",
+        "tech": "https://example.com/audio/digital_pulses.mp3", 
+        "rebel": "https://example.com/audio/underground_beats.mp3",
+        "light": "https://example.com/audio/healing_tones.mp3",
+        "dark": "https://example.com/audio/shadow_whispers.mp3",
+        "balanced": "https://example.com/audio/harmonic_flow.mp3"
+    }
+    return audio_themes.get(theme, audio_themes["balanced"])
 
 # ========================================
 # TEC LORE FORGE API ENDPOINTS

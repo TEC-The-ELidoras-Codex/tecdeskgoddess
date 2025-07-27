@@ -129,6 +129,50 @@
             </div>
         </div>
 
+        <!-- AI Autofill Options -->
+        <div class="border-t border-gray-600 pt-6">
+            <h4 class="text-xl font-semibold mb-4 text-purple-300">
+                <i class="fas fa-magic mr-2"></i>AI Autofill Options
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="autofillTheme" class="block text-sm font-medium text-gray-300 mb-2">Theme Style</label>
+                    <select id="autofillTheme" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors">
+                        <option value="balanced">⚖️ Balanced Explorer</option>
+                        <option value="mystical">🔮 Mystical Sage</option>
+                        <option value="tech">🤖 Tech Innovator</option>
+                        <option value="rebel">⚡ Digital Rebel</option>
+                        <option value="light">✨ Light Bearer</option>
+                        <option value="dark">🌙 Shadow Walker</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="autofillFaction" class="block text-sm font-medium text-gray-300 mb-2">Preferred Faction</label>
+                    <select id="autofillFaction" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors">
+                        <option value="">🎲 Random Faction</option>
+                        <option value="Independent Operators">🆓 Independent Operators</option>
+                        <option value="Astradigital Research Division">🔬 Astradigital Research</option>
+                        <option value="Neo-Constantinople Guard">🛡️ Neo-Constantinople Guard</option>
+                        <option value="The Synthesis Collective">🔗 Synthesis Collective</option>
+                        <option value="Quantum Liberation Front">⚛️ Quantum Liberation</option>
+                        <option value="Digital Preservation Society">📚 Digital Preservation</option>
+                        <option value="Ethereal Architects">🏗️ Ethereal Architects</option>
+                        <option value="Nexus Wardens">🌐 Nexus Wardens</option>
+                        <option value="Void Seekers">🕳️ Void Seekers</option>
+                        <option value="Chrono Guardians">⏰ Chrono Guardians</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <button type="button" id="aiAutofillButton" class="px-6 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors">
+                    <i class="fas fa-magic mr-2"></i>AI Generate Complete Persona
+                </button>
+                <div id="autofillStatus" class="text-sm text-gray-400 hidden">
+                    <i class="fas fa-spinner fa-spin mr-2"></i>Generating your persona...
+                </div>
+            </div>
+        </div>
+
         <!-- Action Buttons -->
         <div class="flex space-x-4 pt-6">
             <button type="submit" class="flex-1 px-6 py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors">
@@ -496,6 +540,83 @@ document.addEventListener('DOMContentLoaded', function() {
         if (confirm('Are you sure you want to reset all persona data?')) {
             personaForm.reset();
             document.getElementById('permissionPrivate').checked = true;
+        }
+    });
+    
+    // AI Autofill button
+    document.getElementById('aiAutofillButton').addEventListener('click', async function() {
+        const button = this;
+        const statusDiv = document.getElementById('autofillStatus');
+        
+        try {
+            // Show loading state
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Generating...';
+            statusDiv.classList.remove('hidden');
+            
+            // Get user preferences
+            const theme = document.getElementById('autofillTheme').value;
+            const faction = document.getElementById('autofillFaction').value;
+            
+            // Call the autofill API
+            const response = await fetch('/api/persona/autofill', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ theme, faction })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Fill in all the form fields with generated data
+                const persona = data.persona;
+                
+                // Basic information
+                document.getElementById('personaTitle').value = persona.title;
+                document.getElementById('personaOpening').value = persona.opening;
+                document.getElementById('personaIntro').value = persona.introduction;
+                document.getElementById('personaTags').value = persona.tags;
+                
+                // Appearance fields
+                document.getElementById('appearanceBodyType').value = persona.appearance.body_type;
+                document.getElementById('appearanceAge').value = persona.appearance.age;
+                document.getElementById('appearanceHair').value = persona.appearance.hair;
+                document.getElementById('appearanceFacialFeatures').value = persona.appearance.facial_features;
+                document.getElementById('appearanceAttire').value = persona.appearance.attire;
+                
+                // Background audio
+                document.getElementById('backgroundAudioUrl').value = persona.background_audio;
+                
+                // Permission settings
+                if (persona.permission === 'private') {
+                    document.getElementById('permissionPrivate').checked = true;
+                } else {
+                    document.getElementById('permissionPublic').checked = true;
+                }
+                
+                // AI understanding notes
+                document.getElementById('playerPersonaNotes').value = persona.notes;
+                
+                // Show success message
+                showPersonaMessage(`✨ AI generated ${data.theme} persona from ${data.faction}! Review and save when ready.`, 'success');
+                
+                // Smooth scroll to top of form
+                document.getElementById('playerPersonaPanel').scrollIntoView({ behavior: 'smooth' });
+                
+            } else {
+                throw new Error(data.error || 'Failed to generate persona');
+            }
+            
+        } catch (error) {
+            console.error('AI Autofill Error:', error);
+            showPersonaMessage(error.message || 'Failed to generate persona. Please try again.', 'error');
+        } finally {
+            // Reset button state
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-magic mr-2"></i>AI Generate Complete Persona';
+            statusDiv.classList.add('hidden');
         }
     });
 });
