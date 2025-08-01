@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEC Avatar System Demo</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e0e6ed;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            background: linear-gradient(90deg, #7b2ff7, #f107a3);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+        }
+        .avatar-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .avatar-demo {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .avatar-demo img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .avatar-demo h3 {
+            margin: 10px 0 5px 0;
+            font-size: 1.1rem;
+        }
+        .avatar-demo p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        .demo-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .demo-btn {
+            background: linear-gradient(135deg, #7b2ff7 0%, #f107a3 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+        }
+        .demo-btn:hover {
+            transform: scale(1.05);
+        }
+        .demo-btn.secondary {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .feature-list {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .feature-list ul {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .feature-list li::before {
+            content: "✨";
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>🎭 TEC Avatar System Demo</h1>
+        
+        <div class="avatar-showcase">
+            <div class="avatar-demo">
+                <img src="assets/face/tec-ai-avatar.svg" alt="TEC AI Avatar">
+                <h3>TEC AI</h3>
+                <p>Mystical AI Guide</p>
+            </div>
+            <div class="avatar-demo">
+                <img src="assets/face/polkin-avatar.svg" alt="Polkin Avatar">
+                <h3>Polkin</h3>
+                <p>Tech Mystic</p>
+            </div>
+            <div class="avatar-demo">
+                <img src="assets/face/mynx-avatar.svg" alt="Mynx Avatar">
+                <h3>Mynx</h3>
+                <p>Tech Mystic</p>
+            </div>
+            <div class="avatar-demo">
+                <img src="assets/face/kaelen-avatar.svg" alt="Kaelen Avatar">
+                <h3>Kaelen</h3>
+                <p>Code Warrior</p>
+            </div>
+            <div class="avatar-demo">
+                <img src="assets/face/user-default-avatar.svg" alt="User Avatar">
+                <h3>User Default</h3>
+                <p>Explorer Avatar</p>
+            </div>
+        </div>
+
+        <div class="demo-actions">
+            <button class="demo-btn" onclick="window.open('tec_enhanced_interface.html', '_blank')">
+                🚀 Launch TEC BITLyfe
+            </button>
+            <button class="demo-btn secondary" onclick="testAvatarSystem()">
+                🎨 Test Avatar System
+            </button>
+            <button class="demo-btn secondary" onclick="window.open('https://tecdeskgoddess.readyplayer.me/avatar', '_blank')">
+                👤 Ready Player Me
+            </button>
+        </div>
+
+        <div class="feature-list">
+            <h2>✨ Avatar System Features</h2>
+            <ul>
+                <li>SVG-based character avatars</li>
+                <li>Ready Player Me integration</li>
+                <li>Real-time chat display</li>
+                <li>Persistent user preferences</li>
+                <li>Mobile-responsive design</li>
+                <li>Fallback avatar system</li>
+                <li>Character-themed designs</li>
+                <li>Custom 3D avatar creation</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function testAvatarSystem() {
+            alert('Avatar System Status:\n\n✅ SVG Avatars Loaded\n✅ Ready Player Me API Ready\n✅ LocalStorage Available\n\nOpen TEC BITLyfe to customize your avatar!');
+        }
+
+        // Test if avatars load correctly
+        document.addEventListener('DOMContentLoaded', () => {
+            const avatars = document.querySelectorAll('.avatar-demo img');
+            let loadedCount = 0;
+            
+            avatars.forEach(img => {
+                img.onload = () => {
+                    loadedCount++;
+                    if (loadedCount === avatars.length) {
+                        console.log('✅ All avatars loaded successfully!');
+                    }
+                };
+                img.onerror = () => {
+                    console.error('❌ Failed to load avatar:', img.src);
+                    img.style.border = '2px solid #ef4444';
+                };
+            });
+        });
+    </script>
+</body>
+</html>

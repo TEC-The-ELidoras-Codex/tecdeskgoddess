@@ -120,6 +120,29 @@ This document provides guidance for coding agents working on the TEC BITLyfe pro
 
 ---
 
+## Current Focus: Chat System Improvements
+
+### Summary of Recent Work
+- Enhanced character selection and persona responses
+- Added clear chat functionality for better UX
+- Improved fallback logic and agentic workflows
+- Modularized chat and persona features
+
+### Priorities
+- Make chat responses more engaging and context-aware
+- Ensure character selection is intuitive and reliable
+- Add/expand persona features (journaling, finance, gamification)
+- Clean up unused tools and instructions
+
+### Next Steps for Copilot Agents
+- Refactor chat UI for clarity and accessibility
+- Improve AI response logic for richer conversations
+- Integrate new APIs or features as needed
+- Document all changes in README.md and instructions
+- Remove outdated or unused code/instructions
+
+---
+
 ## Notes for AI Agents
 - Always follow the modular design philosophy.
 - Prioritize user data sovereignty and security.

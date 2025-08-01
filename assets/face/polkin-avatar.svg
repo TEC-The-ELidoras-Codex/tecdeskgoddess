@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="polkinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a855f7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="100" fill="url(#polkinGradient)"/>
+  <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <circle cx="75" cy="85" r="6" fill="white"/>
+  <circle cx="125" cy="85" r="6" fill="white"/>
+  <path d="M75 125 Q100 140 125 125" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <text x="100" y="40" text-anchor="middle" fill="white" font-family="serif" font-size="14" font-weight="bold">POLKIN</text>
+  <text x="100" y="55" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="serif" font-size="10">Mystical Guide</text>
+  <!-- Mystical elements -->
+  <path d="M100 20 L105 30 L115 30 L107 38 L110 48 L100 42 L90 48 L93 38 L85 30 L95 30 Z" fill="rgba(255,255,255,0.6)"/>
+  <circle cx="60" cy="60" r="3" fill="rgba(255,255,255,0.4)"/>
+  <circle cx="140" cy="60" r="3" fill="rgba(255,255,255,0.4)"/>
+  <circle cx="60" cy="140" r="3" fill="rgba(255,255,255,0.4)"/>
+  <circle cx="140" cy="140" r="3" fill="rgba(255,255,255,0.4)"/>
+</svg>

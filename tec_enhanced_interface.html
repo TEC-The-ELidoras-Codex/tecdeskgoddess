@@ -59,9 +59,11 @@
         /* Chat Interface */
         .chat-interface { flex: 1; display: flex; flex-direction: column; }
         .chat-container { flex: 1; overflow-y: auto; padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.1); min-height: 400px; max-height: 600px; }
-        .message { margin-bottom: 15px; padding: 15px; border-radius: 12px; max-width: 80%; }
-        .user-message { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; margin-left: auto; }
+        .message { margin-bottom: 15px; padding: 15px; border-radius: 12px; max-width: 80%; display: flex; align-items: flex-start; gap: 12px; }
+        .user-message { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; margin-left: auto; flex-direction: row-reverse; }
         .ai-message { background: linear-gradient(135deg, #374151 0%, #4b5563 100%); color: white; margin-right: auto; }
+        .message-avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; object-fit: cover; border: 2px solid rgba(255,255,255,0.2); }
+        .message-body { flex: 1; min-width: 0; }
         .message-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.9rem; opacity: 0.8; }
         .message-content { line-height: 1.6; }
         
@@ -1181,6 +1183,170 @@
                 font-size: 0.7rem;
             }
         }
+
+        /* Avatar Panel Styles */
+        .avatar-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .avatar-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .avatar-panel-header h3 {
+            color: #e0e6ed;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #e0e6ed;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .avatar-panel-content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .avatar-preview h4,
+        .avatar-options h4 {
+            color: #e0e6ed;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .current-avatar-display {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .avatar-preview-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+        }
+
+        .avatar-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(123, 47, 247, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .avatar-option.selected {
+            background: rgba(123, 47, 247, 0.2);
+            border-color: #7b2ff7;
+        }
+
+        .avatar-option img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-bottom: 8px;
+        }
+
+        .avatar-option span {
+            color: #e0e6ed;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .create-avatar-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #7b2ff7;
+        }
+
+        .create-avatar-placeholder i {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .avatar-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .avatar-panel {
+                width: 95%;
+                max-height: 90vh;
+                padding: 15px;
+            }
+
+            .avatar-grid {
+                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+                gap: 10px;
+            }
+
+            .avatar-option {
+                padding: 10px;
+            }
+
+            .avatar-option img {
+                width: 50px;
+                height: 50px;
+            }
+
+            .avatar-actions {
+                flex-direction: column;
+            }
+        }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body class="theme-transition">
@@ -1411,13 +1577,16 @@
         <div class="chat-interface">
             <div class="chat-container" id="chatContainer">
                 <div class="message ai-message animate-fadeInUp">
-                    <div class="message-header">
-                        <span><i class="fas fa-robot mr-2"></i>TEC AI</span>
-                        <span id="currentTime"></span>
-                    </div>
-                    <div class="message-content">
-                        Welcome to TEC: BITLyfe Enhanced! I'm your AI companion with advanced persona capabilities. 
-                        Configure your persona settings to personalize our interactions, or chat with the TEC characters directly.
+                    <img src="assets/face/tec-ai-avatar.png" alt="TEC AI" class="message-avatar" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM3YzNhZWQiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIGZpbGw9IndoaXRlIj4KPHA+8J+SvDwvcD4KPHN2Zz4='">
+                    <div class="message-body">
+                        <div class="message-header">
+                            <span><i class="fas fa-robot mr-2"></i>TEC AI</span>
+                            <span id="currentTime"></span>
+                        </div>
+                        <div class="message-content">
+                            Welcome to TEC: BITLyfe Enhanced! I'm your AI companion with advanced persona capabilities. 
+                            Configure your persona settings to personalize our interactions, or chat with the TEC characters directly.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1461,6 +1630,62 @@
                 </button>
             </div>
         </div>
+
+        <!-- Avatar Customization Panel -->
+        <div class="avatar-panel glassmorphism hidden" id="avatarPanel">
+            <div class="avatar-panel-header">
+                <h3><i class="fas fa-user-circle mr-2"></i>Avatar Customization</h3>
+                <button class="close-btn" onclick="closeAvatarPanel()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="avatar-panel-content">
+                <div class="avatar-preview">
+                    <h4>Current Avatar</h4>
+                    <div class="current-avatar-display">
+                        <img id="currentAvatarPreview" src="assets/face/user-default-avatar.svg" alt="Current Avatar" class="avatar-preview-img">
+                    </div>
+                </div>
+                <div class="avatar-options">
+                    <h4>Avatar Options</h4>
+                    <div class="avatar-grid">
+                        <div class="avatar-option" onclick="selectAvatar('default')">
+                            <img src="assets/face/user-default-avatar.svg" alt="Default Avatar">
+                            <span>Default</span>
+                        </div>
+                        <div class="avatar-option" onclick="selectAvatar('polkin')">
+                            <img src="assets/face/polkin-avatar.svg" alt="Polkin Avatar">
+                            <span>Polkin Style</span>
+                        </div>
+                        <div class="avatar-option" onclick="selectAvatar('mynx')">
+                            <img src="assets/face/mynx-avatar.svg" alt="Mynx Avatar">
+                            <span>Mynx Style</span>
+                        </div>
+                        <div class="avatar-option" onclick="selectAvatar('kaelen')">
+                            <img src="assets/face/kaelen-avatar.svg" alt="Kaelen Avatar">
+                            <span>Kaelen Style</span>
+                        </div>
+                        <div class="avatar-option" onclick="openReadyPlayerMe()">
+                            <div class="create-avatar-placeholder">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Create Custom</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="avatar-actions">
+                    <button class="persona-btn persona-btn-secondary" onclick="resetAvatar()">
+                        <i class="fas fa-undo mr-2"></i>Reset to Default
+                    </button>
+                    <button class="persona-btn" onclick="saveAvatarSettings()">
+                        <i class="fas fa-save mr-2"></i>Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ready Player Me Integration -->
+        <div id="readyPlayerMeContainer" class="hidden"></div>
 
         <!-- Feature Panels -->
         <div class="feature-panels">
@@ -2599,6 +2824,27 @@
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${type}-message animate-fadeInUp`;
                 
+                // Create avatar image
+                const avatarImg = document.createElement('img');
+                avatarImg.className = 'message-avatar';
+                avatarImg.alt = type === 'user' ? 'User' : (character || this.currentCharacter);
+                
+                if (type === 'user') {
+                    avatarImg.src = this.getUserAvatar();
+                } else {
+                    const characterName = character || this.currentCharacter;
+                    avatarImg.src = this.getCharacterAvatar(characterName);
+                }
+                
+                // Fallback for broken avatar images
+                avatarImg.onerror = () => {
+                    avatarImg.src = this.getDefaultAvatar(type, character || this.currentCharacter);
+                };
+                
+                // Create message body container
+                const messageBodyDiv = document.createElement('div');
+                messageBodyDiv.className = 'message-body';
+                
                 const headerDiv = document.createElement('div');
                 headerDiv.className = 'message-header';
                 
@@ -2621,8 +2867,11 @@
                 contentDiv.className = 'message-content';
                 contentDiv.textContent = message;
                 
-                messageDiv.appendChild(headerDiv);
-                messageDiv.appendChild(contentDiv);
+                messageBodyDiv.appendChild(headerDiv);
+                messageBodyDiv.appendChild(contentDiv);
+                
+                messageDiv.appendChild(avatarImg);
+                messageDiv.appendChild(messageBodyDiv);
                 
                 chatContainer.appendChild(messageDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -2639,6 +2888,54 @@
                     'Kaelen': 'fas fa-star'
                 };
                 return icons[character] || 'fas fa-robot';
+            }
+
+            getUserAvatar() {
+                // Check if user has a custom Ready Player Me avatar
+                const userAvatarType = localStorage.getItem('userAvatar') || 'default';
+                
+                if (userAvatarType === 'custom') {
+                    const customAvatarUrl = localStorage.getItem('customAvatarUrl');
+                    if (customAvatarUrl) {
+                        return customAvatarUrl;
+                    }
+                }
+                
+                // Return SVG avatar path based on type
+                switch (userAvatarType) {
+                    case 'polkin': return 'assets/face/polkin-avatar.svg';
+                    case 'mynx': return 'assets/face/mynx-avatar.svg';
+                    case 'kaelen': return 'assets/face/kaelen-avatar.svg';
+                    case 'default':
+                    default: return 'assets/face/user-default-avatar.svg';
+                }
+            }
+
+            getCharacterAvatar(character) {
+                const avatars = {
+                    'default': 'assets/face/tec-ai-avatar.svg',
+                    'Polkin': 'assets/face/polkin-avatar.svg',
+                    'Mynx': 'assets/face/mynx-avatar.svg',
+                    'Kaelen': 'assets/face/kaelen-avatar.svg'
+                };
+                return avatars[character] || avatars['default'];
+            }
+
+            getDefaultAvatar(type, character) {
+                // Generate SVG fallback avatars
+                if (type === 'user') {
+                    return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiMzYjgyZjYiLz4KPHN2ZyB4PSIxMiIgeT0iMTIiIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0id2hpdGUiPgo8cGF0aCBkPSJNOCAwYTggOCAwIDEgMCAwIDE2QTggOCAwIDAgMCA4IDBabTAtMmE2IDYgMCAxIDEgMCAxMiA2IDYgMCAwIDEgMC0xMloiLz4KPHN2Zz4=';
+                } else {
+                    const colors = {
+                        'Polkin': '#a855f7',
+                        'Mynx': '#06b6d4',
+                        'Kaelen': '#f59e0b',
+                        'default': '#7c3aed'
+                    };
+                    const color = colors[character] || colors['default'];
+                    const emoji = character === 'Polkin' ? '🔮' : character === 'Mynx' ? '⚡' : character === 'Kaelen' ? '⭐' : '🤖';
+                    return `data:image/svg+xml;base64,${btoa(`<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="20" fill="${color}"/><text x="20" y="26" text-anchor="middle" font-size="16" fill="white">${emoji}</text></svg>`)}`;
+                }
             }
 
             updateCharacterStatus(character) {
@@ -2757,13 +3054,16 @@
                 // Clear all messages except welcome message
                 chatContainer.innerHTML = `
                     <div class="message ai-message animate-fadeInUp">
-                        <div class="message-header">
-                            <span><i class="fas fa-robot mr-2"></i>TEC AI</span>
-                            <span id="currentTime">${new Date().toLocaleTimeString()}</span>
-                        </div>
-                        <div class="message-content">
-                            Welcome to TEC: BITLyfe Enhanced! I'm your AI companion with advanced persona capabilities. 
-                            Configure your persona settings to personalize our interactions, or chat with the TEC characters directly.
+                        <img src="assets/face/tec-ai-avatar.png" alt="TEC AI" class="message-avatar" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM3YzNhZWQiLz4KPHN2ZyB4PSI4IiB5PSI4IiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIGZpbGw9IndoaXRlIj4KPHA+8J+SvDwvcD4KPHN2Zz4='">
+                        <div class="message-body">
+                            <div class="message-header">
+                                <span><i class="fas fa-robot mr-2"></i>TEC AI</span>
+                                <span id="currentTime">${new Date().toLocaleTimeString()}</span>
+                            </div>
+                            <div class="message-content">
+                                Welcome to TEC: BITLyfe Enhanced! I'm your AI companion with advanced persona capabilities. 
+                                Configure your persona settings to personalize our interactions, or chat with the TEC characters directly.
+                            </div>
                         </div>
                     </div>
                 `;
@@ -2781,12 +3081,216 @@
             window.open(url, '_blank', 'width=1200,height=800');
         }
 
+        // Avatar Management Functions
+        function openAvatarPanel() {
+            const panel = document.getElementById('avatarPanel');
+            if (panel) {
+                panel.classList.remove('hidden');
+                loadCurrentAvatar();
+            }
+        }
+
+        function closeAvatarPanel() {
+            const panel = document.getElementById('avatarPanel');
+            if (panel) {
+                panel.classList.add('hidden');
+            }
+        }
+
+        function loadCurrentAvatar() {
+            const currentAvatar = localStorage.getItem('userAvatar') || 'default';
+            const previewImg = document.getElementById('currentAvatarPreview');
+            if (previewImg) {
+                previewImg.src = getUserAvatarPath(currentAvatar);
+            }
+            // Update selected state in avatar grid
+            updateAvatarSelection(currentAvatar);
+        }
+
+        function updateAvatarSelection(selectedAvatar) {
+            const options = document.querySelectorAll('.avatar-option');
+            options.forEach(option => {
+                option.classList.remove('selected');
+                const onclick = option.getAttribute('onclick');
+                if (onclick && onclick.includes(`'${selectedAvatar}'`)) {
+                    option.classList.add('selected');
+                }
+            });
+        }
+
+        function selectAvatar(avatarType) {
+            const previewImg = document.getElementById('currentAvatarPreview');
+            if (previewImg) {
+                previewImg.src = getUserAvatarPath(avatarType);
+            }
+            updateAvatarSelection(avatarType);
+            // Store temporarily until saved
+            window.tempSelectedAvatar = avatarType;
+        }
+
+        function resetAvatar() {
+            selectAvatar('default');
+            window.tempSelectedAvatar = 'default';
+        }
+
+        function saveAvatarSettings() {
+            const selectedAvatar = window.tempSelectedAvatar || 'default';
+            localStorage.setItem('userAvatar', selectedAvatar);
+            console.log('Avatar saved:', selectedAvatar);
+            
+            // Update user avatar in chat immediately
+            updateUserAvatarsInChat();
+            
+            // Show success feedback
+            showAvatarSaveSuccess();
+            
+            // Close panel after short delay
+            setTimeout(() => {
+                closeAvatarPanel();
+            }, 1500);
+        }
+
+        function getUserAvatarPath(avatarType) {
+            switch (avatarType) {
+                case 'polkin': return 'assets/face/polkin-avatar.svg';
+                case 'mynx': return 'assets/face/mynx-avatar.svg';
+                case 'kaelen': return 'assets/face/kaelen-avatar.svg';
+                case 'default':
+                default: return 'assets/face/user-default-avatar.svg';
+            }
+        }
+
+        function updateUserAvatarsInChat() {
+            const userMessages = document.querySelectorAll('.user-message .message-avatar');
+            const currentAvatar = localStorage.getItem('userAvatar') || 'default';
+            const avatarPath = getUserAvatarPath(currentAvatar);
+            
+            userMessages.forEach(avatar => {
+                avatar.src = avatarPath;
+            });
+        }
+
+        function showAvatarSaveSuccess() {
+            // Create temporary success message
+            const successMsg = document.createElement('div');
+            successMsg.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                z-index: 9999;
+                font-weight: 500;
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            `;
+            successMsg.innerHTML = '<i class="fas fa-check mr-2"></i>Avatar saved successfully!';
+            document.body.appendChild(successMsg);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                document.body.removeChild(successMsg);
+            }, 3000);
+        }
+
+        // Ready Player Me Integration
+        function openReadyPlayerMe() {
+            console.log('Opening Ready Player Me avatar creator...');
+            
+            // Create iframe container
+            const container = document.getElementById('readyPlayerMeContainer');
+            if (!container) return;
+            
+            container.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999;">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 800px; height: 80%; background: white; border-radius: 12px; overflow: hidden;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #f3f4f6; border-bottom: 1px solid #e5e7eb;">
+                            <h3 style="margin: 0; color: #1f2937;">Create Your Avatar</h3>
+                            <button onclick="closeReadyPlayerMe()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6b7280;">×</button>
+                        </div>
+                        <iframe 
+                            src="https://tecdeskgoddess.readyplayer.me/avatar?frameApi"
+                            style="width: 100%; height: calc(100% - 60px); border: none;"
+                            allow="camera; microphone">
+                        </iframe>
+                    </div>
+                </div>
+            `;
+            container.classList.remove('hidden');
+            
+            // Listen for avatar creation messages
+            window.addEventListener('message', handleReadyPlayerMeMessage);
+        }
+
+        function closeReadyPlayerMe() {
+            const container = document.getElementById('readyPlayerMeContainer');
+            if (container) {
+                container.innerHTML = '';
+                container.classList.add('hidden');
+            }
+            window.removeEventListener('message', handleReadyPlayerMeMessage);
+        }
+
+        function handleReadyPlayerMeMessage(event) {
+            if (event.origin !== 'https://tecdeskgoddess.readyplayer.me') return;
+            
+            const json = parse(event.data);
+            if (json?.source !== 'readyplayerme') return;
+            
+            // Avatar created successfully
+            if (json.eventName === 'v1.avatar.exported') {
+                const avatarUrl = json.data.url;
+                console.log('Avatar created:', avatarUrl);
+                
+                // Save custom avatar URL
+                localStorage.setItem('customAvatarUrl', avatarUrl);
+                localStorage.setItem('userAvatar', 'custom');
+                
+                // Update preview
+                const previewImg = document.getElementById('currentAvatarPreview');
+                if (previewImg) {
+                    previewImg.src = avatarUrl;
+                }
+                
+                // Close Ready Player Me
+                closeReadyPlayerMe();
+                
+                // Show success message
+                showAvatarSaveSuccess();
+            }
+        }
+
+        function parse(jsonString) {
+            try {
+                return JSON.parse(jsonString);
+            } catch (error) {
+                return null;
+            }
+        }
+
+        // Add avatar panel button to header
+        function addAvatarButton() {
+            const personaControls = document.querySelector('.persona-controls');
+            if (personaControls && !document.getElementById('avatarBtn')) {
+                const avatarBtn = document.createElement('button');
+                avatarBtn.id = 'avatarBtn';
+                avatarBtn.className = 'character-btn';
+                avatarBtn.onclick = openAvatarPanel;
+                avatarBtn.title = 'Customize Avatar';
+                avatarBtn.innerHTML = '<i class="fas fa-user-circle"></i> Avatar';
+                personaControls.appendChild(avatarBtn);
+            }
+        }
+
         // Initialize the interface when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             window.tecInterface = new TECEnhancedInterface();
             // Load memory stats after initialization
             setTimeout(() => {
                 window.tecInterface.loadMemoryStats();
+                addAvatarButton();
+                loadCurrentAvatar();
             }, 1000);
         });
     </script>

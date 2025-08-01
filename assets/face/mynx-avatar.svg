@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mynxGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0891b2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="100" fill="url(#mynxGradient)"/>
+  <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <circle cx="80" cy="85" r="5" fill="white"/>
+  <circle cx="120" cy="85" r="5" fill="white"/>
+  <path d="M80 125 Q100 135 120 125" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <text x="100" y="40" text-anchor="middle" fill="white" font-family="monospace" font-size="14" font-weight="bold">MYNX</text>
+  <text x="100" y="55" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="10">Tech Mystic</text>
+  <!-- Tech elements -->
+  <rect x="70" y="70" width="8" height="8" fill="rgba(255,255,255,0.4)" rx="1"/>
+  <rect x="122" y="70" width="8" height="8" fill="rgba(255,255,255,0.4)" rx="1"/>
+  <rect x="50" y="50" width="6" height="6" fill="rgba(255,255,255,0.3)" rx="1"/>
+  <rect x="144" y="50" width="6" height="6" fill="rgba(255,255,255,0.3)" rx="1"/>
+  <rect x="50" y="144" width="6" height="6" fill="rgba(255,255,255,0.3)" rx="1"/>
+  <rect x="144" y="144" width="6" height="6" fill="rgba(255,255,255,0.3)" rx="1"/>
+  <!-- Circuit lines -->
+  <path d="M70 100 L80 100 L80 110 L90 110" stroke="rgba(255,255,255,0.4)" stroke-width="2" fill="none"/>
+  <path d="M130 100 L120 100 L120 110 L110 110" stroke="rgba(255,255,255,0.4)" stroke-width="2" fill="none"/>
+</svg>
